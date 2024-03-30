@@ -7,7 +7,6 @@
 #include <GxEPD2_BW.h>
 #include <Fonts/FreeMonoBold9pt7b.h>
 
-
 //////// pins used on board
 #define DATA_OUT GPIO_NUM_23        // SPI MOSI pin, used designed pin for this on esp
 #define CLK GPIO_NUM_18             // SPI SCK pin, used designed pin for this on esp
@@ -24,7 +23,7 @@
 #define DISPLAY_HEIGHT 200       
 
 #define DIGIT_ONE_SHIFT 8
-#define WHOLE_NUMBER_ADJUSTMENT (DIGIT_ONE_SHIFT / 3 * 2)
+#define WHOLE_NUMBER_ADJUSTMENT (DIGIT_ONE_SHIFT + 5)
 
 // generic defines
 #define BLACK 0
@@ -97,6 +96,6 @@ void addNumberCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], in
 ///     (immage that is going to be displayed on the screen)
 ///
 /// @param p_immageBuffer the immage 
-void clearDisplay(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT]);
+void clearImmage(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT]);
 
 #endif

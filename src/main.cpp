@@ -6,6 +6,9 @@
 // my include files
 #include <displayTask.h>
 
+// pins
+#define HALL_SENSOR_PIN GPIO_NUM_39
+
 // lowest priority, no reason to have special priority all the time
 #define DEFAULT_TASK_PRIORITY tskIDLE_PRIORITY
 #define DEFAULT_TASK_STACK_SIZE 2048
@@ -15,8 +18,13 @@
 #define MS_TO_SECONDS 1000
 #define SEND_DATA_DELAY_TICKS 0
 #define IMMAGE_REPRINT_MS 50
-// #define FULL_EPAPER_REFRESH_PERIOD_MS (180 * MS_TO_SECONDS)
-#define FULL_EPAPER_REFRESH_PERIOD_MS (20 * MS_TO_SECONDS)
+#define FULL_EPAPER_REFRESH_PERIOD_MS (180 * MS_TO_SECONDS)
+// #define FULL_EPAPER_REFRESH_PERIOD_MS (20 * MS_TO_SECONDS)
+
+//////////////////////// Speed coomputing related
+// #define PI 3.1415
+#define WHEEL_DIAMETER_MM 700L
+#define WHEEL_PERIMETER_MM (WHEEL_DIAMETER_MM * PI)
 
 GxEPD2_BW<GxEPD2_150_BN, GxEPD2_150_BN::HEIGHT> g_display(GxEPD2_150_BN(/*CS=D8*/ CHIP_SELECT, /*DC=D3*/ DATA_COMMAND, /*RST=D4*/ RST, /*BUSY=D2*/ BUSY)); // DEPG0150BN 200x200, SSD1681, TTGO T5 V2.4.1
 
@@ -35,17 +43,28 @@ void initPins()
     pinMode(BUSY, INPUT);
     pinMode(DATA_OUT, OUTPUT);
     pinMode(CLK, OUTPUT);
+
+    // sensors:
+    pinMode(HALL_SENSOR_PIN, INPUT);
+    // digitalWrite(HALL_SENSOR_PIN, HIGH); // activate internal pullup resistor
 }
 
 // desired workflow:
 //      * wait for message from sensor reading task,
 //      * display received number 
 //      * repeat
+
+// important details:
+//      only update once per new speed value
+//      if received speed is the same as the current speed don't update
+//      after full refresh update continuously for 10 seconds or so "to warm" up pixels 
+//      check bounds when printing anything to the screen
+//      write rescale funtion to print the number as big or as small as you want
 void displayManagement(void *args)
 {    
     resetPanel();
     g_display.init(115200, true, 2, false);  //for Waveshare boards with 2ms reset pulse
-    clearDisplay(g_matrixToDisplay);
+    clearImmage(g_matrixToDisplay);
     g_display.setRotation(ORIENTATION_HORIZONTAL);
     g_display.clearScreen();
 
@@ -54,22 +73,25 @@ void displayManagement(void *args)
 
     while(true)
     {
-        int speedToPrint = 0;
+        int speedToPrint = previousReceivedSpeed;
         // wait for as long as possible to receive the speed to print
         xQueueReceive(g_communicationQueue, &speedToPrint, SEND_DATA_DELAY_TICKS);
-        Serial.println("Received message");
+        previousReceivedSpeed = speedToPrint;
+        // Serial.println("Received message");
 
         if(millis() - lastFullRefresh > FULL_EPAPER_REFRESH_PERIOD_MS)
         {
             lastFullRefresh = millis();
-            clearDisplay(g_matrixToDisplay);
+            clearImmage(g_matrixToDisplay);
             addNumberCentered(g_matrixToDisplay, speedToPrint);    
             displayImmage(g_matrixToDisplay, false);
-            g_display.clearScreen();
+         
+            clearImmage(g_matrixToDisplay);
+            displayImmage(g_matrixToDisplay, false);
         }
         else
         {        
-            clearDisplay(g_matrixToDisplay);
+            clearImmage(g_matrixToDisplay);
             addNumberCentered(g_matrixToDisplay, speedToPrint);    
             displayImmage(g_matrixToDisplay, true);
 
@@ -78,8 +100,19 @@ void displayManagement(void *args)
             // delay(IMMAGE_REPRINT_MS);
             // displayImmage(g_matrixToDisplay, true);
         }
-        taskYIELD();
     }
+}
+
+#define MM_TO_KM 1000000UL
+#define MICROS_TO_SECONDS 1000000UL
+#define SECONDS_TO_HOURS 3600UL
+
+
+int getSpeedKmPerH(int64_t p_lastWheelDetectionTime)
+{
+    int64_t fullSpinDurationMicros = esp_timer_get_time() - p_lastWheelDetectionTime;
+
+    return (WHEEL_PERIMETER_MM * SECONDS_TO_HOURS / fullSpinDurationMicros);
 }
 
 void measurementTask(void *args)
@@ -87,6 +120,10 @@ void measurementTask(void *args)
     unsigned long lastMeasure = 0;
     const int reMeasureMillis = 4000;
     int speed = 0;
+    bool hallHasSwitched = false;
+
+    int64_t lastWheelDetectionTime = 0;
+    bool sendingLatestSpeed = true;
 
     while(true)
     {
@@ -94,19 +131,42 @@ void measurementTask(void *args)
         {
             lastMeasure = millis();
             //send command to the task
-            xQueueSend(g_communicationQueue, &speed, SEND_DATA_DELAY_TICKS);
-            Serial.println("Sent message");
 
-            speed ++;
+            if(sendingLatestSpeed)
+            {
+                xQueueSend(g_communicationQueue, &speed, SEND_DATA_DELAY_TICKS);
+            }
+            else
+            {
+                int approximatedSpeed = getSpeedKmPerH(lastWheelDetectionTime);
+                xQueueSend(g_communicationQueue, &approximatedSpeed, SEND_DATA_DELAY_TICKS);
+            }
+            // Serial.println("Sent message");
+            sendingLatestSpeed = false;
         }
-        // Serial.print("doing work...\n");
-        taskYIELD();
+
+        // the sensor is active low
+        bool detectedMagnet = !digitalRead(HALL_SENSOR_PIN);
+        if(detectedMagnet && hallHasSwitched)
+        {
+            speed = getSpeedKmPerH(lastWheelDetectionTime);
+            lastWheelDetectionTime = esp_timer_get_time();
+
+            sendingLatestSpeed = true;
+            hallHasSwitched = false;
+        }
+        if(!detectedMagnet)
+        {
+            hallHasSwitched = true;
+        }
+        // taskYIELD();
     }
 }
 
 void setup()
 {
     initPins();
+    Serial.begin(115200);
 
     g_communicationQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
     if(g_communicationQueue == NULL){
@@ -115,6 +175,7 @@ void setup()
 
     TaskHandle_t displayTaskHandle = NULL;
     xTaskCreate(displayManagement, "display", DEFAULT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, &displayTaskHandle); 
+    Serial.print("init started");
 
     TaskHandle_t measurementTaskHandle = NULL;
     xTaskCreate(measurementTask, "measurement", DEFAULT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, &measurementTaskHandle);

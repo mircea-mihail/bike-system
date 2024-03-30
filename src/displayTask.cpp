@@ -176,7 +176,7 @@ void addNumberCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], in
     }
 }
 
-void clearDisplay(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT])
+void clearImmage(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT])
 {
     for(int row = 0; row < DISPLAY_HEIGHT; row++)
     {
