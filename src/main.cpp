@@ -19,7 +19,9 @@
 #define SEND_DATA_DELAY_TICKS 0
 #define IMMAGE_REPRINT_MS 50
 #define FULL_EPAPER_REFRESH_PERIOD_MS (180 * MS_TO_SECONDS)
-// #define FULL_EPAPER_REFRESH_PERIOD_MS (20 * MS_TO_SECONDS)
+// after full refresh keep printing for a bit to warm up the display
+#define CONTINUOUS_PRINT_PERIOD_MS 15000 
+#define SEND_MEASUREMENTS_PERIOD 2000
 
 //////////////////////// Speed coomputing related
 // #define PI 3.1415
@@ -49,15 +51,34 @@ void initPins()
     // digitalWrite(HALL_SENSOR_PIN, HIGH); // activate internal pullup resistor
 }
 
+void doNormalRefreshSequence(unsigned long p_lastFullRefresh, int p_speedToPrint, int p_previousReceivedSpeed)
+{
+    if(millis() - p_lastFullRefresh < CONTINUOUS_PRINT_PERIOD_MS)
+    {
+        clearImmage(g_matrixToDisplay);
+        addNumberCentered(g_matrixToDisplay, p_speedToPrint);    
+        displayImmage(g_matrixToDisplay, true);
+    }
+    else
+    {
+        if(p_previousReceivedSpeed != p_speedToPrint)
+        {
+            clearImmage(g_matrixToDisplay);
+            addNumberCentered(g_matrixToDisplay, p_speedToPrint);    
+            displayImmage(g_matrixToDisplay, true);
+        }
+    }
+}
+
 // desired workflow:
 //      * wait for message from sensor reading task,
 //      * display received number 
 //      * repeat
 
 // important details:
-//      only update once per new speed value
-//      if received speed is the same as the current speed don't update
-//      after full refresh update continuously for 10 seconds or so "to warm" up pixels 
+//      * only update once per new speed value
+//      * if received speed is the same as the current speed don't update
+//      * after full refresh update continuously for some seconds or so "to warm" up pixels 
 //      check bounds when printing anything to the screen
 //      write rescale funtion to print the number as big or as small as you want
 void displayManagement(void *args)
@@ -76,9 +97,9 @@ void displayManagement(void *args)
         int speedToPrint = previousReceivedSpeed;
         // wait for as long as possible to receive the speed to print
         xQueueReceive(g_communicationQueue, &speedToPrint, SEND_DATA_DELAY_TICKS);
-        previousReceivedSpeed = speedToPrint;
         // Serial.println("Received message");
 
+        // needs a full refresh
         if(millis() - lastFullRefresh > FULL_EPAPER_REFRESH_PERIOD_MS)
         {
             lastFullRefresh = millis();
@@ -89,17 +110,13 @@ void displayManagement(void *args)
             clearImmage(g_matrixToDisplay);
             displayImmage(g_matrixToDisplay, false);
         }
+        // average refresh
         else
         {        
-            clearImmage(g_matrixToDisplay);
-            addNumberCentered(g_matrixToDisplay, speedToPrint);    
-            displayImmage(g_matrixToDisplay, true);
-
-            // delay(IMMAGE_REPRINT_MS);
-            // displayImmage(g_matrixToDisplay, true);
-            // delay(IMMAGE_REPRINT_MS);
-            // displayImmage(g_matrixToDisplay, true);
+            doNormalRefreshSequence(lastFullRefresh, speedToPrint, previousReceivedSpeed);
         }
+
+        previousReceivedSpeed = speedToPrint;
     }
 }
 
@@ -118,7 +135,6 @@ int getSpeedKmPerH(int64_t p_lastWheelDetectionTime)
 void measurementTask(void *args)
 {
     unsigned long lastMeasure = 0;
-    const int reMeasureMillis = 4000;
     int speed = 0;
     bool hallHasSwitched = false;
 
@@ -127,7 +143,7 @@ void measurementTask(void *args)
 
     while(true)
     {
-        if(millis() - lastMeasure > reMeasureMillis)
+        if(millis() - lastMeasure > SEND_MEASUREMENTS_PERIOD)
         {
             lastMeasure = millis();
             //send command to the task

@@ -120,6 +120,34 @@ int getOneOffsetValue(int p_number, int p_digitsInNumber)
     return offset;
 }
 
+void pullWithinOXBounds(int &p_xScreenPos)
+{
+    if(p_xScreenPos < 0) p_xScreenPos = 0;
+    if(p_xScreenPos > DISPLAY_WIDTH) p_xScreenPos = DISPLAY_WIDTH;
+}
+
+void pullWithinOYBounds(int &p_yScreenPos)
+{
+    if(p_yScreenPos < 0) p_yScreenPos = 0;
+    if(p_yScreenPos > DISPLAY_HEIGHT) p_yScreenPos = DISPLAY_HEIGHT;
+}
+
+bool isWithinOXBounds(int &p_xScreenPos)
+{
+    if(p_xScreenPos < 0) return false;
+    if(p_xScreenPos > DISPLAY_WIDTH) return false;
+    
+    return true;
+}
+
+bool isWithinOYBounds(int &p_yScreenPos)
+{
+    if(p_yScreenPos < 0) return false;
+    if(p_yScreenPos > DISPLAY_HEIGHT) return false;
+
+    return true;
+}
+
 void addNumberCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], int p_numberToWrite)
 {   
     int digitsToWrite = getNumberOfDigits(p_numberToWrite);
