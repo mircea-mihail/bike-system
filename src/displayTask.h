@@ -90,12 +90,21 @@ int getOneOffsetValue(int p_number, int p_digitsInNumber);
 ///
 /// @param p_immageBuffer the immage buffer to print the numbers on 
 /// @param p_numberToWrite the number to be converted from int to saved font
-void addNumberCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], int p_numberToWrite);
+void addNumberCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], int p_numberToWrite, int p_OxImmageOffset = 0, int p_OyImmageOffset = 0);
 
 /// @brief sets everythin in the immage buffer to white (1)
 ///     (immage that is going to be displayed on the screen)
 ///
 /// @param p_immageBuffer the immage 
 void clearImmage(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT]);
+
+/// @brief returns true if the value is higher than the lower bound, it included, 
+///     and lower than the upper bound, excluding it
+///
+/// @param p_value the value to check for 
+/// @param p_lowerBound the lower bound value
+/// @param p_upperBound the upper bound value
+/// @return 
+bool checkValueWithinBounds(int p_value, int p_lowerBound, int p_upperBound);
 
 #endif

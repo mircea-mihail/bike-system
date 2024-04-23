@@ -148,15 +148,21 @@ bool isWithinOYBounds(int &p_yScreenPos)
     return true;
 }
 
-void addNumberCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], int p_numberToWrite)
+bool checkValueWithinBounds(int p_value, int p_lowerBound, int p_upperBound)
+{
+    if(p_value < p_lowerBound || p_value >= p_upperBound)
+    {
+        return false;
+    }
+    return true;
+}
+
+void addNumberCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], int p_numberToWrite, int p_OxImmageOffset, int p_OyImmageOffset)
 {   
     int digitsToWrite = getNumberOfDigits(p_numberToWrite);
     
     int xStartPos = (DISPLAY_WIDTH - digitsToWrite * FONT_IMAGE_WIDTH) / 2; // to center horisontally
     int yStartPos = (DISPLAY_HEIGHT - FONT_IMAGE_HEIGHT) / 2;
-
-    // offset the whole number for recentering after "one" adjustment
-    int wholeNumberOffset = getOneOffsetValue(p_numberToWrite, digitsToWrite);
 
     // clear previous immage
     for(int digitIdx = 0; digitIdx < digitsToWrite; digitIdx ++)
@@ -180,24 +186,14 @@ void addNumberCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], in
         for(int row = yStartPos; row < yStartPos + FONT_IMAGE_HEIGHT; row++)
         {
             for(int col = xStartPos + FONT_IMAGE_WIDTH *(digitsToWrite - digitIdx - 1); col < xStartPos + FONT_IMAGE_WIDTH * (digitsToWrite - digitIdx - 1) + FONT_IMAGE_WIDTH; col ++)
-            {
-                int digitOffset = 0;           // used to mitigate the one being too far from the other digits
-
-                if(digit == 1 && digitIdx == digitsToWrite - 1)
-                {
-                    digitOffset += DIGIT_ONE_SHIFT;
-                }
-                if(digit == 1 && digitIdx == 0)
-                {
-                    digitOffset -= DIGIT_ONE_SHIFT;
-                }
-                
+            {                
                 uint8_t pixelToWrite = pgm_read_byte(&g_digitVector[digit][row-yStartPos][col-xStartPos]);
-                if(pixelToWrite == BLACK)
-                {
-                    p_immageBuffer[row][col + digitOffset + wholeNumberOffset] = pixelToWrite;
 
-                }                
+                if(checkValueWithinBounds(row + p_OyImmageOffset, 0, DISPLAY_HEIGHT)  
+                    && checkValueWithinBounds(col + p_OxImmageOffset, 0, DISPLAY_WIDTH))
+                {
+                    p_immageBuffer[row + p_OyImmageOffset][col + p_OxImmageOffset] = pixelToWrite;
+                }
             }
         }
         p_numberToWrite /= 10;
