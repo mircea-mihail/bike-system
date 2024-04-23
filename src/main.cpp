@@ -152,18 +152,21 @@ void measurementTask(void *args)
         if(millis() - lastMeasure > SEND_MEASUREMENTS_PERIOD)
         {
             lastMeasure = millis();
-            //send command to the task
+            unsigned portBASE_TYPE queueLength = uxQueueMessagesWaiting(g_communicationQueue);
 
-            if(sendingLatestSpeed)
+            if(queueLength == 0)
             {
-                xQueueSend(g_communicationQueue, &speed, SEND_DATA_DELAY_TICKS);
+                if(sendingLatestSpeed)
+                {
+                    xQueueSend(g_communicationQueue, &speed, SEND_DATA_DELAY_TICKS);
+                }
+                else
+                {
+                    int approximatedSpeed = getSpeedKmPerH(lastWheelDetectionTime);
+                    xQueueSend(g_communicationQueue, &approximatedSpeed, SEND_DATA_DELAY_TICKS);
+                }
             }
-            else
-            {
-                int approximatedSpeed = getSpeedKmPerH(lastWheelDetectionTime);
-                xQueueSend(g_communicationQueue, &approximatedSpeed, SEND_DATA_DELAY_TICKS);
-            }
-            // Serial.println("Sent message");
+            
             sendingLatestSpeed = false;
         }
 
