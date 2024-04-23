@@ -157,37 +157,38 @@ bool checkValueWithinBounds(int p_value, int p_lowerBound, int p_upperBound)
     return true;
 }
 
-void addNumberCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], int p_numberToWrite, int p_OxImmageOffset, int p_OyImmageOffset)
+bool getScaledImmagePixel(float p_scale, int p_currentOxPixelPos, int p_currentOyPixelPos)
+{   
+    int newImmageHeight = p_scale * FONT_IMAGE_HEIGHT;
+    int newImmageWidth = p_scale * FONT_IMAGE_WIDTH;
+    int currentOxPx = p_currentOxPixelPos/p_scale;
+
+}
+
+// add scale function
+// add function that displays number with one or two presision decimals
+void addNumberCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], int p_numberToWrite, int p_OxImmageOffset, int p_OyImmageOffset, float p_scale)
 {   
     int digitsToWrite = getNumberOfDigits(p_numberToWrite);
     
-    int xStartPos = (DISPLAY_WIDTH - digitsToWrite * FONT_IMAGE_WIDTH) / 2; // to center horisontally
-    int yStartPos = (DISPLAY_HEIGHT - FONT_IMAGE_HEIGHT) / 2;
-
-    // clear previous immage
-    for(int digitIdx = 0; digitIdx < digitsToWrite; digitIdx ++)
-    {
-        int digit = p_numberToWrite % 10;
-
-        for(int row = yStartPos; row < yStartPos + FONT_IMAGE_HEIGHT; row++)
-        {
-            for(int col = xStartPos + FONT_IMAGE_WIDTH *(digitsToWrite - digitIdx - 1); col < xStartPos + FONT_IMAGE_WIDTH * (digitsToWrite - digitIdx - 1) + FONT_IMAGE_WIDTH; col ++)
-            {
-                p_immageBuffer[row][col] = WHITE; 
-            }
-        }
-    }
+    int xStartPos = (DISPLAY_WIDTH - digitsToWrite * FONT_IMAGE_WIDTH * p_scale) / 2; // to center horisontally
+    int yStartPos = (DISPLAY_HEIGHT - FONT_IMAGE_HEIGHT * p_scale) / 2;
 
     // takes around 0.8 microseconds to read one digit from flash
     for(int digitIdx = 0; digitIdx < digitsToWrite; digitIdx ++)
     {
         int digit = p_numberToWrite % 10;
 
-        for(int row = yStartPos; row < yStartPos + FONT_IMAGE_HEIGHT; row++)
+        for(int row = yStartPos; row < yStartPos + FONT_IMAGE_HEIGHT * p_scale; row++)
         {
-            for(int col = xStartPos + FONT_IMAGE_WIDTH *(digitsToWrite - digitIdx - 1); col < xStartPos + FONT_IMAGE_WIDTH * (digitsToWrite - digitIdx - 1) + FONT_IMAGE_WIDTH; col ++)
-            {                
-                uint8_t pixelToWrite = pgm_read_byte(&g_digitVector[digit][row-yStartPos][col-xStartPos]);
+            int startColIdx = xStartPos + FONT_IMAGE_WIDTH * p_scale * (digitsToWrite - digitIdx - 1);
+            int stopColIdx = xStartPos + FONT_IMAGE_WIDTH * p_scale * (digitsToWrite - digitIdx - 1) + FONT_IMAGE_WIDTH * p_scale;
+            for(int col = startColIdx; col < stopColIdx; col ++)
+            {      
+                uint8_t pixelToWrite;
+
+                pixelToWrite = pgm_read_byte(&g_digitVector[digit][int((row-yStartPos)/p_scale)][int((col-xStartPos)/p_scale)]);
+                
 
                 if(checkValueWithinBounds(row + p_OyImmageOffset, 0, DISPLAY_HEIGHT)  
                     && checkValueWithinBounds(col + p_OxImmageOffset, 0, DISPLAY_WIDTH))

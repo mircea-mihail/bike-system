@@ -90,7 +90,7 @@ int getOneOffsetValue(int p_number, int p_digitsInNumber);
 ///
 /// @param p_immageBuffer the immage buffer to print the numbers on 
 /// @param p_numberToWrite the number to be converted from int to saved font
-void addNumberCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], int p_numberToWrite, int p_OxImmageOffset = 0, int p_OyImmageOffset = 0);
+void addNumberCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], int p_numberToWrite, int p_OxImmageOffset = 0, int p_OyImmageOffset = 0, float p_scale = 1);
 
 /// @brief sets everythin in the immage buffer to white (1)
 ///     (immage that is going to be displayed on the screen)
