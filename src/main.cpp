@@ -25,8 +25,11 @@
 
 //////////////////////// Speed coomputing related
 // #define PI 3.1415
-#define WHEEL_DIAMETER_MM 700L
+#define WHEEL_DIAMETER_MM 700UL
 #define WHEEL_PERIMETER_MM (WHEEL_DIAMETER_MM * PI)
+
+//////////////////////// Immage related
+#define NUMBER_OX_OFFSET 20
 
 GxEPD2_BW<GxEPD2_150_BN, GxEPD2_150_BN::HEIGHT> g_display(GxEPD2_150_BN(/*CS=D8*/ CHIP_SELECT, /*DC=D3*/ DATA_COMMAND, /*RST=D4*/ RST, /*BUSY=D2*/ BUSY)); // DEPG0150BN 200x200, SSD1681, TTGO T5 V2.4.1
 
@@ -47,26 +50,17 @@ void initPins()
     pinMode(CLK, OUTPUT);
 
     // sensors:
-    pinMode(HALL_SENSOR_PIN, INPUT);
+    pinMode(HALL_SENSOR_PIN, INPUT_PULLDOWN);
     // digitalWrite(HALL_SENSOR_PIN, HIGH); // activate internal pullup resistor
 }
 
 void doNormalRefreshSequence(unsigned long p_lastFullRefresh, int p_speedToPrint, int p_previousReceivedSpeed)
 {
-    if(millis() - p_lastFullRefresh < CONTINUOUS_PRINT_PERIOD_MS)
+    if(millis() - p_lastFullRefresh < CONTINUOUS_PRINT_PERIOD_MS || p_previousReceivedSpeed != p_speedToPrint)
     {
         clearImmage(g_matrixToDisplay);
         addNumberCentered(g_matrixToDisplay, p_speedToPrint);    
         displayImmage(g_matrixToDisplay, true);
-    }
-    else
-    {
-        if(p_previousReceivedSpeed != p_speedToPrint)
-        {
-            clearImmage(g_matrixToDisplay);
-            addNumberCentered(g_matrixToDisplay, p_speedToPrint);    
-            displayImmage(g_matrixToDisplay, true);
-        }
     }
 }
 
@@ -121,15 +115,27 @@ void displayManagement(void *args)
 }
 
 #define MM_TO_KM 1000000UL
+#define MILLIS_TO_MICROS 1000UL
 #define MICROS_TO_SECONDS 1000000UL
 #define SECONDS_TO_HOURS 3600UL
+#define DEBOUNCE_PERIOD_MS 50UL
 
 
 int getSpeedKmPerH(int64_t p_lastWheelDetectionTime)
 {
     int64_t fullSpinDurationMicros = esp_timer_get_time() - p_lastWheelDetectionTime;
+    int64_t computedSpeed = (WHEEL_PERIMETER_MM * SECONDS_TO_HOURS / fullSpinDurationMicros);
+    return computedSpeed > 100 ? 99 : computedSpeed;
+}
 
-    return (WHEEL_PERIMETER_MM * SECONDS_TO_HOURS / fullSpinDurationMicros);
+bool debounceActiveLowSenor(int64_t p_lastSensorDetectionTime, const int p_sensorPin)
+{
+    bool detectedActivity = !digitalRead(p_sensorPin);
+    if(esp_timer_get_time() - p_lastSensorDetectionTime < (DEBOUNCE_PERIOD_MS * MILLIS_TO_MICROS))
+    {
+        return HIGH; // active low, return HIGH when innactive
+    }
+    return detectedActivity;
 }
 
 void measurementTask(void *args)
@@ -162,7 +168,7 @@ void measurementTask(void *args)
         }
 
         // the sensor is active low
-        bool detectedMagnet = !digitalRead(HALL_SENSOR_PIN);
+        bool detectedMagnet = debounceActiveLowSenor(lastWheelDetectionTime, HALL_SENSOR_PIN);
         if(detectedMagnet && hallHasSwitched)
         {
             speed = getSpeedKmPerH(lastWheelDetectionTime);
