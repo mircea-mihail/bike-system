@@ -157,14 +157,6 @@ bool checkValueWithinBounds(int p_value, int p_lowerBound, int p_upperBound)
     return true;
 }
 
-bool getScaledImmagePixel(float p_scale, int p_currentOxPixelPos, int p_currentOyPixelPos)
-{   
-    int newImmageHeight = p_scale * FONT_IMAGE_HEIGHT;
-    int newImmageWidth = p_scale * FONT_IMAGE_WIDTH;
-    int currentOxPx = p_currentOxPixelPos/p_scale;
-
-}
-
 // add scale function
 // add function that displays number with one or two presision decimals
 void addNumberCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], int p_numberToWrite, int p_OxImmageOffset, int p_OyImmageOffset, float p_scale)
