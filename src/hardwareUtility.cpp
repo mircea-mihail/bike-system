@@ -69,3 +69,33 @@ bool HardwareUtility::pressedMenuButton()
     
     return false;
 }
+
+bool HardwareUtility::pressedSubmenuButton()
+{
+    unsigned long time = millis();
+    int state = digitalRead(CHANGE_SUBMENU_PIN);
+
+    // if the button has a constant state
+    if(state == m_submenuButton.m_prevState)
+    {
+        // if the constant state has been kept for a while
+        if(time - m_submenuButton.m_prevTime > BUTTON_DEBOUNCE_PERIOD_MS && m_submenuButton.m_prevCountedState != state)
+        {
+            m_submenuButton.m_prevCountedState = state;
+
+            if(state == HIGH)
+            {
+                m_submenuButton.m_prevState = state;
+                return true;
+            }
+        }
+    }
+    else
+    {
+        m_submenuButton.m_prevTime = time;
+    }
+
+    m_submenuButton.m_prevState = state;
+    
+    return false;
+}

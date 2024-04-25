@@ -36,6 +36,7 @@ public:
 
     bool pressedMenuButton();
 
+    bool pressedSubmenuButton();
 };
 
 
