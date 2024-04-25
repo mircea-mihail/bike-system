@@ -1,0 +1,22 @@
+#ifndef GENERAL_UTILITY_H
+#define GENERAL_UTILITY_H
+
+
+// convenient conversions
+#define MM_TO_KM 1000000UL
+#define MILLIS_TO_MICROS 1000UL
+#define MICROS_TO_SECONDS 1000000UL
+#define SECONDS_TO_HOURS 3600UL
+
+// hardware debounce timings
+#define SENSOR_DEBOUNCE_PERIOD_MS 50UL
+#define BUTTON_DEBOUNCE_PERIOD_MS 30UL
+
+/////////////////////////////// pins
+// input pins
+#define HALL_SENSOR_PIN GPIO_NUM_39
+#define CHANGE_SUBMENU_PIN GPIO_NUM_39
+
+
+
+#endif
