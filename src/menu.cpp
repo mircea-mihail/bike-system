@@ -24,7 +24,6 @@ void Menu::getImmage(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT])
 
                 case BothCombined: 
                     clearImmage(p_matrixToDisplay);
-                    addNumberCentered(p_matrixToDisplay, 70);
                     addNumberCentered(p_matrixToDisplay, m_currentVelocity, 0, 50, 0.7);
                     addNumberCentered(p_matrixToDisplay, m_averageTripVelocity, 0, -50, 0.7);
                     break;
