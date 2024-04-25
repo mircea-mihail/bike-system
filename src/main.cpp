@@ -7,7 +7,7 @@
 #include "displayTask.h"
 #include "menu.h"
 #include "bikeCalc.h"
-#include "HardwareUtility.h"
+#include "hardwareUtility.h"
 
 // waveshare E-Paper display config
 #define SERIAL_BITRATE 115200
@@ -146,6 +146,8 @@ void measurementTask(void *args)
 
             sendingLatestSpeed = true;
         }
+
+        // menu.nextSubmenuState(hwUtil.pressedMenuButton());
         // taskYIELD();
     }
 }
