@@ -45,7 +45,7 @@ public:
 
     void nextMenuState(bool p_shouldChangeState);
     
-    void nextSubmenuState(bool p_shouldChangeState);
+    void nextSubmenuState();
 
 };
 

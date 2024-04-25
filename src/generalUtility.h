@@ -15,8 +15,9 @@
 /////////////////////////////// pins
 // input pins
 #define HALL_SENSOR_PIN GPIO_NUM_39
-#define CHANGE_SUBMENU_PIN GPIO_NUM_39
+#define CHANGE_SUBMENU_PIN GPIO_NUM_36
 
+#define CHANGE_MENU_PIN GPIO_NUM_34
 
 
 #endif

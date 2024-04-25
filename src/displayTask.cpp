@@ -39,7 +39,7 @@ void displayImmage(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], bool p
                     g_display.drawPixel(row, col, g_matrixToDisplay[row][col]);
                 }
             }
-        }while(g_display.nextPage());
+        } while(g_display.nextPage());
     }  
 }
 

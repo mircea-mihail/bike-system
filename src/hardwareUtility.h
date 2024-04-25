@@ -28,14 +28,13 @@ private:
     button m_menuButton;
     button m_submenuButton;
 
-    unsigned long m_lastJoystickSound = 0;
-
 public:
     // bool debounceActiveLowSenor(int64_t p_lastSensorDetectionTime, const int p_sensorPin);
     bool detectedSensor();
 
     bool pressedMenuButton();
 
+    // not sure why button spamming does not really work? Not a big deal atm
     bool pressedSubmenuButton();
 };
 

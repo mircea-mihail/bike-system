@@ -43,7 +43,7 @@ bool HardwareUtility::detectedSensor()
 bool HardwareUtility::pressedMenuButton()
 {
     unsigned long time = millis();
-    int state = digitalRead(CHANGE_SUBMENU_PIN);
+    int state = digitalRead(CHANGE_MENU_PIN);
 
     // if the button has a constant state
     if(state == m_menuButton.m_prevState)

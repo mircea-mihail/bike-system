@@ -23,9 +23,10 @@ void Menu::getImmage(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT])
                     break;
 
                 case BothCombined: 
-                    // clearImmage(p_matrixToDisplay);
-                    // addNumberCentered(p_matrixToDisplay, m_currentVelocity, 0, 50, 0.6);
-                    // addNumberCentered(p_matrixToDisplay, m_averageTripVelocity, 0, 50, 0.6);
+                    clearImmage(p_matrixToDisplay);
+                    addNumberCentered(p_matrixToDisplay, 70);
+                    addNumberCentered(p_matrixToDisplay, m_currentVelocity, 0, 50, 0.7);
+                    addNumberCentered(p_matrixToDisplay, m_averageTripVelocity, 0, -50, 0.7);
                     break;
 
                 default:
@@ -61,26 +62,25 @@ void Menu::nextMenuState(bool p_shouldChangeState)
     }
 }
 
-void Menu::nextSubmenuState(bool p_shouldChangeState)
+void Menu::nextSubmenuState()
 {
-    if(p_shouldChangeState)
+    // Serial.print("current submenu: ");
+    // Serial.println(m_submenuState);
+    switch(m_submenuState)
     {
-        switch(m_submenuState)
-        {
-            case Instant:
-                m_submenuState = TripAvg;
-                break;
+        case Instant:
+            m_submenuState = TripAvg;
+            break;
 
-            case TripAvg:
-                m_submenuState = BothCombined;
-                break;
-                
-            case BothCombined:
-                m_submenuState = Instant;
-                break;
+        case TripAvg:
+            m_submenuState = BothCombined;
+            break;
             
-            default:
-                break;
-        }
+        case BothCombined:
+            m_submenuState = Instant;
+            break;
+        
+        default:
+            break;
     }
 }

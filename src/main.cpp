@@ -147,7 +147,10 @@ void measurementTask(void *args)
             sendingLatestSpeed = true;
         }
 
-        // menu.nextSubmenuState(hwUtil.pressedMenuButton());
+        if(hwUtil.pressedSubmenuButton())
+        {
+            menu.nextSubmenuState();
+        }
         // taskYIELD();
     }
 }
