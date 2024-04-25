@@ -31,6 +31,7 @@ private:
 
     // relevant information regarding to things that need to be displayed
     uint8_t m_currentVelocity = 0;
+    uint8_t m_averageTripVelocity = 0;
 
     void enterSpeedSubmenu();
 
@@ -41,6 +42,11 @@ public:
     void getImmage(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT]);
     
     void update(uint8_t p_currentVelocity);
+
+    void nextMenuState(bool p_shouldChangeState);
+    
+    void nextSubmenuState(bool p_shouldChangeState);
+
 };
 
 #endif
