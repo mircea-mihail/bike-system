@@ -1,6 +1,8 @@
 #ifndef DISPLAY_TASK_H
 #define DISPLAY_TASK_H
 
+// utility header for easy matrix and display opperations
+
 #include <Arduino.h>
 #include "numbersFont.h"
 
