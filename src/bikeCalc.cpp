@@ -1,29 +1,36 @@
 #include "bikeCalc.h"
 
 
-int8_t BikeCalc::recordVelocity(int64_t p_lastWheelDetectionTime)
+TripData BikeCalc::recordDetection(int64_t p_lastWheelDetectionTime)
 {        
     int64_t fullSpinDurationMicros = esp_timer_get_time() - p_lastWheelDetectionTime;
-    m_currentVelocity = (WHEEL_PERIMETER_MM * SECONDS_TO_HOURS / (double)fullSpinDurationMicros);
-    
+    data.m_currentVelocity = (WHEEL_PERIMETER_MM * SECONDS_TO_HOURS / (double)fullSpinDurationMicros);
+    TripData dataToSend = data;
+
     // ignore reading, most likely fake
-    if(m_currentVelocity > 100)
+    if(data.m_currentVelocity > 100)
     {
-        return 99;
+        dataToSend.m_currentVelocity = 99;
+        return dataToSend;
     }
-    m_magnetDetections ++;
+    data.m_magnetDetections ++;
 
-    uint32_t distanceInKm = m_magnetDetections * WHEEL_PERIMETER_MM * SECONDS_TO_HOURS;
-    double timeInH = (esp_timer_get_time() - m_rideStart) / MICROS_TO_SECONDS / SECONDS_TO_HOURS;
-    m_tripAvgVelocity = distanceInKm / timeInH;
+    uint32_t distanceInKm = data.m_magnetDetections * WHEEL_PERIMETER_MM * SECONDS_TO_HOURS;
+    double timeInH = (esp_timer_get_time() - data.m_rideStart) / MICROS_TO_SECONDS / SECONDS_TO_HOURS;
+    data.m_tripAvgVelocity = distanceInKm / timeInH;
 
-    return m_currentVelocity;
+    return dataToSend;
 }
 
 
-int8_t BikeCalc::approximateVelocity(int64_t p_lastWheelDetectionTime)
+TripData BikeCalc::approximateVelocity(int64_t p_lastWheelDetectionTime)
 {        
+    TripData dataToSend = data;
     int64_t fullSpinDurationMicros = esp_timer_get_time() - p_lastWheelDetectionTime;
     uint8_t approximatedVelocity = (WHEEL_PERIMETER_MM * SECONDS_TO_HOURS / (double)fullSpinDurationMicros);
-    return approximatedVelocity > 100 ? 99 : approximatedVelocity;
+    
+    approximatedVelocity = approximatedVelocity > 100 ? 99 : approximatedVelocity;
+    dataToSend.m_currentVelocity = approximatedVelocity;
+
+    return dataToSend;
 }

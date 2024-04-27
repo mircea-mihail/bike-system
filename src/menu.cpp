@@ -1,10 +1,5 @@
 #include "menu.h"
 
-void Menu::enterSpeedSubmenu()
-{
-    
-}
-
 void Menu::getImmage(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT])
 {
     switch(m_mainMenuState)
@@ -14,18 +9,18 @@ void Menu::getImmage(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT])
             {
                 case Instant:
                     clearImmage(p_matrixToDisplay);
-                    addNumberCentered(p_matrixToDisplay, m_currentVelocity);
+                    addNumberCentered(p_matrixToDisplay, m_tripData.m_currentVelocity);
                     break;
 
                 case TripAvg:
                     clearImmage(p_matrixToDisplay);
-                    addNumberCentered(p_matrixToDisplay, m_averageTripVelocity);
+                    addNumberCentered(p_matrixToDisplay, m_tripData.m_tripAvgVelocity);
                     break;
 
                 case BothCombined: 
                     clearImmage(p_matrixToDisplay);
-                    addNumberCentered(p_matrixToDisplay, m_currentVelocity, 0, 50, 0.7);
-                    addNumberCentered(p_matrixToDisplay, m_averageTripVelocity, 0, -50, 0.7);
+                    addNumberCentered(p_matrixToDisplay, m_tripData.m_currentVelocity, 0, 50, 0.7);
+                    addNumberCentered(p_matrixToDisplay, m_tripData.m_tripAvgVelocity, 0, -50, 0.7);
                     break;
 
                 default:
@@ -41,9 +36,9 @@ void Menu::getImmage(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT])
     }
 }
 
-void Menu::update(uint8_t p_currentVelocity)
+void Menu::update(TripData p_tripData)
 {
-    m_currentVelocity = p_currentVelocity;
+    m_tripData = p_tripData;
 }
 
 void Menu::nextMenuState(bool p_shouldChangeState)

@@ -11,24 +11,20 @@
 class BikeCalc
 {
 private:
-    uint32_t m_magnetDetections;
-    uint64_t m_rideStart;
-
-    double m_currentVelocity;
-    double m_tripAvgVelocity;
-
+    TripData data;
+    
 public:
     BikeCalc()
     {
-        m_rideStart = esp_timer_get_time();
-        m_magnetDetections = 0;
-        m_currentVelocity = 0;
-        m_tripAvgVelocity = 0;
+        data.m_rideStart = esp_timer_get_time();
+        data.m_magnetDetections = 0;
+        data.m_currentVelocity = 0;
+        data.m_tripAvgVelocity = 0;
     }
 
-    int8_t recordVelocity(int64_t p_lastWheelDetectionTime);
+    TripData recordDetection(int64_t p_lastWheelDetectionTime);
 
-    int8_t approximateVelocity(int64_t p_lastWheelDetectionTime);
+    TripData approximateVelocity(int64_t p_lastWheelDetectionTime);
 };
 
 #endif

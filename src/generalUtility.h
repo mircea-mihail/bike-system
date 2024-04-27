@@ -20,7 +20,7 @@
 #define CHANGE_MENU_PIN GPIO_NUM_34
 
 // data packet to send to menu
-struct usefulCalcData
+struct TripData
 {
     uint32_t m_magnetDetections;
     uint64_t m_rideStart;

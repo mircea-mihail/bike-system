@@ -107,7 +107,7 @@ void displayManagement(void *args)
 void measurementTask(void *args)
 {
     unsigned long lastMeasure = 0;
-    uint8_t speed = 0;
+    TripData tripData;
     Menu menu;
     BikeCalc bikeCalc;
 
@@ -126,13 +126,13 @@ void measurementTask(void *args)
 
             if(sendingLatestSpeed)
             {
-                menu.update(speed);
+                menu.update(tripData);
                 xQueueSend(g_communicationQueue, &menu, SEND_DATA_DELAY_TICKS);
             }
             else
             {
-                int approximatedSpeed = bikeCalc.approximateVelocity(lastWheelDetectionTime);
-                menu.update(approximatedSpeed);
+                TripData estimatedData = bikeCalc.approximateVelocity(lastWheelDetectionTime);
+                menu.update(estimatedData);
                 xQueueSend(g_communicationQueue, &menu, SEND_DATA_DELAY_TICKS);
             }
             
@@ -141,7 +141,7 @@ void measurementTask(void *args)
 
         if(hwUtil.detectedSensor())
         {
-            speed = bikeCalc.recordVelocity(lastWheelDetectionTime);
+            tripData = bikeCalc.recordDetection(lastWheelDetectionTime);
             lastWheelDetectionTime = esp_timer_get_time();
 
             sendingLatestSpeed = true;
