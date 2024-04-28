@@ -21,7 +21,7 @@ void displayImmage(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], bool p
         {
             for(int col = 0; col < DISPLAY_HEIGHT; col += 1)
             {
-                g_display.drawPixel(row, col, g_matrixToDisplay[row][col]);
+                g_display.drawPixel(col, row, g_matrixToDisplay[row][col]);
             }
         }
 
@@ -36,7 +36,7 @@ void displayImmage(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], bool p
             {
                 for(int col = 0; col < DISPLAY_HEIGHT; col += 1)
                 {
-                    g_display.drawPixel(row, col, g_matrixToDisplay[row][col]);
+                    g_display.drawPixel(col, row, g_matrixToDisplay[row][col]);
                 }
             }
         } while(g_display.nextPage());
@@ -45,8 +45,8 @@ void displayImmage(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], bool p
 
 void displayBlackPixels(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], bool p_displayFast)
 {   
-    g_display.setFullWindow();
-    g_display.firstPage();
+    // g_display.setFullWindow();
+    // g_display.firstPage();
 
     if(p_displayFast)
     {
@@ -57,7 +57,7 @@ void displayBlackPixels(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], b
             {
                 if(g_matrixToDisplay[row][col] == BLACK)
                 {
-                    g_display.drawPixel(row, col, g_matrixToDisplay[row][col]);
+                    g_display.drawPixel(col, row, g_matrixToDisplay[row][col]);
                 }
             }
         }
@@ -75,7 +75,7 @@ void displayBlackPixels(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], b
                 {
                     if(g_matrixToDisplay[row][col] == BLACK)
                     {
-                        g_display.drawPixel(row, col, g_matrixToDisplay[row][col]);
+                        g_display.drawPixel(col, row, g_matrixToDisplay[row][col]);
                     }
                 }
             }
@@ -191,6 +191,35 @@ void addNumberCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], in
         }
         p_numberToWrite /= 10;
     }
+}
+
+// add scale function
+// add function that displays number with one or two presision decimals
+void addStampCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], int p_stampToWrite, int p_OxImmageOffset, int p_OyImmageOffset, float p_scale)
+{       
+    int xStartPos = (DISPLAY_WIDTH - STAMP_WIDTH * p_scale) / 2; // to center horisontally
+    int yStartPos = (DISPLAY_HEIGHT - STAMP_HEIGHT * p_scale) / 2;
+
+    // takes around 0.8 microseconds to read one digit from flash
+
+    for(int row = yStartPos; row < yStartPos + STAMP_HEIGHT * p_scale; row++)
+    {
+        int startColIdx = xStartPos + STAMP_WIDTH * p_scale;
+        int stopColIdx = xStartPos + STAMP_WIDTH * p_scale + STAMP_WIDTH * p_scale;
+        for(int col = startColIdx; col < stopColIdx; col ++)
+        {      
+            uint8_t pixelToWrite;
+
+            pixelToWrite = pgm_read_byte(&g_stampVector[p_stampToWrite][int((row-yStartPos)/p_scale)][int((col-xStartPos)/p_scale)]);
+            
+            if(checkValueWithinBounds(row + p_OyImmageOffset, 0, DISPLAY_HEIGHT)  
+                && checkValueWithinBounds(col + p_OxImmageOffset, 0, DISPLAY_WIDTH))
+            {
+                p_immageBuffer[row + p_OyImmageOffset][col + p_OxImmageOffset] = pixelToWrite;
+            }
+        }
+    }
+    p_stampToWrite /= 10;
 }
 
 void clearImmage(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT])

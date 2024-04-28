@@ -5,6 +5,7 @@
 
 #include <Arduino.h>
 #include "numbersFont.h"
+#include "stampsFont.h"
 
 #include <GxEPD2_BW.h>
 #include <Fonts/FreeMonoBold9pt7b.h>
@@ -88,11 +89,24 @@ int getOneOffsetValue(int p_number, int p_digitsInNumber);
 /// @brief overlays the number given by the user on the immage that is going to be displayed
 ///     using the custom font saved in flash
 ///     it also centers the number both horisontally and vertically 
-///     it also blanks the space the numbers are going to be printed on 
 ///
 /// @param p_immageBuffer the immage buffer to print the numbers on 
 /// @param p_numberToWrite the number to be converted from int to saved font
+/// @param p_OxImmageOffset ox offset to be able to print the immage a little to the right/left 
+/// @param p_OyImmageOffset oy offset to be able to print the immage a little higher or lower 
+/// @param p_scale used to scale the immage, make it bigger or smaller, as a percentage of the original
 void addNumberCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], int p_numberToWrite, int p_OxImmageOffset = 0, int p_OyImmageOffset = 0, float p_scale = 1);
+
+/// @brief overlays the "stamp" given by the user on the immage that is going to be displayed
+///     using the custom immages saved in flash
+///     it also centers the immage both horisontally and vertically 
+///
+/// @param p_immageBuffer the immage buffer to print the numbers on 
+/// @param p_numberToWrite the number to be converted from int to saved font
+/// @param p_OxImmageOffset ox offset to be able to print the immage a little to the right/left 
+/// @param p_OyImmageOffset oy offset to be able to print the immage a little higher or lower 
+/// @param p_scale used to scale the immage, make it bigger or smaller, as a percentage of the original 
+void addStampCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], int p_stampToWrite, int p_OxImmageOffset = 0, int p_OyImmageOffset = 0, float p_scale = 1);
 
 /// @brief sets everythin in the immage buffer to white (1)
 ///     (immage that is going to be displayed on the screen)
