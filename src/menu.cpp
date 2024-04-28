@@ -9,12 +9,12 @@ void Menu::getImmage(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT])
             {
                 case Instant:
                     clearImmage(p_matrixToDisplay);
-                    addNumberCentered(p_matrixToDisplay, m_tripData.m_currentVelocity);
+                    addNumberCentered(p_matrixToDisplay, (int)m_tripData.m_currentVelocity);
                     break;
 
                 case TripAvg:
                     clearImmage(p_matrixToDisplay);
-                    addNumberCentered(p_matrixToDisplay, m_tripData.m_tripAvgVelocity);
+                    addNumberCentered(p_matrixToDisplay, (int)m_tripData.m_tripAvgVelocity);
                     break;
 
                 case BothCombined: 

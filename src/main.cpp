@@ -119,8 +119,8 @@ void measurementTask(void *args)
     while(true)
     {
         // send latest speed every x seconds only if the queue is empty (the display has seen the previous speed sent)
-        unsigned portBASE_TYPE queueLength = uxQueueMessagesWaiting(g_communicationQueue);
-        if(millis() - lastMeasure > SEND_MEASUREMENTS_PERIOD && queueLength == 0)
+        // unsigned portBASE_TYPE queueLength = uxQueueMessagesWaiting(g_communicationQueue);
+        if(millis() - lastMeasure > SEND_MEASUREMENTS_PERIOD)
         {
             lastMeasure = millis();
 

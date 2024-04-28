@@ -11,15 +11,15 @@
 class BikeCalc
 {
 private:
-    TripData data;
+    TripData m_data;
     
 public:
     BikeCalc()
     {
-        data.m_rideStart = esp_timer_get_time();
-        data.m_magnetDetections = 0;
-        data.m_currentVelocity = 0;
-        data.m_tripAvgVelocity = 0;
+        m_data.m_rideStart = esp_timer_get_time();
+        m_data.m_magnetDetections = 0;
+        m_data.m_currentVelocity = 0;
+        m_data.m_tripAvgVelocity = 0;
     }
 
     TripData recordDetection(int64_t p_lastWheelDetectionTime);
