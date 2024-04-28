@@ -12,6 +12,7 @@
 
 #define TOP_FONT_OFFSET 20
 #define SIDE_FONT_OFFSET 10
+#define RIGHT_SIDE_FONT_OFFSET 25
 
 extern GxEPD2_BW<GxEPD2_150_BN, GxEPD2_150_BN::HEIGHT> g_display;
 

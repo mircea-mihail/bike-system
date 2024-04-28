@@ -51,8 +51,24 @@ void Menu::getImmage(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT])
                     break;
 
                 case BothCombined: 
-                    // g_display.setTextSize(2);
-                    // g_display.print("Instant\nand\nAverage\nVelocity");
+                    g_display.setCursor(0, TOP_FONT_OFFSET);
+                    g_display.print("s");
+                    g_display.setCursor(0, 2*TOP_FONT_OFFSET);
+                    g_display.print("p");
+                    g_display.setCursor(0, 3*TOP_FONT_OFFSET);
+                    g_display.print("e");
+                    g_display.setCursor(0, 4*TOP_FONT_OFFSET);
+                    g_display.print("e");
+                    g_display.setCursor(0, 5*TOP_FONT_OFFSET);
+                    g_display.print("d\n");
+                    
+                    g_display.setCursor(DISPLAY_WIDTH - RIGHT_SIDE_FONT_OFFSET, 7*TOP_FONT_OFFSET);
+                    g_display.print("a");
+                    g_display.setCursor(DISPLAY_WIDTH - RIGHT_SIDE_FONT_OFFSET, 8*TOP_FONT_OFFSET);
+                    g_display.print("v");
+                    g_display.setCursor(DISPLAY_WIDTH - RIGHT_SIDE_FONT_OFFSET, 9*TOP_FONT_OFFSET);
+                    g_display.print("g");
+
 
                     clearImmage(p_matrixToDisplay);
                     addNumberCentered(p_matrixToDisplay, m_tripData.m_currentVelocity, 0, -50, 0.7);
