@@ -26,10 +26,10 @@ print("const bool g_digitVector[NUMBER_OF_LETTERS][FONT_IMAGE_HEIGHT][FONT_IMAGE
 
 for img in range(0, NR_OF_IMAGES):
     print("\t{")
-    for i in range(IMAGE_HEIGHT-1, -1, -1):
+    for i in range(0, IMAGE_HEIGHT):
         print("\t\t{", end="")
         print(0 if(imgList[img][i][0] == 0) else 1, end="")
-        for j in range(1, IMAGE_WIDTH, 1):
+        for j in range(0, IMAGE_WIDTH-1):
             print(",", 0 if(imgList[img][i][j] == 0) else 1, end="")
         print("},")
     print("\t},")
