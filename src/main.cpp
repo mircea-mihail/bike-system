@@ -3,6 +3,7 @@
 // adafrit GFX library
 #include <GxEPD2_BW.h>
 #include <Fonts/FreeMonoBold9pt7b.h>
+#include <Fonts/FreeMonoBoldOblique9pt7b.h>
 // my include files
 #include "displayTask.h"
 #include "menu.h"
@@ -28,7 +29,7 @@
 #define CONTINUOUS_PRINT_PERIOD_MS 15000 
 #define SEND_MEASUREMENTS_PERIOD 1500
 
-//////////////////////// Immage related
+//////////////////////// Immage rela((ted
 #define NUMBER_OX_OFFSET 20
 
 GxEPD2_BW<GxEPD2_150_BN, GxEPD2_150_BN::HEIGHT> g_display(GxEPD2_150_BN(/*CS=D8*/ CHIP_SELECT, /*DC=D3*/ DATA_COMMAND, /*RST=D4*/ RST, /*BUSY=D2*/ BUSY)); // DEPG0150BN 200x200, SSD1681, TTGO T5 V2.4.1
@@ -72,8 +73,11 @@ void displayManagement(void *args)
     g_display.init(SERIAL_BITRATE, true, WAVESHARE_REFRESH_TIME_MS, false);
     
     clearImmage(g_matrixToDisplay);
-    g_display.setRotation(ORIENTATION_HORIZONTAL);
+    g_display.setRotation(ORIENTATION_VERTICAL);
     g_display.clearScreen();
+
+    g_display.setFont(&FreeMonoBoldOblique9pt7b);
+    g_display.setTextColor(GxEPD_BLACK);
 
     unsigned long lastFullRefresh = 0;
     Menu menu;
@@ -87,19 +91,25 @@ void displayManagement(void *args)
         // wait for as long as possible to receive the speed to print
         xQueueReceive(g_communicationQueue, &menu, SEND_DATA_DELAY_TICKS);
 
+
+        // setup display for refresh
+        g_display.setFullWindow();
+        g_display.firstPage();
+        g_display.setTextSize(2);
+
         // enter menu and display the appropriate thing on the matrix then display it regardless of what it is
         menu.getImmage(g_matrixToDisplay);
 
         // needs a full refresh
         if(millis() - lastFullRefresh > FULL_EPAPER_REFRESH_PERIOD_MS)
         {
-            lastFullRefresh = millis();   
-            displayImmage(g_matrixToDisplay, false);
+            lastFullRefresh = millis();
+            displayBlackPixels(g_matrixToDisplay, false);
         }
         // fast refresh,
         else
-        {        
-            displayImmage(g_matrixToDisplay, true);
+        {   
+            displayBlackPixels(g_matrixToDisplay, true);
         }
     }
 }
@@ -128,12 +138,14 @@ void measurementTask(void *args)
             {
                 menu.update(tripData);
                 xQueueSend(g_communicationQueue, &menu, SEND_DATA_DELAY_TICKS);
+                menu.resetChangedState();
             }
             else
             {
                 TripData estimatedData = bikeCalc.approximateVelocity(lastWheelDetectionTime);
                 menu.update(estimatedData);
                 xQueueSend(g_communicationQueue, &menu, SEND_DATA_DELAY_TICKS);
+                menu.resetChangedState();
             }
             
             sendingLatestSpeed = false;
