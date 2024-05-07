@@ -67,6 +67,7 @@ void initPins()
 //      * after full refresh update continuously for some seconds or so to "warm up" pixels 
 //      check bounds when printing anything to the screen
 //      write rescale funtion to print the number as big or as small as you want
+
 void displayManagement(void *args)
 {    
     resetPanel();
@@ -90,8 +91,8 @@ void displayManagement(void *args)
     {
         // wait for as long as possible to receive the speed to print
         xQueueReceive(g_communicationQueue, &menu, SEND_DATA_DELAY_TICKS);
-
-
+        Serial.print("    updated Screen\n");
+        
         // setup display for refresh
         g_display.setFullWindow();
         g_display.firstPage();
@@ -128,10 +129,11 @@ void measurementTask(void *args)
 
     while(true)
     {
-        // send latest speed every x seconds only if the queue is empty (the display has seen the previous speed sent)
         // unsigned portBASE_TYPE queueLength = uxQueueMessagesWaiting(g_communicationQueue);
-        if(millis() - lastMeasure > SEND_MEASUREMENTS_PERIOD)
+        if(millis() - lastMeasure > SEND_MEASUREMENTS_PERIOD || menu.getChangedState())
         {
+            Serial.print("  Sent New Screen\n");
+
             lastMeasure = millis();
 
             if(sendingLatestSpeed)

@@ -138,3 +138,8 @@ void Menu::resetChangedState()
 {
     m_changedState = false;
 }
+
+bool Menu::getChangedState()
+{
+    return m_changedState;
+}

@@ -57,6 +57,8 @@ public:
 
     void resetChangedState();
 
+    bool getChangedState();
+
 };
 
 #endif

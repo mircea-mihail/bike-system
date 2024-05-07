@@ -9,8 +9,8 @@
 #define SECONDS_TO_HOURS 3600UL
 
 // hardware debounce timings
-#define SENSOR_DEBOUNCE_PERIOD_MS 50UL
-#define BUTTON_DEBOUNCE_PERIOD_MS 30UL
+#define SENSOR_DEBOUNCE_PERIOD_MS 10UL
+#define BUTTON_DEBOUNCE_PERIOD_MS 10UL
 
 /////////////////////////////// pins
 // input pins
