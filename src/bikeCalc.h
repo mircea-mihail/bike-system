@@ -12,7 +12,8 @@ class BikeCalc
 {
 private:
     TripData m_data;
-    
+    int64_t m_lastWheelDetectionTime;
+
 public:
     BikeCalc()
     {
@@ -20,11 +21,12 @@ public:
         m_data.m_magnetDetections = 0;
         m_data.m_currentVelocity = 0;
         m_data.m_tripAvgVelocity = 0;
+        m_lastWheelDetectionTime = 0;
     }
 
-    TripData recordDetection(int64_t p_lastWheelDetectionTime);
+    TripData recordDetection();
 
-    TripData approximateVelocity(int64_t p_lastWheelDetectionTime);
+    TripData approximateVelocity();
 };
 
 #endif

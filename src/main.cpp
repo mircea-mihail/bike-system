@@ -91,7 +91,6 @@ void displayManagement(void *args)
     {
         // wait for as long as possible to receive the speed to print
         xQueueReceive(g_communicationQueue, &menu, SEND_DATA_DELAY_TICKS);
-        Serial.print("    updated Screen\n");
         
         // setup display for refresh
         g_display.setFullWindow();
@@ -122,18 +121,15 @@ void measurementTask(void *args)
     Menu menu;
     BikeCalc bikeCalc;
 
-    int64_t lastWheelDetectionTime = 0;
     bool sendingLatestSpeed = true;
 
     HardwareUtility hwUtil;
 
     while(true)
     {
-        // unsigned portBASE_TYPE queueLength = uxQueueMessagesWaiting(g_communicationQueue);
+        // used to send informaiton to display task
         if(millis() - lastMeasure > SEND_MEASUREMENTS_PERIOD || menu.getChangedState())
         {
-            Serial.print("  Sent New Screen\n");
-
             lastMeasure = millis();
 
             if(sendingLatestSpeed)
@@ -144,7 +140,7 @@ void measurementTask(void *args)
             }
             else
             {
-                TripData estimatedData = bikeCalc.approximateVelocity(lastWheelDetectionTime);
+                TripData estimatedData = bikeCalc.approximateVelocity();
                 menu.update(estimatedData);
                 xQueueSend(g_communicationQueue, &menu, SEND_DATA_DELAY_TICKS);
                 menu.resetChangedState();
@@ -153,10 +149,10 @@ void measurementTask(void *args)
             sendingLatestSpeed = false;
         }
 
+        // update the sensor ins 
         if(hwUtil.detectedSensor())
         {
-            tripData = bikeCalc.recordDetection(lastWheelDetectionTime);
-            lastWheelDetectionTime = esp_timer_get_time();
+            tripData = bikeCalc.recordDetection(); 
 
             sendingLatestSpeed = true;
         }
