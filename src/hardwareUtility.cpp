@@ -15,28 +15,21 @@ bool HardwareUtility::detectedSensor()
     unsigned long time = millis();
     int state = digitalRead(HALL_SENSOR_PIN);
 
-    // if the button has a constant state
-    if(state == m_sensor.m_prevState)
+    // if state just changed from low to high do something else wait for state change
+    if(m_sensor.m_prevState != state)
     {
-        // if the constant state has been kept for a while
-        if(time - m_sensor.m_prevTime > SENSOR_DEBOUNCE_PERIOD_MS && m_sensor.m_prevCountedState != state)
+        // if detected magnet and it's been a while since last reading then probabily valid state read
+        if(state == LOW && m_sensor.m_prevTime - time > SENSOR_DEBOUNCE_PERIOD_MS)
         {
-            m_sensor.m_prevCountedState = state;
-
-            if(state == HIGH)
-            {
-                m_sensor.m_prevState = state;
-                return true;
-            }
+            m_sensor.m_prevTime = time;
+            m_sensor.m_prevState = state;
+            return true;
         }
-    }
-    else
-    {
+    
         m_sensor.m_prevTime = time;
     }
-
-    m_sensor.m_prevState = state;
     
+    m_sensor.m_prevState = state;
     return false;
 }
 
