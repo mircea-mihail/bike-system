@@ -170,7 +170,7 @@ bool printFileContents(const char* p_filePath)
     return false;
 }
 
-bool appendStringToFile(const char* p_filePath, const char *p_string)
+bool appendStringToFile(const char* p_filePath, char *p_string)
 {
     File fileObj = SPIFFS.open(p_filePath, FILE_APPEND);
     if(fileObj)
@@ -185,20 +185,19 @@ bool appendStringToFile(const char* p_filePath, const char *p_string)
     return false;
 }
 
+#define MAX_SIZE_OF_ERR_MSG 50
+#define SPEED_THRESHOLD_VELOCITY_KMPH 55
+
 void measurementTask(void *args)
 {
     const char* errorCheckFilePath = "/data/hall_sensor_errors.txt";
-    const char* sendMessage = "pulapizda hey\n";
-    if (SPIFFS.begin(true)) 
-    {
-        appendStringToFile(errorCheckFilePath, sendMessage);
-        printFileContents(errorCheckFilePath);
-    }
-    else
-    {
-        Serial.print("failed to start file system\n");
-    }
+    char sendMessage[MAX_SIZE_OF_ERR_MSG];
+    bool canWriteToFs = false;
 
+    if (SPIFFS.begin(true)) 
+    {   
+        canWriteToFs = true;
+    }
     unsigned long lastMeasure = 0;
     TripData tripData;
     Menu menu;
@@ -236,6 +235,12 @@ void measurementTask(void *args)
             tripData = bikeCalc.recordDetection(); 
 
             sendingLatestSpeed = true;
+
+            if(canWriteToFs && tripData.m_currentVelocity > SPEED_THRESHOLD_VELOCITY_KMPH)
+            {
+                snprintf(sendMessage, MAX_SIZE_OF_ERR_MSG, "%lu s after startup, speed: %d\n", millis()/MS_TO_SECONDS, tripData.m_currentVelocity);
+                appendStringToFile(errorCheckFilePath, sendMessage);
+            }
         }
 
         if(hwUtil.pressedSubmenuButton())
