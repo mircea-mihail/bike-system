@@ -4,6 +4,11 @@
 #include <GxEPD2_BW.h>
 #include <Fonts/FreeMonoBold9pt7b.h>
 #include <Fonts/FreeMonoBoldOblique9pt7b.h>
+// file system
+#include "esp_vfs_fat.h"
+#include "esp_spiffs.h"
+#include "SPIFFS.h"
+
 // my include files
 #include "displayTask.h"
 #include "menu.h"
@@ -18,6 +23,7 @@
 // lowest priority, no reason to have special priority all the time
 #define DEFAULT_TASK_PRIORITY tskIDLE_PRIORITY
 #define DEFAULT_TASK_STACK_SIZE 2048
+#define MEASUREMENT_TASK_STACK_SIZE 8192
 #define QUEUE_SIZE 10
 
 // timing related
@@ -114,17 +120,92 @@ void displayManagement(void *args)
     }
 }
 
+bool deleteFileContents(const char* p_filePath)
+{
+    File fileObj = SPIFFS.open(p_filePath, FILE_WRITE);
+    if(fileObj)
+    {
+        fileObj.close();
+        return true;
+    }
+    return false;
+}
+
+bool copyFileContents(const char* p_donorFilePath, const char* p_receiveFilePath)
+{
+    File donorFileObj = SPIFFS.open(p_donorFilePath, FILE_READ);
+    File receiveFileObj = SPIFFS.open(p_receiveFilePath, FILE_WRITE);
+    if(donorFileObj && receiveFileObj)
+    {
+        int readChar = donorFileObj.read();
+        while(readChar != -1)
+        {
+            receiveFileObj.write((uint8_t)readChar);
+            readChar = donorFileObj.read();
+        }
+        receiveFileObj.close();
+        donorFileObj.close();
+        return true;
+    }
+    return false;
+}
+
+bool printFileContents(const char* p_filePath)
+{
+    File fileObj = SPIFFS.open(p_filePath, FILE_READ);
+    // SPIFFS.exists("/data/hall_sensor_errors.txt");
+    if(fileObj)
+    {
+        int readChar = fileObj.read();
+        while(readChar != -1)
+        {
+            Serial.print((char) readChar);
+            readChar = fileObj.read();
+        }
+        fileObj.flush();
+        Serial.flush();
+        fileObj.close();
+        return true;
+    }
+    return false;
+}
+
+bool appendStringToFile(const char* p_filePath, const char *p_string)
+{
+    File fileObj = SPIFFS.open(p_filePath, FILE_APPEND);
+    if(fileObj)
+    {
+        if (fileObj.print(p_string)) 
+        {
+            fileObj.flush();
+            fileObj.close();
+            return true;
+        }
+    }
+    return false;
+}
+
 void measurementTask(void *args)
 {
+    const char* errorCheckFilePath = "/data/hall_sensor_errors.txt";
+    const char* sendMessage = "pulapizda hey\n";
+    if (SPIFFS.begin(true)) 
+    {
+        appendStringToFile(errorCheckFilePath, sendMessage);
+        printFileContents(errorCheckFilePath);
+    }
+    else
+    {
+        Serial.print("failed to start file system\n");
+    }
+
     unsigned long lastMeasure = 0;
     TripData tripData;
     Menu menu;
     BikeCalc bikeCalc;
-
     bool sendingLatestSpeed = true;
-
     HardwareUtility hwUtil;
-
+    
     while(true)
     {
         // used to send informaiton to display task
@@ -166,7 +247,7 @@ void measurementTask(void *args)
 }
 
 void setup()
-{
+{    
     initPins();
     Serial.begin(115200);
 
@@ -177,10 +258,9 @@ void setup()
 
     TaskHandle_t displayTaskHandle = NULL;
     xTaskCreate(displayManagement, "display", DEFAULT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, &displayTaskHandle); 
-    Serial.print("init started");
 
     TaskHandle_t measurementTaskHandle = NULL;
-    xTaskCreate(measurementTask, "measurement", DEFAULT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, &measurementTaskHandle);
+    xTaskCreate(measurementTask, "measurement", MEASUREMENT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, &measurementTaskHandle);
 }
 
 void loop(){};
