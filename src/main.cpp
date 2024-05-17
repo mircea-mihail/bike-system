@@ -187,16 +187,31 @@ bool appendStringToFile(const char* p_filePath, char *p_string)
 
 #define MAX_SIZE_OF_ERR_MSG 50
 #define SPEED_THRESHOLD_VELOCITY_KMPH 55
+#define PRINT_CONTENTS_OF_ALL_FILES true
+#define RESET_FILES_AFTER_PRINT true
+
+// csv files 
+const char* g_errorCheckFilePath = "/data/hall_sensor_errors.txt";
+const char* g_velocityAccFilePath = "/data/speed_acc.txt";
+
+// add filter that excludes speeds that surpass an acceleration threshold
+// upload speeds to a /data/velocities.txt and acceleration between speeds to /data/accelerations.txt and analyse the data for acceleration filter
+// periodically print an acc max for easier data analisys
+// find a way to extract the data from the folders easier
 
 void measurementTask(void *args)
 {
-    const char* errorCheckFilePath = "/data/hall_sensor_errors.txt";
     char sendMessage[MAX_SIZE_OF_ERR_MSG];
     bool canWriteToFs = false;
 
     if (SPIFFS.begin(true)) 
     {   
         canWriteToFs = true;
+        char csvErrStartMsg[MAX_SIZE_OF_ERR_MSG] = "time, velocity\n";
+        char csvSpeedAccStartMsg[MAX_SIZE_OF_ERR_MSG] = "velocity, delta V, acceleration\n";
+
+        appendStringToFile(g_errorCheckFilePath, csvErrStartMsg);
+        appendStringToFile(g_velocityAccFilePath, csvSpeedAccStartMsg);
     }
     unsigned long lastMeasure = 0;
     TripData tripData;
@@ -204,7 +219,8 @@ void measurementTask(void *args)
     BikeCalc bikeCalc;
     bool sendingLatestSpeed = true;
     HardwareUtility hwUtil;
-    
+    double previousVelocity = 0;
+
     while(true)
     {
         // used to send informaiton to display task
@@ -236,10 +252,22 @@ void measurementTask(void *args)
 
             sendingLatestSpeed = true;
 
-            if(canWriteToFs && tripData.m_currentVelocity > SPEED_THRESHOLD_VELOCITY_KMPH)
+            if(canWriteToFs)
             {
-                snprintf(sendMessage, MAX_SIZE_OF_ERR_MSG, "%lu s after startup, speed: %d\n", millis()/MS_TO_SECONDS, tripData.m_currentVelocity);
-                appendStringToFile(errorCheckFilePath, sendMessage);
+                // record errors
+                if(tripData.m_currentVelocity > SPEED_THRESHOLD_VELOCITY_KMPH)
+                {
+                    snprintf(sendMessage, MAX_SIZE_OF_ERR_MSG, "%lu, %d\n", millis()/MS_TO_SECONDS, tripData.m_currentVelocity);
+                    appendStringToFile(g_errorCheckFilePath, sendMessage);
+                }
+                // record speed and acceleration
+
+                snprintf(sendMessage, MAX_SIZE_OF_ERR_MSG, "%d, %d, %d\n", 
+                         tripData.m_currentVelocity, 
+                         tripData.m_currentVelocity - previousVelocity,
+                         (tripData.m_currentVelocity - previousVelocity) * (tripData.m_currentVelocity + previousVelocity) / (2 * WHEEL_PERIMETER_MM / MM_TO_KM));
+                appendStringToFile(g_velocityAccFilePath, sendMessage);
+                previousVelocity = tripData.m_currentVelocity;
             }
         }
 
@@ -261,11 +289,29 @@ void setup()
         Serial.println("Error creating the queue\n");
     }
 
-    TaskHandle_t displayTaskHandle = NULL;
-    xTaskCreate(displayManagement, "display", DEFAULT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, &displayTaskHandle); 
+    if(PRINT_CONTENTS_OF_ALL_FILES)
+    {
+        if (SPIFFS.begin(true)) 
+        {
+            Serial.print("printing from error file:\n");
+            printFileContents(g_errorCheckFilePath);
+            Serial.print("printing from monitor file:\n");
+            printFileContents(g_velocityAccFilePath);
+            if(RESET_FILES_AFTER_PRINT)
+            {
+                deleteFileContents(g_errorCheckFilePath);
+                deleteFileContents(g_velocityAccFilePath);
+            }
+        }
+    }   
+    else
+    {
+        TaskHandle_t displayTaskHandle = NULL;
+        xTaskCreate(displayManagement, "display", DEFAULT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, &displayTaskHandle); 
 
-    TaskHandle_t measurementTaskHandle = NULL;
-    xTaskCreate(measurementTask, "measurement", MEASUREMENT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, &measurementTaskHandle);
+        TaskHandle_t measurementTaskHandle = NULL;
+        xTaskCreate(measurementTask, "measurement", MEASUREMENT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, &measurementTaskHandle);
+    }
 }
 
 void loop(){};
