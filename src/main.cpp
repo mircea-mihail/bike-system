@@ -4,16 +4,13 @@
 #include <GxEPD2_BW.h>
 #include <Fonts/FreeMonoBold9pt7b.h>
 #include <Fonts/FreeMonoBoldOblique9pt7b.h>
-// file system
-#include "esp_vfs_fat.h"
-#include "esp_spiffs.h"
-#include "SPIFFS.h"
 
 // my include files
 #include "displayTask.h"
 #include "menu.h"
 #include "bikeCalc.h"
 #include "hardwareUtility.h"
+#include "FSInteraction.h"
 
 // waveshare E-Paper display config
 #define SERIAL_BITRATE 115200
@@ -120,75 +117,8 @@ void displayManagement(void *args)
     }
 }
 
-bool deleteFileContents(const char* p_filePath)
-{
-    File fileObj = SPIFFS.open(p_filePath, FILE_WRITE);
-    if(fileObj)
-    {
-        fileObj.close();
-        return true;
-    }
-    return false;
-}
-
-bool copyFileContents(const char* p_donorFilePath, const char* p_receiveFilePath)
-{
-    File donorFileObj = SPIFFS.open(p_donorFilePath, FILE_READ);
-    File receiveFileObj = SPIFFS.open(p_receiveFilePath, FILE_WRITE);
-    if(donorFileObj && receiveFileObj)
-    {
-        int readChar = donorFileObj.read();
-        while(readChar != -1)
-        {
-            receiveFileObj.write((uint8_t)readChar);
-            readChar = donorFileObj.read();
-        }
-        receiveFileObj.close();
-        donorFileObj.close();
-        return true;
-    }
-    return false;
-}
-
-bool printFileContents(const char* p_filePath)
-{
-    File fileObj = SPIFFS.open(p_filePath, FILE_READ);
-    // SPIFFS.exists("/data/hall_sensor_errors.txt");
-    if(fileObj)
-    {
-        int readChar = fileObj.read();
-        while(readChar != -1)
-        {
-            Serial.print((char) readChar);
-            readChar = fileObj.read();
-        }
-        fileObj.flush();
-        Serial.flush();
-        fileObj.close();
-        return true;
-    }
-    return false;
-}
-
-bool appendStringToFile(const char* p_filePath, char *p_string)
-{
-    File fileObj = SPIFFS.open(p_filePath, FILE_APPEND);
-    if(fileObj)
-    {
-        if (fileObj.print(p_string)) 
-        {
-            fileObj.flush();
-            fileObj.close();
-            return true;
-        }
-    }
-    return false;
-}
-
 #define MAX_SIZE_OF_ERR_MSG 50
 #define SPEED_THRESHOLD_VELOCITY_KMPH 55
-#define PRINT_CONTENTS_OF_ALL_FILES true
-#define RESET_FILES_AFTER_PRINT true
 
 // csv files 
 const char* g_errorCheckFilePath = "/data/hall_sensor_errors.txt";
@@ -202,24 +132,24 @@ const char* g_velocityAccFilePath = "/data/speed_acc.txt";
 void measurementTask(void *args)
 {
     char sendMessage[MAX_SIZE_OF_ERR_MSG];
-    bool canWriteToFs = false;
 
-    if (SPIFFS.begin(true)) 
+    if (FSInteraction::canWriteToFs()) 
     {   
-        canWriteToFs = true;
         char csvErrStartMsg[MAX_SIZE_OF_ERR_MSG] = "time, velocity\n";
         char csvSpeedAccStartMsg[MAX_SIZE_OF_ERR_MSG] = "velocity, delta V, acceleration\n";
 
-        appendStringToFile(g_errorCheckFilePath, csvErrStartMsg);
-        appendStringToFile(g_velocityAccFilePath, csvSpeedAccStartMsg);
+        FSInteraction::appendStringToFile(g_errorCheckFilePath, csvErrStartMsg);
+        FSInteraction::appendStringToFile(g_velocityAccFilePath, csvSpeedAccStartMsg);
     }
-    unsigned long lastMeasure = 0;
+
     TripData tripData;
     Menu menu;
     BikeCalc bikeCalc;
-    bool sendingLatestSpeed = true;
     HardwareUtility hwUtil;
+
+    unsigned long lastMeasure = 0;
     double previousVelocity = 0;
+    bool sendingLatestSpeed = true;
 
     while(true)
     {
@@ -249,26 +179,23 @@ void measurementTask(void *args)
         if(hwUtil.detectedSensor())
         {
             tripData = bikeCalc.recordDetection(); 
-
             sendingLatestSpeed = true;
 
-            if(canWriteToFs)
+            // record errors
+            if(tripData.m_currentVelocity > SPEED_THRESHOLD_VELOCITY_KMPH)
             {
-                // record errors
-                if(tripData.m_currentVelocity > SPEED_THRESHOLD_VELOCITY_KMPH)
-                {
-                    snprintf(sendMessage, MAX_SIZE_OF_ERR_MSG, "%lu, %d\n", millis()/MS_TO_SECONDS, tripData.m_currentVelocity);
-                    appendStringToFile(g_errorCheckFilePath, sendMessage);
-                }
-                // record speed and acceleration
-
-                snprintf(sendMessage, MAX_SIZE_OF_ERR_MSG, "%d, %d, %d\n", 
-                         tripData.m_currentVelocity, 
-                         tripData.m_currentVelocity - previousVelocity,
-                         (tripData.m_currentVelocity - previousVelocity) * (tripData.m_currentVelocity + previousVelocity) / (2 * WHEEL_PERIMETER_MM / MM_TO_KM));
-                appendStringToFile(g_velocityAccFilePath, sendMessage);
-                previousVelocity = tripData.m_currentVelocity;
+                snprintf(sendMessage, MAX_SIZE_OF_ERR_MSG, "%lu, %lf\n", millis()/MS_TO_SECONDS, tripData.m_currentVelocity);
+                FSInteraction::appendStringToFile(g_errorCheckFilePath, sendMessage);
             }
+            // record speed and acceleration
+            snprintf(sendMessage, MAX_SIZE_OF_ERR_MSG, "%lf, %lf, %lf\n", 
+                        tripData.m_currentVelocity, 
+                        tripData.m_currentVelocity - previousVelocity,
+                        (tripData.m_currentVelocity - previousVelocity) * (tripData.m_currentVelocity + previousVelocity) / (2 * WHEEL_PERIMETER_MM / MM_TO_KM));
+            FSInteraction::appendStringToFile(g_velocityAccFilePath, sendMessage);
+            
+            previousVelocity = tripData.m_currentVelocity;
+            
         }
 
         if(hwUtil.pressedSubmenuButton())
@@ -279,29 +206,33 @@ void measurementTask(void *args)
     }
 }
 
+#define PRINT_CONTENTS_OF_ALL_FILES false
+#define RESET_FILES_AFTER_PRINT false
+
 void setup()
 {    
     initPins();
     Serial.begin(115200);
-
+    
     g_communicationQueue = xQueueCreate(QUEUE_SIZE, sizeof(Menu));
     if(g_communicationQueue == NULL){
         Serial.println("Error creating the queue\n");
     }
 
+    FSInteraction::init();
+
     if(PRINT_CONTENTS_OF_ALL_FILES)
     {
-        if (SPIFFS.begin(true)) 
+        Serial.print("printing from error file:\n");
+        FSInteraction::printFileContents(g_errorCheckFilePath);
+        
+        Serial.print("printing from monitor file:\n");
+        FSInteraction::printFileContents(g_velocityAccFilePath);
+        
+        if(RESET_FILES_AFTER_PRINT)
         {
-            Serial.print("printing from error file:\n");
-            printFileContents(g_errorCheckFilePath);
-            Serial.print("printing from monitor file:\n");
-            printFileContents(g_velocityAccFilePath);
-            if(RESET_FILES_AFTER_PRINT)
-            {
-                deleteFileContents(g_errorCheckFilePath);
-                deleteFileContents(g_velocityAccFilePath);
-            }
+            FSInteraction::deleteFileContents(g_errorCheckFilePath);
+            FSInteraction::deleteFileContents(g_velocityAccFilePath);
         }
     }   
     else
