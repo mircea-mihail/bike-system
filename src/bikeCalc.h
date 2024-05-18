@@ -8,6 +8,8 @@
 #define WHEEL_DIAMETER_MM 700UL
 #define WHEEL_PERIMETER_MM (WHEEL_DIAMETER_MM * PI)
 
+#define MAX_DELTA_VELOCITY_KMPH 30
+
 class BikeCalc
 {
 private:
@@ -21,6 +23,7 @@ public:
         m_data.m_magnetDetections = 0;
         m_data.m_currentVelocity = 0;
         m_data.m_tripAvgVelocity = 0;
+        m_data.m_previousVelocity = 0;
         m_lastWheelDetectionTime = 0;
     }
 
