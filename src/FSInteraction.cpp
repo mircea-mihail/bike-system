@@ -1,5 +1,7 @@
 #include "FSInteraction.h"
 
+bool FSInteraction::m_canWriteToFs = false;
+
 bool FSInteraction::init()
 {
     if (SPIFFS.begin(true)) 
@@ -13,7 +15,7 @@ bool FSInteraction::init()
 
 bool FSInteraction::canWriteToFs()
 {
-    return m_canWriteToFs;
+    if(m_canWriteToFs);
 }
 
 bool FSInteraction::deleteFileContents(const char* p_filePath)
