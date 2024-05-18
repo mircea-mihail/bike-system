@@ -26,6 +26,7 @@ struct TripData
     uint64_t m_rideStart;
 
     double m_currentVelocity;
+    double m_previousVelocity;
     double m_tripAvgVelocity;   
 };
 
