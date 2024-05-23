@@ -11,7 +11,9 @@ TripData BikeCalc::recordDetection()
     TripData dataToSend = m_data;
 
     // ignore reading, most likely fake
-    if(m_data.m_currentVelocity - m_data.m_previousVelocity > MAX_DELTA_VELOCITY_KMPH)
+    if(m_data.m_currentVelocity - m_data.m_previousVelocity > MAX_DELTA_VELOCITY_KMPH 
+        || m_data.m_currentVelocity > MAX_POSSIBLE_VELOCITY 
+        || m_data.m_currentVelocity < MIN_POSSIBLE_VELOCITY)
     {
         // ignore, send previous data recording
         return dataToSend;
@@ -31,6 +33,11 @@ TripData BikeCalc::recordDetection()
 
 TripData BikeCalc::approximateVelocity()
 {        
+    if(m_data.m_magnetDetections == 0)
+    {
+        return m_data;
+    }
+
     TripData dataToSend = m_data;
     int64_t fullSpinDurationMicros = esp_timer_get_time() - m_lastWheelDetectionTime;
     uint8_t approximatedVelocity = (WHEEL_PERIMETER_MM * SECONDS_TO_HOURS / (double)fullSpinDurationMicros);
