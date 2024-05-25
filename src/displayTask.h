@@ -6,18 +6,10 @@
 #include <Arduino.h>
 #include "numbersFont.h"
 #include "stampsFont.h"
+#include "generalUtility.h"
 
 #include <GxEPD2_BW.h>
 #include <Fonts/FreeMonoBold9pt7b.h>
-
-//////// pins used on board
-#define DATA_OUT GPIO_NUM_23        // SPI MOSI pin, used designed pin for this on esp
-#define CLK GPIO_NUM_18             // SPI SCK pin, used designed pin for this on esp
-#define CHIP_SELECT GPIO_NUM_33     // SPI chip selection, low active
-#define DATA_COMMAND GPIO_NUM_12    // Data/Command selection (high for data, low for command) -> am pus pinul de MISO
-
-#define RST GPIO_NUM_27             // External reset, low active
-#define BUSY GPIO_NUM_35            // Busy status output, high active
 
 //////// display logic
 #define NUMBER_OF_UPDATES 4

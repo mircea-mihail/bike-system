@@ -1,23 +1,47 @@
 #ifndef GENERAL_UTILITY_H
 #define GENERAL_UTILITY_H
 
-
 // convenient conversions
 #define MM_TO_KM 1000000UL
+#define MM_TO_M 1000UL
+#define M_TO_KM 1000UL
 #define MILLIS_TO_MICROS 1000UL
 #define MICROS_TO_SECONDS 1000000UL
 #define SECONDS_TO_HOURS 3600UL
 
 // hardware debounce timings
 #define SENSOR_DEBOUNCE_PERIOD_MS 10UL
-#define BUTTON_DEBOUNCE_PERIOD_MS 10UL
+#define BUTTON_CONSTANT_STATE_MS 70UL
 
 /////////////////////////////// pins
 // input pins
 #define HALL_SENSOR_PIN GPIO_NUM_39
 #define CHANGE_SUBMENU_PIN GPIO_NUM_36
-
 #define CHANGE_MENU_PIN GPIO_NUM_34
+
+// SPI pins
+#define SD_CHIP_SELECT GPIO_NUM_5
+#define DISPLAY_CHIP_SELECT GPIO_NUM_33     // SPI chip selection, low active
+
+#define DATA_OUT GPIO_NUM_23        // SPI MOSI pin, used designed pin for this on esp
+#define CLK GPIO_NUM_18             // SPI SCK pin, used designed pin for this on esp
+#define DATA_COMMAND GPIO_NUM_12    // Data/Command selection (high for data, low for command) -> am pus pinul de MISO
+
+// pins for e-paper display
+#define RST GPIO_NUM_27             // External reset, low active
+#define BUSY GPIO_NUM_35            // Busy status output, high active
+
+void enableSdCS()
+{
+    digitalWrite(SD_CHIP_SELECT, HIGH);
+    digitalWrite(DISPLAY_CHIP_SELECT, LOW);
+}
+
+void enableDisplayCS()
+{
+    digitalWrite(SD_CHIP_SELECT, LOW);
+    digitalWrite(DISPLAY_CHIP_SELECT, HIGH);
+}
 
 // data packet to send to menu
 struct TripData

@@ -4,18 +4,28 @@ bool FSInteraction::m_canWriteToFs = false;
 
 bool FSInteraction::init()
 {
-    if (SPIFFS.begin(true)) 
+    enableSdCS();
+    if(!SD.begin()) 
     {
-        m_canWriteToFs = true;
-        return true;
+        Serial.println("Card Mount Failed");
+        m_canWriteToFs = false;
+        return false;
     }
-    m_canWriteToFs = false;
-    return false;
+
+    uint8_t cardType = SD.cardType();
+    if(cardType == CARD_NONE)
+    {
+        Serial.println("No SD card attached");
+        return false;
+    }
+
+    m_canWriteToFs = true;
+    return true;
 }
 
 bool FSInteraction::canWriteToFs()
 {
-    if(m_canWriteToFs);
+    return m_canWriteToFs;
 }
 
 bool FSInteraction::deleteFileContents(const char* p_filePath)
@@ -24,8 +34,9 @@ bool FSInteraction::deleteFileContents(const char* p_filePath)
     {
         return false;
     }
+    enableSdCS();
 
-    File fileObj = SPIFFS.open(p_filePath, FILE_WRITE);
+    File fileObj = SD.open(p_filePath, FILE_WRITE);
     if(fileObj)
     {
         fileObj.close();
@@ -40,9 +51,10 @@ bool FSInteraction::copyFileContents(const char* p_donorFilePath, const char* p_
     {
         return false;
     }
+    enableSdCS();
 
-    File donorFileObj = SPIFFS.open(p_donorFilePath, FILE_READ);
-    File receiveFileObj = SPIFFS.open(p_receiveFilePath, FILE_WRITE);
+    File donorFileObj = SD.open(p_donorFilePath, FILE_READ);
+    File receiveFileObj = SD.open(p_receiveFilePath, FILE_WRITE);
     if(donorFileObj && receiveFileObj)
     {
         int readChar = donorFileObj.read();
@@ -64,8 +76,9 @@ bool FSInteraction::printFileContents(const char* p_filePath)
     {
         return false;
     }
+    enableSdCS();
 
-    File fileObj = SPIFFS.open(p_filePath, FILE_READ);
+    File fileObj = SD.open(p_filePath, FILE_READ);
     // SPIFFS.exists("/data/hall_sensor_errors.txt");
     if(fileObj)
     {
@@ -89,8 +102,9 @@ bool FSInteraction::appendStringToFile(const char* p_filePath, char *p_string)
     {
         return false;
     }
+    enableSdCS();
     
-    File fileObj = SPIFFS.open(p_filePath, FILE_APPEND);
+    File fileObj = SD.open(p_filePath, FILE_APPEND);
     if(fileObj)
     {
         if (fileObj.print(p_string)) 

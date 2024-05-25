@@ -5,6 +5,9 @@
 #include "esp_vfs_fat.h"
 #include "esp_spiffs.h"
 #include "SPIFFS.h"
+#include "SD.h"
+
+#include "generalUtility.h"
 
 class FSInteraction
 {

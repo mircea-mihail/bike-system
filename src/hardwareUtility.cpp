@@ -44,7 +44,7 @@ bool HardwareUtility::pressedMenuButton()
     if(state == m_menuButton.m_prevState)
     {
         // if the constant state has been kept for a while
-        if(time - m_menuButton.m_prevTime > BUTTON_DEBOUNCE_PERIOD_MS && m_menuButton.m_prevCountedState != state)
+        if(time - m_menuButton.m_prevTime > BUTTON_CONSTANT_STATE_MS && m_menuButton.m_prevCountedState != state)
         {
             m_menuButton.m_prevCountedState = state;
 
@@ -74,7 +74,7 @@ bool HardwareUtility::pressedSubmenuButton()
     if(state == m_submenuButton.m_prevState)
     {
         // if the constant state has been kept for a while
-        if(time - m_submenuButton.m_prevTime > BUTTON_DEBOUNCE_PERIOD_MS && m_submenuButton.m_prevCountedState != state)
+        if(time - m_submenuButton.m_prevTime > BUTTON_CONSTANT_STATE_MS && m_submenuButton.m_prevCountedState != state)
         {
             m_submenuButton.m_prevCountedState = state;
 

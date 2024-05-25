@@ -11,6 +11,7 @@
 #include "bikeCalc.h"
 #include "hardwareUtility.h"
 #include "FSInteraction.h"
+#include "generalUtility.h"
 
 // waveshare E-Paper display config
 #define SERIAL_BITRATE 115200
@@ -35,7 +36,7 @@
 //////////////////////// Immage rela((ted
 #define NUMBER_OX_OFFSET 20
 
-GxEPD2_BW<GxEPD2_150_BN, GxEPD2_150_BN::HEIGHT> g_display(GxEPD2_150_BN(/*CS=D8*/ CHIP_SELECT, /*DC=D3*/ DATA_COMMAND, /*RST=D4*/ RST, /*BUSY=D2*/ BUSY)); // DEPG0150BN 200x200, SSD1681, TTGO T5 V2.4.1
+GxEPD2_BW<GxEPD2_150_BN, GxEPD2_150_BN::HEIGHT> g_display(GxEPD2_150_BN(/*CS=D8*/ DISPLAY_CHIP_SELECT, /*DC=D3*/ DATA_COMMAND, /*RST=D4*/ RST, /*BUSY=D2*/ BUSY)); // DEPG0150BN 200x200, SSD1681, TTGO T5 V2.4.1
 
 // spi_device_handle_t g_spi2;
 uint8_t g_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT];
@@ -47,7 +48,8 @@ void initPins()
 {
     // ePaper display pins
     pinMode(CHANGE_SUBMENU_PIN, INPUT_PULLDOWN);
-    pinMode(CHIP_SELECT, OUTPUT);
+    pinMode(DISPLAY_CHIP_SELECT, OUTPUT);
+    pinMode(SD_CHIP_SELECT, OUTPUT);
     pinMode(DATA_COMMAND, OUTPUT);
     pinMode(RST, OUTPUT);
     pinMode(BUSY, INPUT);
@@ -100,6 +102,7 @@ void displayManagement(void *args)
         g_display.firstPage();
         g_display.setTextSize(2);
 
+        enableDisplayCS();
         // enter menu and display the appropriate thing on the matrix then display it regardless of what it is
         menu.getImmage(g_matrixToDisplay);
 
@@ -190,8 +193,8 @@ void measurementTask(void *args)
             // record speed and acceleration
             snprintf(sendMessage, MAX_SIZE_OF_ERR_MSG, "%lf, %lf, %lf\n", 
                         tripData.m_currentVelocity, 
-                        tripData.m_currentVelocity - previousVelocity,
-                        (tripData.m_currentVelocity - previousVelocity) * (tripData.m_currentVelocity + previousVelocity) / (2 * WHEEL_PERIMETER_MM / MM_TO_KM));
+                        tripData.m_currentVelocity - tripData.m_previousVelocity,
+                        (tripData.m_currentVelocity - tripData.m_previousVelocity) * (tripData.m_currentVelocity + tripData.m_previousVelocity) / (2 * WHEEL_PERIMETER_MM / MM_TO_KM) * M_TO_KM);
             FSInteraction::appendStringToFile(g_velocityAccFilePath, sendMessage);
             
             previousVelocity = tripData.m_currentVelocity;
@@ -207,15 +210,16 @@ void measurementTask(void *args)
 }
 
 #define PRINT_CONTENTS_OF_ALL_FILES false
-#define RESET_FILES_AFTER_PRINT false
+#define RESET_FILES_AFTER_PRINT     false
 
 void setup()
 {    
     initPins();
     Serial.begin(115200);
-    
+
     g_communicationQueue = xQueueCreate(QUEUE_SIZE, sizeof(Menu));
-    if(g_communicationQueue == NULL){
+    if(g_communicationQueue == NULL)
+    {
         Serial.println("Error creating the queue\n");
     }
 
@@ -225,7 +229,6 @@ void setup()
     {
         Serial.print("printing from error file:\n");
         FSInteraction::printFileContents(g_errorCheckFilePath);
-        
         Serial.print("printing from monitor file:\n");
         FSInteraction::printFileContents(g_velocityAccFilePath);
         
