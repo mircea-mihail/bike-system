@@ -4,7 +4,6 @@ bool FSInteraction::m_canWriteToFs = false;
 
 bool FSInteraction::init()
 {
-    enableSdCS();
     if(!SD.begin()) 
     {
         Serial.println("Card Mount Failed");
@@ -34,7 +33,6 @@ bool FSInteraction::deleteFileContents(const char* p_filePath)
     {
         return false;
     }
-    enableSdCS();
 
     File fileObj = SD.open(p_filePath, FILE_WRITE);
     if(fileObj)
@@ -51,7 +49,6 @@ bool FSInteraction::copyFileContents(const char* p_donorFilePath, const char* p_
     {
         return false;
     }
-    enableSdCS();
 
     File donorFileObj = SD.open(p_donorFilePath, FILE_READ);
     File receiveFileObj = SD.open(p_receiveFilePath, FILE_WRITE);
@@ -76,7 +73,6 @@ bool FSInteraction::printFileContents(const char* p_filePath)
     {
         return false;
     }
-    enableSdCS();
 
     File fileObj = SD.open(p_filePath, FILE_READ);
     // SPIFFS.exists("/data/hall_sensor_errors.txt");
@@ -102,7 +98,6 @@ bool FSInteraction::appendStringToFile(const char* p_filePath, char *p_string)
     {
         return false;
     }
-    enableSdCS();
     
     File fileObj = SD.open(p_filePath, FILE_APPEND);
     if(fileObj)
