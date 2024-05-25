@@ -59,6 +59,42 @@ public:
 
     bool getChangedState();
 
+    bool operator== (const Menu p_rhs)
+    {
+        if(this->m_changedState == p_rhs.m_changedState 
+            && this->m_mainMenuState == p_rhs.m_mainMenuState
+            && this->m_submenuState == p_rhs.m_submenuState
+            && this->m_tripData == p_rhs.m_tripData)
+        {
+            return true;   
+        }
+
+        return false;
+    }
+
+    bool operator!= (const Menu p_rhs)
+    {
+        if(this->m_changedState == p_rhs.m_changedState 
+            && this->m_mainMenuState == p_rhs.m_mainMenuState
+            && this->m_submenuState == p_rhs.m_submenuState
+            && this->m_tripData == p_rhs.m_tripData)
+        {
+            return false;   
+        }
+
+        return true;
+    }
+
+    Menu & operator= (const Menu& p_rhs)
+    {
+        if(this != &p_rhs){
+            this->m_changedState = p_rhs.m_changedState; 
+            this->m_mainMenuState = p_rhs.m_mainMenuState;
+            this->m_submenuState = p_rhs.m_submenuState;
+            this->m_tripData = p_rhs.m_tripData;
+        }
+        return *this;
+    }
 };
 
 #endif

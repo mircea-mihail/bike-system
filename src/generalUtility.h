@@ -31,18 +31,6 @@
 #define RST GPIO_NUM_27             // External reset, low active
 #define BUSY GPIO_NUM_35            // Busy status output, high active
 
-void enableSdCS()
-{
-    digitalWrite(SD_CHIP_SELECT, HIGH);
-    digitalWrite(DISPLAY_CHIP_SELECT, LOW);
-}
-
-void enableDisplayCS()
-{
-    digitalWrite(SD_CHIP_SELECT, LOW);
-    digitalWrite(DISPLAY_CHIP_SELECT, HIGH);
-}
-
 // data packet to send to menu
 struct TripData
 {
@@ -52,6 +40,33 @@ struct TripData
     double m_currentVelocity;
     double m_previousVelocity;
     double m_tripAvgVelocity;   
+
+    bool operator== (const TripData p_rhs)
+    {
+        if(this->m_magnetDetections == p_rhs.m_magnetDetections
+            && this->m_rideStart == p_rhs.m_rideStart
+            && this->m_currentVelocity == p_rhs.m_currentVelocity
+            && this->m_previousVelocity == p_rhs.m_previousVelocity
+            && this->m_tripAvgVelocity == p_rhs.m_tripAvgVelocity
+        )
+        {
+            return true;
+        }
+        return false;
+    }
+
+    TripData & operator= (const TripData& p_rhs){
+        if(this != &p_rhs)
+        {
+            this->m_magnetDetections = p_rhs.m_magnetDetections;
+            this->m_rideStart = p_rhs.m_rideStart;
+            this->m_currentVelocity = p_rhs.m_currentVelocity;
+            this->m_previousVelocity = p_rhs.m_previousVelocity;
+            this->m_tripAvgVelocity = p_rhs.m_tripAvgVelocity;
+        }
+        return *this;
+    }
+
 };
 
 #endif
