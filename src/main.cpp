@@ -1,5 +1,18 @@
 // ePaper Library: https://github.com/ZinggJM/GxEPD2
 
+
+// todo:
+/*
+    make display do some back to back refreshes after full refresh (for like 10 secs?) 
+    (maybe every second for 10 secs to have a window to write to sd even in this time)
+
+    make task that writes to sd card
+   
+    make queues bigger (like 50-100)
+
+    make a separate queue for each file to get data from in the new task 
+*/
+
 // adafrit GFX library
 #include <GxEPD2_BW.h>
 #include <Fonts/FreeMonoBold9pt7b.h>
@@ -44,6 +57,8 @@ uint8_t g_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT];
 // using FreeRTOS queues to establish comms between tasks
 QueueHandle_t g_communicationQueue;
 
+xSemaphoreHandle g_spiMutex;
+
 void initPins()
 {
     // ePaper display pins
@@ -73,7 +88,7 @@ void initPins()
 //      check bounds when printing anything to the screen
 //      write rescale funtion to print the number as big or as small as you want
 
-void displayManagement(void *args)
+void displayManagement(void *p_args)
 {    
     resetPanel();
     g_display.init(SERIAL_BITRATE, true, WAVESHARE_REFRESH_TIME_MS, false);
@@ -87,6 +102,7 @@ void displayManagement(void *args)
 
     unsigned long lastFullRefresh = 0;
     Menu menu;
+    Menu prevMenuState;
 
     // one full white refresh
     clearImmage(g_matrixToDisplay);
@@ -96,27 +112,37 @@ void displayManagement(void *args)
     {
         // wait for as long as possible to receive the speed to print
         xQueueReceive(g_communicationQueue, &menu, SEND_DATA_DELAY_TICKS);
-        
-        // setup display for refresh
-        g_display.setFullWindow();
-        g_display.firstPage();
-        g_display.setTextSize(2);
-
-        enableDisplayCS();
-        // enter menu and display the appropriate thing on the matrix then display it regardless of what it is
-        menu.getImmage(g_matrixToDisplay);
-
-        // needs a full refresh
-        if(millis() - lastFullRefresh > FULL_EPAPER_REFRESH_PERIOD_MS)
+        if(menu != prevMenuState)
         {
-            lastFullRefresh = millis();
-            displayBlackPixels(g_matrixToDisplay, false);
-        }
-        // fast refresh,
-        else
-        {   
-            displayBlackPixels(g_matrixToDisplay, true);
-        }
+            Serial.print("starting Display\n");
+            // setup display for refresh
+            g_display.setFullWindow();
+            g_display.firstPage();
+            g_display.setTextSize(2);
+
+            // enter menu and display the appropriate thing on the matrix then display it regardless of what it is
+
+            if (xSemaphoreTake(g_spiMutex, portMAX_DELAY))
+            {
+                menu.getImmage(g_matrixToDisplay);
+
+                // needs a full refresh
+                if(millis() - lastFullRefresh > FULL_EPAPER_REFRESH_PERIOD_MS)
+                {
+                    lastFullRefresh = millis();
+                    displayBlackPixels(g_matrixToDisplay, false);
+                }
+                // fast refresh,
+                else
+                {   
+                    displayBlackPixels(g_matrixToDisplay, true);
+                }
+                xSemaphoreGive(g_spiMutex);
+            }
+            Serial.print("finishing Display\n");
+
+            prevMenuState = menu;    
+        }   
     }
 }
 
@@ -132,7 +158,35 @@ const char* g_velocityAccFilePath = "/data/speed_acc.txt";
 // periodically print an acc max for easier data analisys
 // find a way to extract the data from the folders easier
 
-void measurementTask(void *args)
+struct appendStringTaskArgs
+{
+    const char *m_filePath;
+    char m_stringToWrite[50];
+};
+
+void appendStringToFileTask(void *p_args)
+{
+    if (xSemaphoreTake(g_spiMutex, portMAX_DELAY))
+    {
+        Serial.print("about to write to task!\n");
+        // appendStringTaskArgs *args = (appendStringTaskArgs *)p_args; 
+        // FSInteraction::appendStringToFistartingle(args->m_filePath, args->m_stringToWrite);
+        
+        xSemaphoreGive(g_spiMutex);
+    }  
+    else
+    {
+        Serial.print("failed to write to task..\n");
+    }
+
+    while(true)
+    {
+
+    }
+
+}
+
+void measurementTask(void *p_args)
 {
     char sendMessage[MAX_SIZE_OF_ERR_MSG];
 
@@ -141,8 +195,19 @@ void measurementTask(void *args)
         char csvErrStartMsg[MAX_SIZE_OF_ERR_MSG] = "time, velocity\n";
         char csvSpeedAccStartMsg[MAX_SIZE_OF_ERR_MSG] = "velocity, delta V, acceleration\n";
 
-        FSInteraction::appendStringToFile(g_errorCheckFilePath, csvErrStartMsg);
-        FSInteraction::appendStringToFile(g_velocityAccFilePath, csvSpeedAccStartMsg);
+        // FSInteraction::appendStringToFile(g_errorCheckFilePath, csvErrStartMsg);
+        // FSInteraction::appendStringToFile(g_velocityAccFilePath, csvSpeedAccStartMsg);
+        appendStringTaskArgs initAppendStringArgs;
+        
+        initAppendStringArgs.m_filePath = g_errorCheckFilePath;
+        strcpy(initAppendStringArgs.m_stringToWrite, csvErrStartMsg);
+        // xTaskCreate(appendStringToFileTask, "csvErrStartMsg", DEFAULT_TASK_STACK_SIZE, (void*)(&initAppendStringArgs), DEFAULT_TASK_PRIORITY, NULL);
+        // xTaskCreate(appendStringToFileTask, "csvErrStartMsg", DEFAULT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, NULL);
+
+        initAppendStringArgs.m_filePath = g_velocityAccFilePath;
+        strcpy(initAppendStringArgs.m_stringToWrite, csvSpeedAccStartMsg);
+        // xTaskCreate(appendStringToFileTask, "csvErrStartMsg", DEFAULT_TASK_STACK_SIZE, (void*)(&initAppendStringArgs), DEFAULT_TASK_PRIORITY, NULL); 
+        // xTaskCreate(appendStringToFileTask, "csvSpeedAccStartMsg", DEFAULT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, NULL); 
     }
 
     TripData tripData;
@@ -184,19 +249,30 @@ void measurementTask(void *args)
             tripData = bikeCalc.recordDetection(); 
             sendingLatestSpeed = true;
 
+            appendStringTaskArgs csvAppendTaskArgs;
             // record errors
             if(tripData.m_currentVelocity > SPEED_THRESHOLD_VELOCITY_KMPH)
             {
                 snprintf(sendMessage, MAX_SIZE_OF_ERR_MSG, "%lu, %lf\n", millis()/MS_TO_SECONDS, tripData.m_currentVelocity);
-                FSInteraction::appendStringToFile(g_errorCheckFilePath, sendMessage);
+                // FSInteraction::appendStringToFile(g_errorCheckFilePath, sendMessage);
+                
+                csvAppendTaskArgs.m_filePath = g_errorCheckFilePath;
+                strcpy(csvAppendTaskArgs.m_stringToWrite, sendMessage);
+                // xTaskCreate(appendStringToFileTask, "csvSpeedAccStartMsg", DEFAULT_TASK_STACK_SIZE, (void*)(&csvAppendTaskArgs), DEFAULT_TASK_PRIORITY, NULL); 
+                // xTaskCreate(appendStringToFileTask, "csvErrSendMsg", DEFAULT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, NULL);
             }
             // record speed and acceleration
             snprintf(sendMessage, MAX_SIZE_OF_ERR_MSG, "%lf, %lf, %lf\n", 
                         tripData.m_currentVelocity, 
                         tripData.m_currentVelocity - tripData.m_previousVelocity,
                         (tripData.m_currentVelocity - tripData.m_previousVelocity) * (tripData.m_currentVelocity + tripData.m_previousVelocity) / (2 * WHEEL_PERIMETER_MM / MM_TO_KM) * M_TO_KM);
-            FSInteraction::appendStringToFile(g_velocityAccFilePath, sendMessage);
+            // FSInteraction::appendStringToFile(g_velocityAccFilePath, sendMessage);
             
+            csvAppendTaskArgs.m_filePath = g_velocityAccFilePath;
+            strcpy(csvAppendTaskArgs.m_stringToWrite, sendMessage);
+            // xTaskCreate(appendStringToFileTask, "velocityDataSendMessage", DEFAULT_TASK_STACK_SIZE, (void*)(&csvAppendTaskArgs), DEFAULT_TASK_PRIORITY, NULL);
+            // xTaskCreate(appendStringToFileTask, "velocityDataSendMessage", DEFAULT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, NULL);
+        
             previousVelocity = tripData.m_currentVelocity;
             
         }
@@ -237,15 +313,16 @@ void setup()
             FSInteraction::deleteFileContents(g_errorCheckFilePath);
             FSInteraction::deleteFileContents(g_velocityAccFilePath);
         }
-    }   
-    else
-    {
-        TaskHandle_t displayTaskHandle = NULL;
-        xTaskCreate(displayManagement, "display", DEFAULT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, &displayTaskHandle); 
 
-        TaskHandle_t measurementTaskHandle = NULL;
-        xTaskCreate(measurementTask, "measurement", MEASUREMENT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, &measurementTaskHandle);
-    }
+        return;
+    }   
+    g_spiMutex = xSemaphoreCreateMutex();
+
+    TaskHandle_t displayTaskHandle = NULL;
+    xTaskCreate(displayManagement, "display", DEFAULT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, &displayTaskHandle); 
+
+    TaskHandle_t measurementTaskHandle = NULL;
+    xTaskCreate(measurementTask, "measurement", MEASUREMENT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, &measurementTaskHandle);
 }
 
 void loop(){};
