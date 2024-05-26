@@ -43,6 +43,9 @@
 #define SEND_DATA_DELAY_TICKS 0
 #define IMMAGE_REPRINT_MS 50
 #define FULL_EPAPER_REFRESH_PERIOD_MS (180 * MS_TO_SECONDS)
+#define PRINT_BURST_PERIOD_MS (7 * MS_TO_SECONDS)
+#define BURST_REFRESH_TIMEOUT_MS (1 * MS_TO_SECONDS)
+
 // after full refresh keep printing for a bit to warm up the display
 #define CONTINUOUS_PRINT_PERIOD_MS 15000 
 #define SEND_MEASUREMENTS_PERIOD 1500
@@ -106,7 +109,6 @@ void displayManagement(void *p_args)
     g_display.setFont(&FreeMonoBoldOblique9pt7b);
     g_display.setTextColor(GxEPD_BLACK);
 
-    unsigned long lastFullRefresh = 0;
     Menu menu;
     Menu prevMenuState;
 
@@ -114,8 +116,24 @@ void displayManagement(void *p_args)
     clearImmage(g_matrixToDisplay);
     displayImmage(g_matrixToDisplay, false);
 
+    bool needsFullRefresh;
+    bool burstPrintAfterRefresh;
+
+    bool doBurstRefresh = true;
+    unsigned long lastBurstRefresh = millis();
+    unsigned long lastFullRefresh = millis();
     while(true)
     {
+        // only periodically do burst refresh (like every second for 6 seconds)
+        if(millis() - lastBurstRefresh > BURST_REFRESH_TIMEOUT_MS)
+        {
+            lastBurstRefresh = millis();
+            doBurstRefresh = true;
+        }
+        
+        needsFullRefresh = (millis() - lastFullRefresh > FULL_EPAPER_REFRESH_PERIOD_MS);
+        burstPrintAfterRefresh = (millis() - lastFullRefresh < PRINT_BURST_PERIOD_MS) && doBurstRefresh;
+
         // wait for as long as possible to receive the speed to print
         if (menu != g_menu && xSemaphoreTake(g_menuMutex, portMAX_DELAY))
         {
@@ -123,8 +141,10 @@ void displayManagement(void *p_args)
             xSemaphoreGive(g_menuMutex);
         }
 
-        if(menu != prevMenuState)
+        if(menu != prevMenuState || needsFullRefresh || burstPrintAfterRefresh)
         {
+            doBurstRefresh = false;
+
             // setup display for refresh
             g_display.setFullWindow();
             g_display.firstPage();
@@ -137,7 +157,7 @@ void displayManagement(void *p_args)
                 menu.getImmage(g_matrixToDisplay);
 
                 // needs a full refresh
-                if(millis() - lastFullRefresh > FULL_EPAPER_REFRESH_PERIOD_MS)
+                if(needsFullRefresh)
                 {
                     lastFullRefresh = millis();
                     displayBlackPixels(g_matrixToDisplay, false);
@@ -202,7 +222,7 @@ void writeToFileTask(void *p_args)
 
         if(dataToWrite != previousData)
         {
-            if (xSemaphoreTake(g_spiMutex, SEND_DATA_DELAY_TICKS))
+            if (xSemaphoreTake(g_spiMutex, portMAX_DELAY))
             {
                 Serial.print("about to write to task!\n");
 
