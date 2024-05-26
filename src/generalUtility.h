@@ -41,6 +41,15 @@ struct TripData
     double m_previousVelocity;
     double m_tripAvgVelocity;   
 
+    TripData()
+    {
+        m_magnetDetections = 0; 
+        m_rideStart = 0;
+        m_currentVelocity = 0;
+        m_previousVelocity = 0;
+        m_tripAvgVelocity = 0;
+    }
+
     bool operator== (const TripData p_rhs)
     {
         if(this->m_magnetDetections == p_rhs.m_magnetDetections
