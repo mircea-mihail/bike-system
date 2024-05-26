@@ -79,7 +79,6 @@ struct TripData
         return true;
     }
 
-
     TripData & operator= (const TripData& p_rhs){
         if(this != &p_rhs)
         {
@@ -91,7 +90,6 @@ struct TripData
         }
         return *this;
     }
-
 };
 
 #endif

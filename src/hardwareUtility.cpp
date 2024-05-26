@@ -1,15 +1,5 @@
 #include "hardwareUtility.h"
 
-// bool debounceActiveLowSenor(int64_t p_lastSensorDetectionTime, const int p_sensorPin)
-// {
-//     bool detectedActivity = !digitalRead(p_sensorPin);
-//     if(esp_timer_get_time() - p_lastSensorDetectionTime < (DEBOUNCE_PERIOD_MS * MILLIS_TO_MICROS))
-//     {
-//         return HIGH; // active low, return HIGH when innactive
-//     }
-//     return detectedActivity;
-// }
-
 // no filtering on sensor reading -> all filtering is done in the speed recording area
 bool HardwareUtility::detectedSensor()
 {

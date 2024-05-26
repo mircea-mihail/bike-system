@@ -1,8 +1,5 @@
 #include "bikeCalc.h"
 
-/// @brief records the latest hall sensor reading and updates all member variables dependent on it
-/// @param p_lastWheelDetectionTime the time that the reading took pl
-/// @return 
 TripData BikeCalc::recordDetection()
 {        
     int64_t fullSpinDurationMicros = esp_timer_get_time() - m_lastWheelDetectionTime;

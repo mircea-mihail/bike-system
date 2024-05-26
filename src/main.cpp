@@ -69,4 +69,8 @@ void setup()
 
 }
 
-void loop(){};
+// don't need the loop task (everything takes place in the custom tasks)
+void loop()
+{
+    vTaskDelete(NULL);
+};

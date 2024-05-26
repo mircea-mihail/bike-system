@@ -25,6 +25,7 @@ void displayManagement(void *p_args)
     bool doBurstRefresh = true;
     unsigned long lastBurstRefresh = millis();
     unsigned long lastFullRefresh = millis();
+    
     while(true)
     {
         // only periodically do burst refresh (like every second for 6 seconds)

@@ -41,60 +41,52 @@ private:
     bool m_changedState;
 
 public:
+    /// @brief constructor used to init the member variables
+    /// @param p_mainMenuState the main menu state, used to know what to display
+    /// @param p_submenuState the sub-menu state, used to know what to display
     Menu(mainMenuStates p_mainMenuState = Speed, submenuStates p_submenuState = Instant)
         : m_mainMenuState(p_mainMenuState), m_submenuState(p_submenuState) 
     {
         m_changedState = true;
     };
     
+    /// @brief the part that does the actual displaying of the letters on the screen
+    ///     and that writes to the pixel matrix the appropriate number to be then sent to the screen
+    /// @param p_matrixToDisplay the 200 x 200 matrix that is then displayed to the screen
     void getImmage(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT]);
     
-    void update(TripData p_currentVelocity);
+    /// @brief updates the tripdata member variable
+    /// @param p_tripData value to put in the trip data member variable
+    void update(TripData p_tripData);
 
+    /// @brief updates the menu state if it should
+    /// @param p_shouldChangeState only change state when this is true
     void nextMenuState(bool p_shouldChangeState);
     
+    /// @brief updates the submenu state to the next one in order
     void nextSubmenuState();
 
+    /// @brief resets the changedState member variable
     void resetChangedState();
-
+    
+    /// @brief used to get the state of the changedState member variable
+    /// @return returns the state of the changedState member variable
     bool getChangedState();
 
-    bool operator== (const Menu p_rhs)
-    {
-        if(this->m_changedState == p_rhs.m_changedState 
-            && this->m_mainMenuState == p_rhs.m_mainMenuState
-            && this->m_submenuState == p_rhs.m_submenuState
-            && this->m_tripData == p_rhs.m_tripData)
-        {
-            return true;   
-        }
+    /// @brief overloads the == operator 
+    /// @param p_rhs the right hand side Menu object to compare to
+    /// @return returns the result of the comparison
+    bool operator== (const Menu p_rhs);
 
-        return false;
-    }
+    /// @brief overloads the == operator 
+    /// @param p_rhs the right hand side Menu object to compare to
+    /// @return returns the result of the comparison
+    bool operator!= (const Menu p_rhs);
 
-    bool operator!= (const Menu p_rhs)
-    {
-        if(this->m_changedState == p_rhs.m_changedState 
-            && this->m_mainMenuState == p_rhs.m_mainMenuState
-            && this->m_submenuState == p_rhs.m_submenuState
-            && this->m_tripData == p_rhs.m_tripData)
-        {
-            return false;   
-        }
-
-        return true;
-    }
-
-    Menu & operator= (const Menu& p_rhs)
-    {
-        if(this != &p_rhs){
-            this->m_changedState = p_rhs.m_changedState; 
-            this->m_mainMenuState = p_rhs.m_mainMenuState;
-            this->m_submenuState = p_rhs.m_submenuState;
-            this->m_tripData = p_rhs.m_tripData;
-        }
-        return *this;
-    }
+    /// @brief overloads the = operator
+    /// @param p_rhs the right hand side Menu object
+    /// @return returns the changed this refference
+    Menu & operator= (const Menu& p_rhs);
 };
 
 #endif

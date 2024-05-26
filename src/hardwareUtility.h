@@ -29,12 +29,16 @@ private:
     button m_submenuButton;
 
 public:
-    // bool debounceActiveLowSenor(int64_t p_lastSensorDetectionTime, const int p_sensorPin);
+    /// @brief detects if the sensor changed state from 1 to 0 (active low sensor)
+    /// @return returns true if the sensor is triggered
     bool detectedSensor();
 
+    /// @brief debounces the menu button
+    /// @return returns true if it has been pressed
     bool pressedMenuButton();
 
-    // not sure why button spamming does not really work? Not a big deal atm
+    /// @brief debounces the submenu button
+    /// @return returns true if it has been pressed
     bool pressedSubmenuButton();
 };
 
