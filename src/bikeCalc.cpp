@@ -26,7 +26,6 @@ TripData BikeCalc::recordDetection()
     m_lastWheelDetectionTime = esp_timer_get_time();
     m_data.m_previousVelocity = previousVelocity;
 
-
     return dataToSend;
 }
 
