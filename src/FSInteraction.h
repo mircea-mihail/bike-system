@@ -46,6 +46,7 @@ public:
     /// @return if operation was succesful (bool)
     static bool appendStringToFile(const char* p_filePath, char *p_string);
 
+    static int32_t getFileSize(const char* p_filePath);
 };
 
 #endif

@@ -75,7 +75,6 @@ bool FSInteraction::printFileContents(const char* p_filePath)
     }
 
     File fileObj = SD.open(p_filePath, FILE_READ);
-    // SPIFFS.exists("/data/hall_sensor_errors.txt");
     if(fileObj)
     {
         int readChar = fileObj.read();
@@ -111,3 +110,30 @@ bool FSInteraction::appendStringToFile(const char* p_filePath, char *p_string)
     }
     return false;
 }
+
+int32_t FSInteraction::getFileSize(const char* p_filePath)
+{
+    if(!m_canWriteToFs)
+    {
+        return -1;
+    }
+    int32_t fileSize = 0;
+
+    File fileObj = SD.open(p_filePath, FILE_READ);
+    if(fileObj)
+    {
+        int readChar = fileObj.read();
+        fileSize ++;
+        while(readChar != -1)
+        {
+            fileSize ++;
+            readChar = fileObj.read();
+        }
+        fileObj.close();
+        return fileSize;
+    }
+    return -1;
+}
+
+
+// SPIFFS.exists("/data/hall_sensor_errors.txt");
