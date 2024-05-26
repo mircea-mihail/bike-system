@@ -35,7 +35,8 @@
 #define DEFAULT_TASK_PRIORITY tskIDLE_PRIORITY
 #define DEFAULT_TASK_STACK_SIZE 2048
 #define MEASUREMENT_TASK_STACK_SIZE 8192
-#define QUEUE_SIZE 10
+#define FILE_WRITING_TASK_STACK_SIZE 8192
+#define QUEUE_SIZE 30
 
 // timing related
 #define MS_TO_SECONDS 1000
@@ -56,6 +57,10 @@ uint8_t g_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT];
 
 // using FreeRTOS queues to establish comms between tasks
 QueueHandle_t g_communicationQueue;
+
+QueueHandle_t g_tripDataQueue;
+
+// used for sending data from bike calc to display task
 Menu g_menu;
 
 xSemaphoreHandle g_menuMutex;
@@ -89,7 +94,6 @@ void initPins()
 //      * after full refresh update continuously for some seconds or so to "warm up" pixels 
 //      check bounds when printing anything to the screen
 //      write rescale funtion to print the number as big or as small as you want
-
 void displayManagement(void *p_args)
 {    
     resetPanel();
@@ -113,7 +117,6 @@ void displayManagement(void *p_args)
     while(true)
     {
         // wait for as long as possible to receive the speed to print
-        // xQueueReceive(g_communicationQueue, &menu, SEND_DATA_DELAY_TICKS);
         if (menu != g_menu && xSemaphoreTake(g_menuMutex, portMAX_DELAY))
         {
             menu = g_menu;
@@ -164,58 +167,72 @@ const char* g_velocityAccFilePath = "/data/speed_acc.txt";
 // periodically print an acc max for easier data analisys
 // find a way to extract the data from the folders easier
 
-struct appendStringTaskArgs
+void writeToFileTask(void *p_args)
 {
-    const char *m_filePath;
-    char m_stringToWrite[50];
-};
+    if (FSInteraction::canWriteToFs()) 
+    {  
+        if (xSemaphoreTake(g_spiMutex, portMAX_DELAY))
+        { 
+            char csvErrStartMsg[MAX_SIZE_OF_ERR_MSG] = "time, velocity\n";
+            char csvSpeedAccStartMsg[MAX_SIZE_OF_ERR_MSG] = "velocity, delta V, acceleration\n";
 
-void appendStringToFileTask(void *p_args)
-{
-    if (xSemaphoreTake(g_spiMutex, portMAX_DELAY))
-    {
-        Serial.print("about to write to task!\n");
-        // appendStringTaskArgs *args = (appendStringTaskArgs *)p_args; 
-        // FSInteraction::appendStringToFistartingle(args->m_filePath, args->m_stringToWrite);
-        
-        xSemaphoreGive(g_spiMutex);
-    }  
+            FSInteraction::appendStringToFile(g_errorCheckFilePath, csvErrStartMsg);
+            FSInteraction::appendStringToFile(g_velocityAccFilePath, csvSpeedAccStartMsg);
+            
+            xSemaphoreGive(g_spiMutex);
+        }
+        else
+        {
+            Serial.print("failed to write to task..\n");
+        }
+    }
     else
     {
-        Serial.print("failed to write to task..\n");
+        // no point to this task if it cannot write to the file system
+        vTaskDelete(NULL); 
+        return;
     }
+
+    TripData dataToWrite, previousData;
+    char sendMessage[MAX_SIZE_OF_ERR_MSG];
 
     while(true)
     {
+        xQueueReceive(g_tripDataQueue, &dataToWrite, SEND_DATA_DELAY_TICKS);
 
+        if(dataToWrite != previousData)
+        {
+            if (xSemaphoreTake(g_spiMutex, SEND_DATA_DELAY_TICKS))
+            {
+                Serial.print("about to write to task!\n");
+
+                // record error (not sure what to do here yet)                
+                // snprintf(sendMessage, MAX_SIZE_OF_ERR_MSG, "%lu, %lf\n", millis()/MS_TO_SECONDS, dataToWrite.m_currentVelocity);
+                // FSInteraction::appendStringToFile(g_errorCheckFilePath, sendMessage);
+                
+                // record speed and acceleration
+                snprintf(sendMessage, MAX_SIZE_OF_ERR_MSG, "%.2lf, %.2lf\n", 
+                            dataToWrite.m_currentVelocity, 
+                            dataToWrite.m_currentVelocity - dataToWrite.m_previousVelocity);
+                            // (dataToWrite.m_currentVelocity - dataToWrite.m_previousVelocity) * (dataToWrite.m_currentVelocity + dataToWrite.m_previousVelocity) / (2 * WHEEL_PERIMETER_MM / MM_TO_KM) * M_TO_KM);
+                FSInteraction::appendStringToFile(g_velocityAccFilePath, sendMessage);
+                        
+                Serial.print(sendMessage);
+
+                xSemaphoreGive(g_spiMutex);
+            }  
+            else
+            {
+                Serial.print("failed to write to task..\n");
+            }
+
+            previousData = dataToWrite;
+        }
     }
-
 }
 
 void measurementTask(void *p_args)
 {
-    char sendMessage[MAX_SIZE_OF_ERR_MSG];
-
-    if (FSInteraction::canWriteToFs()) 
-    {   
-        char csvErrStartMsg[MAX_SIZE_OF_ERR_MSG] = "time, velocity\n";
-        char csvSpeedAccStartMsg[MAX_SIZE_OF_ERR_MSG] = "velocity, delta V, acceleration\n";
-
-        // FSInteraction::appendStringToFile(g_errorCheckFilePath, csvErrStartMsg);
-        // FSInteraction::appendStringToFile(g_velocityAccFilePath, csvSpeedAccStartMsg);
-        appendStringTaskArgs initAppendStringArgs;
-        
-        initAppendStringArgs.m_filePath = g_errorCheckFilePath;
-        strcpy(initAppendStringArgs.m_stringToWrite, csvErrStartMsg);
-        // xTaskCreate(appendStringToFileTask, "csvErrStartMsg", DEFAULT_TASK_STACK_SIZE, (void*)(&initAppendStringArgs), DEFAULT_TASK_PRIORITY, NULL);
-        // xTaskCreate(appendStringToFileTask, "csvErrStartMsg", DEFAULT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, NULL);
-
-        initAppendStringArgs.m_filePath = g_velocityAccFilePath;
-        strcpy(initAppendStringArgs.m_stringToWrite, csvSpeedAccStartMsg);
-        // xTaskCreate(appendStringToFileTask, "csvErrStartMsg", DEFAULT_TASK_STACK_SIZE, (void*)(&initAppendStringArgs), DEFAULT_TASK_PRIORITY, NULL); 
-        // xTaskCreate(appendStringToFileTask, "csvSpeedAccStartMsg", DEFAULT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, NULL); 
-    }
-
     TripData tripData;
     Menu menu;
     BikeCalc bikeCalc;
@@ -235,7 +252,6 @@ void measurementTask(void *p_args)
             if(sendingLatestSpeed)
             {
                 menu.update(tripData);
-                // xQueueSend(g_communicationQueue, &menu, SEND_DATA_DELAY_TICKS);
                 menu.resetChangedState();
 
                 if (xSemaphoreTake(g_menuMutex, portMAX_DELAY))
@@ -248,7 +264,6 @@ void measurementTask(void *p_args)
             {
                 TripData estimatedData = bikeCalc.approximateVelocity();
                 menu.update(estimatedData);
-                // xQueueSend(g_communicationQueue, &menu, SEND_DATA_DELAY_TICKS);
                 menu.resetChangedState();
 
                 if (xSemaphoreTake(g_menuMutex, portMAX_DELAY))
@@ -265,32 +280,11 @@ void measurementTask(void *p_args)
         if(hwUtil.detectedSensor())
         {
             tripData = bikeCalc.recordDetection(); 
-            sendingLatestSpeed = true;
-
-            appendStringTaskArgs csvAppendTaskArgs;
-            // record errors
-            if(tripData.m_currentVelocity > SPEED_THRESHOLD_VELOCITY_KMPH)
-            {
-                snprintf(sendMessage, MAX_SIZE_OF_ERR_MSG, "%lu, %lf\n", millis()/MS_TO_SECONDS, tripData.m_currentVelocity);
-                // FSInteraction::appendStringToFile(g_errorCheckFilePath, sendMessage);
-                
-                csvAppendTaskArgs.m_filePath = g_errorCheckFilePath;
-                strcpy(csvAppendTaskArgs.m_stringToWrite, sendMessage);
-                // xTaskCreate(appendStringToFileTask, "csvSpeedAccStartMsg", DEFAULT_TASK_STACK_SIZE, (void*)(&csvAppendTaskArgs), DEFAULT_TASK_PRIORITY, NULL); 
-                // xTaskCreate(appendStringToFileTask, "csvErrSendMsg", DEFAULT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, NULL);
-            }
-            // record speed and acceleration
-            snprintf(sendMessage, MAX_SIZE_OF_ERR_MSG, "%lf, %lf, %lf\n", 
-                        tripData.m_currentVelocity, 
-                        tripData.m_currentVelocity - tripData.m_previousVelocity,
-                        (tripData.m_currentVelocity - tripData.m_previousVelocity) * (tripData.m_currentVelocity + tripData.m_previousVelocity) / (2 * WHEEL_PERIMETER_MM / MM_TO_KM) * M_TO_KM);
-            // FSInteraction::appendStringToFile(g_velocityAccFilePath, sendMessage);
             
-            csvAppendTaskArgs.m_filePath = g_velocityAccFilePath;
-            strcpy(csvAppendTaskArgs.m_stringToWrite, sendMessage);
-            // xTaskCreate(appendStringToFileTask, "velocityDataSendMessage", DEFAULT_TASK_STACK_SIZE, (void*)(&csvAppendTaskArgs), DEFAULT_TASK_PRIORITY, NULL);
-            // xTaskCreate(appendStringToFileTask, "velocityDataSendMessage", DEFAULT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, NULL);
-        
+            // todo (not sure how long to wait, leaving 0 for now)
+            xQueueSend(g_tripDataQueue, &tripData, SEND_DATA_DELAY_TICKS);
+
+            sendingLatestSpeed = true;        
             previousVelocity = tripData.m_currentVelocity;
             
         }
@@ -311,8 +305,8 @@ void setup()
     initPins();
     Serial.begin(115200);
 
-    g_communicationQueue = xQueueCreate(QUEUE_SIZE, sizeof(Menu));
-    if(g_communicationQueue == NULL)
+    g_tripDataQueue = xQueueCreate(QUEUE_SIZE, sizeof(TripData));
+    if(g_tripDataQueue == NULL)
     {
         Serial.println("Error creating the queue\n");
     }
@@ -337,11 +331,15 @@ void setup()
     g_spiMutex = xSemaphoreCreateMutex();
     g_menuMutex = xSemaphoreCreateMutex();
 
+    TaskHandle_t writeToFsTask = NULL;
+    xTaskCreate(writeToFileTask, "writeToFsTask", FILE_WRITING_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, &writeToFsTask);
+
     TaskHandle_t displayTaskHandle = NULL;
     xTaskCreate(displayManagement, "display", DEFAULT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, &displayTaskHandle); 
 
     TaskHandle_t measurementTaskHandle = NULL;
     xTaskCreate(measurementTask, "measurement", MEASUREMENT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, &measurementTaskHandle);
+
 }
 
 void loop(){};
