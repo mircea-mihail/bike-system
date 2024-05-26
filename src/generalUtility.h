@@ -55,6 +55,21 @@ struct TripData
         return false;
     }
 
+    bool operator!= (const TripData p_rhs)
+    {
+        if(this->m_magnetDetections == p_rhs.m_magnetDetections
+            && this->m_rideStart == p_rhs.m_rideStart
+            && this->m_currentVelocity == p_rhs.m_currentVelocity
+            && this->m_previousVelocity == p_rhs.m_previousVelocity
+            && this->m_tripAvgVelocity == p_rhs.m_tripAvgVelocity
+        )
+        {
+            return false;
+        }
+        return true;
+    }
+
+
     TripData & operator= (const TripData& p_rhs){
         if(this != &p_rhs)
         {
