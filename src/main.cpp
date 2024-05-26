@@ -56,7 +56,9 @@ uint8_t g_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT];
 
 // using FreeRTOS queues to establish comms between tasks
 QueueHandle_t g_communicationQueue;
+Menu g_menu;
 
+xSemaphoreHandle g_menuMutex;
 xSemaphoreHandle g_spiMutex;
 
 void initPins()
@@ -111,10 +113,15 @@ void displayManagement(void *p_args)
     while(true)
     {
         // wait for as long as possible to receive the speed to print
-        xQueueReceive(g_communicationQueue, &menu, SEND_DATA_DELAY_TICKS);
+        // xQueueReceive(g_communicationQueue, &menu, SEND_DATA_DELAY_TICKS);
+        if (menu != g_menu && xSemaphoreTake(g_menuMutex, portMAX_DELAY))
+        {
+            menu = g_menu;
+            xSemaphoreGive(g_menuMutex);
+        }
+
         if(menu != prevMenuState)
         {
-            Serial.print("starting Display\n");
             // setup display for refresh
             g_display.setFullWindow();
             g_display.firstPage();
@@ -139,7 +146,6 @@ void displayManagement(void *p_args)
                 }
                 xSemaphoreGive(g_spiMutex);
             }
-            Serial.print("finishing Display\n");
 
             prevMenuState = menu;    
         }   
@@ -229,15 +235,27 @@ void measurementTask(void *p_args)
             if(sendingLatestSpeed)
             {
                 menu.update(tripData);
-                xQueueSend(g_communicationQueue, &menu, SEND_DATA_DELAY_TICKS);
+                // xQueueSend(g_communicationQueue, &menu, SEND_DATA_DELAY_TICKS);
                 menu.resetChangedState();
+
+                if (xSemaphoreTake(g_menuMutex, portMAX_DELAY))
+                {
+                    g_menu = menu;
+                    xSemaphoreGive(g_menuMutex);
+                }
             }
             else
             {
                 TripData estimatedData = bikeCalc.approximateVelocity();
                 menu.update(estimatedData);
-                xQueueSend(g_communicationQueue, &menu, SEND_DATA_DELAY_TICKS);
+                // xQueueSend(g_communicationQueue, &menu, SEND_DATA_DELAY_TICKS);
                 menu.resetChangedState();
+
+                if (xSemaphoreTake(g_menuMutex, portMAX_DELAY))
+                {
+                    g_menu = menu;
+                    xSemaphoreGive(g_menuMutex);
+                }
             }
             
             sendingLatestSpeed = false;
@@ -317,6 +335,7 @@ void setup()
         return;
     }   
     g_spiMutex = xSemaphoreCreateMutex();
+    g_menuMutex = xSemaphoreCreateMutex();
 
     TaskHandle_t displayTaskHandle = NULL;
     xTaskCreate(displayManagement, "display", DEFAULT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, &displayTaskHandle); 
