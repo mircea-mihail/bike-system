@@ -79,11 +79,15 @@ void displayManagement(void *p_args)
     }
 }
 
+// list files, see which one starts with the highest number 
+// followed by the filename i'm interested in
+// check that file's size and if too big create a new one starting with a new number
+// append to this file periodically checking size and creating an new one if needed
 void writeToFileTask(void *p_args)
 {
     // csv files 
-    const char* errorCheckFilePath = "/data/hall_sensor_errors.txt";
-    const char* velocityAccFilePath = "/data/speed_acc.txt";
+    const char errorCheckFilePath[MAX_SIZE_OF_FILE_PATH] = "/data/hall_sensor_errors.txt";
+    const char velocityAccFilePath[MAX_SIZE_OF_FILE_PATH] = "/data/speed_acc.txt";
 
     FSInteraction::init();
 
@@ -93,7 +97,8 @@ void writeToFileTask(void *p_args)
         FSInteraction::printFileContents(errorCheckFilePath);
         Serial.print("printing from monitor file:\n");
         FSInteraction::printFileContents(velocityAccFilePath);
-        
+        Serial.print("total file size: ");
+        Serial.println(FSInteraction::getFileSize(velocityAccFilePath));
         if(RESET_FILES_AFTER_PRINT)
         {
             FSInteraction::deleteFileContents(errorCheckFilePath);
