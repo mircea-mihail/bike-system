@@ -8,6 +8,7 @@
 #define MILLIS_TO_MICROS 1000UL
 #define MICROS_TO_SECONDS 1000000UL
 #define SECONDS_TO_HOURS 3600UL
+#define MS_TO_SECONDS 1000
 
 // hardware debounce timings
 #define SENSOR_DEBOUNCE_PERIOD_MS 10UL
