@@ -66,10 +66,9 @@ void setup()
 
     TaskHandle_t measurementTaskHandle = NULL;
     xTaskCreate(measurementTask, "measurement", MEASUREMENT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, &measurementTaskHandle);
-
 }
 
-// don't need the loop task (everything takes place in the custom tasks)
+// don't need the loop (everything takes place in custom tasks)
 void loop()
 {
     vTaskDelete(NULL);
