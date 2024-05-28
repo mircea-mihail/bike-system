@@ -111,29 +111,83 @@ bool FSInteraction::appendStringToFile(const char* p_filePath, char *p_string)
     return false;
 }
 
-int32_t FSInteraction::getFileSize(const char* p_filePath)
+size_t FSInteraction::getFileSize(const char* p_filePath)
+{
+    if(!m_canWriteToFs)
+    {
+        return 0;
+    }
+
+    File fileObj = SD.open(p_filePath, FILE_READ);
+    if(fileObj)
+    {
+        return fileObj.size();
+    }
+    return 0;
+}
+
+
+int FSInteraction::getLatestVersion(const char * p_dirname, const char *p_fileName)
 {
     if(!m_canWriteToFs)
     {
         return -1;
     }
-    int32_t fileSize = 0;
 
-    File fileObj = SD.open(p_filePath, FILE_READ);
-    if(fileObj)
+    File root = SD.open(p_dirname);
+    if(!root)
     {
-        int readChar = fileObj.read();
-        fileSize ++;
-        while(readChar != -1)
-        {
-            fileSize ++;
-            readChar = fileObj.read();
-        }
-        fileObj.close();
-        return fileSize;
+        Serial.println("Failed to open directory");
+        return -1;
     }
-    return -1;
-}
+    if(!root.isDirectory())
+    {
+        Serial.println("Not a directory");
+        return -1;
+    }
 
+    File file = root.openNextFile();
+    
+    int maxFileIdx = 0;
+    char fileIdxBuffer[MAX_SIZE_OF_FILE_NAME];
+
+    // the file name looks like this:
+    // fileName.txt
+    // and the file with the index in front:
+    // 1_fileName.txt
+    Serial.println("about to check files");
+    while(file)
+    {
+        Serial.println("found a file: ");
+        Serial.print(file.name());
+
+        if(!file.isDirectory())
+        {
+            char *checkFilePtr;
+            const char *currentFilePtr = file.name();
+            checkFilePtr = strstr(currentFilePtr, p_fileName);
+            
+            if(checkFilePtr != NULL)
+            {
+                Serial.println("filename is within file");
+                int idx = 0;
+                while(IDX_FILE_SEPARATOR_CHAR != currentFilePtr[idx] && p_fileName[0] != currentFilePtr[idx])
+                {   
+                    fileIdxBuffer[idx] = currentFilePtr[idx];
+                    idx ++;
+                }
+                fileIdxBuffer[idx] = '\0';
+                int fileIdx = atoi(fileIdxBuffer);
+                
+                if(fileIdx > maxFileIdx)
+                {
+                    maxFileIdx = fileIdx;
+                }
+            }
+        }
+        file = root.openNextFile();
+    }
+    return maxFileIdx;
+}
 
 // SPIFFS.exists("/data/hall_sensor_errors.txt");

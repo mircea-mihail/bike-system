@@ -9,6 +9,8 @@
 
 #include "generalUtility.h"
 
+#define IDX_FILE_SEPARATOR_CHAR '_'
+
 class FSInteraction
 {
 private:
@@ -46,7 +48,9 @@ public:
     /// @return if operation was succesful (bool)
     static bool appendStringToFile(const char* p_filePath, char *p_string);
 
-    static int32_t getFileSize(const char* p_filePath);
+    static size_t getFileSize(const char* p_filePath);
+
+    static int getLatestVersion(const char * p_dirname, const char *  p_fileName);
 };
 
 #endif
