@@ -31,9 +31,6 @@
 #define BURST_REFRESH_TIMEOUT_MS (1 * MS_TO_SECONDS)
 
 //////////////////////////////////////// writeToFile task
-// data sizes
-#define MAX_SIZE_OF_ERR_MSG 50
-#define MAX_SIZE_OF_FILE_PATH 50
 // timing related
 #define SEND_DATA_DELAY_TICKS 0
 // misc

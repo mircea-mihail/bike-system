@@ -75,6 +75,8 @@ void displayManagement(void *p_args)
             }
 
             prevMenuState = menu;    
+            
+            taskYIELD(); // yeld after update
         }   
     }
 }
@@ -85,11 +87,40 @@ void displayManagement(void *p_args)
 // append to this file periodically checking size and creating an new one if needed
 void writeToFileTask(void *p_args)
 {
-    // csv files 
-    const char errorCheckFilePath[MAX_SIZE_OF_FILE_PATH] = "/data/hall_sensor_errors.txt";
-    const char velocityAccFilePath[MAX_SIZE_OF_FILE_PATH] = "/data/speed_acc.txt";
-
     FSInteraction::init();
+
+    // csv files 
+    const char writeDirPath[MAX_SIZE_OF_DIR_PATH] = "/data";
+    
+    // const char default
+    const char errorFileName[MAX_SIZE_OF_FILE_NAME] = "hall_sensor_errors.txt";
+    const char velocityAccFileName[MAX_SIZE_OF_FILE_NAME] = "speed_acc.txt";
+
+    char errorCheckFilePath[MAX_SIZE_OF_FILE_PATH] = "/data/hall_sensor_errors.txt";
+    char velocityAccFilePath[MAX_SIZE_OF_FILE_PATH];
+
+    Serial.print("about to get latest ver");
+    int currentFileIdx = FSInteraction::getLatestVersion(writeDirPath, velocityAccFileName);
+
+    char fileVersion[MAX_SIZE_OF_FILE_NAME];
+    snprintf(fileVersion, MAX_SIZE_OF_FILE_NAME, "%d", currentFileIdx);
+    strcpy(velocityAccFilePath, writeDirPath);
+    strcat(velocityAccFilePath, "/");
+    strcat(velocityAccFilePath, fileVersion);
+    strcat(velocityAccFilePath, "_");
+    strcat(velocityAccFilePath, velocityAccFileName);
+
+    if(FSInteraction::getFileSize(velocityAccFilePath) > MAX_FILE_SIZE_BYTES)
+    {
+        currentFileIdx ++;
+        char fileVersion[MAX_SIZE_OF_FILE_NAME];
+        snprintf(fileVersion, MAX_SIZE_OF_FILE_NAME, "%d", currentFileIdx);
+        strcpy(velocityAccFilePath, writeDirPath);
+        strcat(velocityAccFilePath, "/");
+        strcat(velocityAccFilePath, fileVersion);
+        strcat(velocityAccFilePath, "_");
+        strcat(velocityAccFilePath, velocityAccFileName);
+    }
 
     if(PRINT_CONTENTS_OF_ALL_FILES)
     {
@@ -159,7 +190,22 @@ void writeToFileTask(void *p_args)
                         
                 Serial.print(sendMessage);
 
+                // check file size and make a new file fi surpassed max acceptable file size
+                if(FSInteraction::getFileSize(velocityAccFilePath) > MAX_FILE_SIZE_BYTES)
+                {
+                    currentFileIdx ++;
+                    char fileVersion[MAX_SIZE_OF_FILE_NAME];
+                    snprintf(fileVersion, MAX_SIZE_OF_FILE_NAME, "%d", currentFileIdx);
+                    strcpy(velocityAccFilePath, writeDirPath);
+                    strcat(velocityAccFilePath, "/");
+                    strcat(velocityAccFilePath, fileVersion);
+                    strcat(velocityAccFilePath, "_");
+                    strcat(velocityAccFilePath, velocityAccFileName);
+                }
+
                 xSemaphoreGive(g_spiMutex);
+                
+                taskYIELD(); // yeld after writing
             }  
             else
             {
