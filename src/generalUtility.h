@@ -14,6 +14,14 @@
 #define SENSOR_DEBOUNCE_PERIOD_MS 10UL
 #define BUTTON_CONSTANT_STATE_MS 70UL
 
+// data sizes
+#define MAX_SIZE_OF_ERR_MSG 50
+#define MAX_SIZE_OF_DIR_PATH 20
+#define MAX_SIZE_OF_FILE_NAME 30
+#define MAX_SIZE_OF_FILE_PATH (MAX_SIZE_OF_DIR_PATH + MAX_SIZE_OF_FILE_NAME)
+// max size is this value so that a new file is created every 5 minutes for an average speed of 21 kmph
+#define MAX_FILE_SIZE_BYTES 12800
+
 /////////////////////////////// pins
 // input pins
 #define HALL_SENSOR_PIN GPIO_NUM_39
