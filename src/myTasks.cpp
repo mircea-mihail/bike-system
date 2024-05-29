@@ -205,7 +205,6 @@ void writeToFileTask(void *p_args)
 
                 xSemaphoreGive(g_spiMutex);
                 
-                taskYIELD(); // yeld after writing
             }  
             else
             {
@@ -213,7 +212,10 @@ void writeToFileTask(void *p_args)
             }
 
             previousData = dataToWrite;
+
         }
+
+        taskYIELD(); 
     }
 }
 
@@ -279,6 +281,7 @@ void measurementTask(void *p_args)
         {
             menu.nextSubmenuState();
         }
-        // taskYIELD();
+        
+        taskYIELD();
     }
 }
