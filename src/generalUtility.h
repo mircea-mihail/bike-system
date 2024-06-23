@@ -5,10 +5,13 @@
 #define MM_TO_KM 1000000UL
 #define MM_TO_M 1000UL
 #define M_TO_KM 1000UL
+
 #define MILLIS_TO_MICROS 1000UL
 #define MICROS_TO_SECONDS 1000000UL
 #define SECONDS_TO_HOURS 3600UL
 #define MS_TO_SECONDS 1000
+
+#define KMPH_TO_MPS (10/36)
 
 // hardware debounce timings
 #define SENSOR_DEBOUNCE_PERIOD_MS 10UL

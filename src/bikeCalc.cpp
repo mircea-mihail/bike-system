@@ -7,7 +7,8 @@ TripData BikeCalc::recordDetection()
     int64_t previousDetection = m_data.m_latestDetectionTime;
     double currentVelocity = (WHEEL_PERIMETER_MM * SECONDS_TO_HOURS / (double)fullSpinDurationMicros);
 
-    double currentAcceleration = (currentVelocity - previousVelocity) / (esp_timer_get_time() - previousDetection);
+    //  CONVERT ACCELERATION TO MPS
+    double currentAcceleration = (currentVelocity - previousVelocity) * KMPH_TO_MPS / ((esp_timer_get_time() - previousDetection) * MICROS_TO_SECONDS);
     // filter bad reading using acceleration and velocity as relevant markers
     if(currentAcceleration > MAX_ACCELERATION_MPS
         || currentVelocity > MAX_POSSIBLE_VELOCITY 
