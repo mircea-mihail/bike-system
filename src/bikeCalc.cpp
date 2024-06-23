@@ -4,10 +4,12 @@ TripData BikeCalc::recordDetection()
 {        
     int64_t fullSpinDurationMicros = esp_timer_get_time() - m_lastWheelDetectionTime;
     double previousVelocity = m_data.m_currentVelocity;
+    int64_t previousDetection = m_data.m_latestDetectionTime;
     double currentVelocity = (WHEEL_PERIMETER_MM * SECONDS_TO_HOURS / (double)fullSpinDurationMicros);
 
-    // ignore reading, most likely fake
-    if(currentVelocity - previousVelocity > MAX_DELTA_VELOCITY_KMPH 
+    double currentAcceleration = (currentVelocity - previousVelocity) / (esp_timer_get_time() - previousDetection);
+    // filter bad reading using acceleration and velocity as relevant markers
+    if(currentAcceleration > MAX_ACCELERATION_MPS
         || currentVelocity > MAX_POSSIBLE_VELOCITY 
         || currentVelocity < MIN_POSSIBLE_VELOCITY)
     {
