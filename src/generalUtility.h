@@ -44,11 +44,16 @@
 struct TripData
 {
     uint32_t m_magnetDetections;
+    // micros
     uint64_t m_rideStart;
+    // micros
     int64_t m_latestDetectionTime;
 
+    // KMPH
     double m_currentVelocity;
+    // KMPH
     double m_previousVelocity;
+    // KMPH
     double m_tripAvgVelocity;   
 
     TripData()
