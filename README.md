@@ -29,3 +29,15 @@ https://files.waveshare.com/upload/e/e5/1.54inch_e-paper_V2_Datasheet.pdf
 * keep white while not in use
 * operating temperatures: 0 - 50 C
 * storing temperatures: -25 - 50 C
+
+### Project presentation advice
+
+intro -> poza cu proiectul
+overview proiect
+de unde a pornit motivatie etc
+contributia noastra (ce e nou fata de ce exista deja)
+ce nu suntem multumiti
+ce am face in plus, unde se poate continua pe viitor, poate vorbesc si de licenta
+
+numerotare slideuri
+ultimul slide -> un rezumat, cu ce vrem sa ramana publicul la final

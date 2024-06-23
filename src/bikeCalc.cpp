@@ -17,6 +17,7 @@ TripData BikeCalc::recordDetection()
     
     m_data.m_currentVelocity = currentVelocity;
     m_data.m_magnetDetections ++;
+    m_data.m_latestDetectionTime = esp_timer_get_time();
 
     int64_t distanceInKm = m_data.m_magnetDetections * WHEEL_PERIMETER_MM * SECONDS_TO_HOURS; // / MM_TO_KM * MICROS_TO_SECONDS (they cancel out)
     int64_t timeInH = (esp_timer_get_time() - m_data.m_rideStart);

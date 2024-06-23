@@ -45,6 +45,7 @@ struct TripData
 {
     uint32_t m_magnetDetections;
     uint64_t m_rideStart;
+    int64_t m_latestDetectionTime;
 
     double m_currentVelocity;
     double m_previousVelocity;
@@ -63,6 +64,7 @@ struct TripData
     {
         if(this->m_magnetDetections == p_rhs.m_magnetDetections
             && this->m_rideStart == p_rhs.m_rideStart
+            && this->m_latestDetectionTime == p_rhs.m_latestDetectionTime
             && this->m_currentVelocity == p_rhs.m_currentVelocity
             && this->m_previousVelocity == p_rhs.m_previousVelocity
             && this->m_tripAvgVelocity == p_rhs.m_tripAvgVelocity
@@ -77,6 +79,7 @@ struct TripData
     {
         if(this->m_magnetDetections == p_rhs.m_magnetDetections
             && this->m_rideStart == p_rhs.m_rideStart
+            && this->m_latestDetectionTime == p_rhs.m_latestDetectionTime
             && this->m_currentVelocity == p_rhs.m_currentVelocity
             && this->m_previousVelocity == p_rhs.m_previousVelocity
             && this->m_tripAvgVelocity == p_rhs.m_tripAvgVelocity
@@ -92,6 +95,7 @@ struct TripData
         {
             this->m_magnetDetections = p_rhs.m_magnetDetections;
             this->m_rideStart = p_rhs.m_rideStart;
+            this->m_latestDetectionTime = p_rhs.m_latestDetectionTime;
             this->m_currentVelocity = p_rhs.m_currentVelocity;
             this->m_previousVelocity = p_rhs.m_previousVelocity;
             this->m_tripAvgVelocity = p_rhs.m_tripAvgVelocity;

@@ -142,7 +142,7 @@ void writeToFileTask(void *p_args)
         if (xSemaphoreTake(g_spiMutex, portMAX_DELAY))
         { 
             char csvErrStartMsg[MAX_SIZE_OF_ERR_MSG] = "time, velocity, previous velocity\n";
-            char csvSpeedAccStartMsg[MAX_SIZE_OF_ERR_MSG] = "velocity, delta V\n";
+            char csvSpeedAccStartMsg[MAX_SIZE_OF_ERR_MSG] = "detection time micros\n";
 
             FSInteraction::appendStringToFile(errorCheckFilePath, csvErrStartMsg);
             FSInteraction::appendStringToFile(velocityAccFilePath, csvSpeedAccStartMsg);
@@ -181,10 +181,9 @@ void writeToFileTask(void *p_args)
                     FSInteraction::appendStringToFile(errorCheckFilePath, sendMessage);
                 }
 
-                // record speed and acceleration
-                snprintf(sendMessage, MAX_SIZE_OF_ERR_MSG, "%.2lf, %.2lf\n", 
-                            dataToWrite.m_currentVelocity, 
-                            dataToWrite.m_currentVelocity - dataToWrite.m_previousVelocity);
+                // record time of latest detection
+                snprintf(sendMessage, MAX_SIZE_OF_ERR_MSG, "%" PRId64 "\n", 
+                            dataToWrite.m_latestDetectionTime);
                             // (dataToWrite.m_currentVelocity - dataToWrite.m_previousVelocity) * (dataToWrite.m_currentVelocity + dataToWrite.m_previousVelocity) / (2 * WHEEL_PERIMETER_MM / MM_TO_KM) * M_TO_KM);
                 FSInteraction::appendStringToFile(velocityAccFilePath, sendMessage);
                         
