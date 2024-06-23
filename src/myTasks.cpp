@@ -182,6 +182,8 @@ void writeToFileTask(void *p_args)
                 }
 
                 // record time of latest detection
+                // >>> len(str(pow(2, 64))) == 20 
+
                 snprintf(sendMessage, MAX_SIZE_OF_ERR_MSG, "%" PRId64 "\n", 
                             dataToWrite.m_latestDetectionTime);
                             // (dataToWrite.m_currentVelocity - dataToWrite.m_previousVelocity) * (dataToWrite.m_currentVelocity + dataToWrite.m_previousVelocity) / (2 * WHEEL_PERIMETER_MM / MM_TO_KM) * M_TO_KM);
