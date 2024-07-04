@@ -1,6 +1,19 @@
 #ifndef GENERAL_UTILITY_H
 #define GENERAL_UTILITY_H
 
+// real world defines
+#define BIKE_MASS_KG 10
+#define RIDER_MASS_KG 60
+#define BAG_MASS_KG 2
+#define TOTAL_MASS_KG (BIKE_MASS_KG + RIDER_MASS_KG + BAG_MASS_KG) 
+
+#define WHEEL_DIAMETER_MM 700UL
+#define WHEEL_PERIMETER_MM (WHEEL_DIAMETER_MM * PI)
+
+#define MAX_ACCELERATION_MPS 5 
+#define MAX_POSSIBLE_VELOCITY 99
+#define MIN_POSSIBLE_VELOCITY 0
+
 // convenient conversions
 #define MM_TO_KM 1000000UL
 #define MM_TO_M 1000UL

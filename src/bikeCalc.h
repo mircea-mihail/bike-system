@@ -4,14 +4,6 @@
 #include <Arduino.h>
 #include "generalUtility.h"
 
-// real-world constants
-#define WHEEL_DIAMETER_MM 700UL
-#define WHEEL_PERIMETER_MM (WHEEL_DIAMETER_MM * PI)
-
-#define MAX_ACCELERATION_MPS 5 
-#define MAX_POSSIBLE_VELOCITY 99
-#define MIN_POSSIBLE_VELOCITY 0
-
 class BikeCalc
 {
 private:
