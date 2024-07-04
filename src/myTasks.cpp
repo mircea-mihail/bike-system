@@ -282,6 +282,11 @@ void measurementTask(void *p_args)
         {
             menu.nextSubmenuState();
         }
+
+        if(hwUtil.pressedMenuButton())
+        {
+            menu.nextMenuState();
+        }
         
         taskYIELD();
     }
