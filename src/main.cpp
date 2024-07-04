@@ -22,6 +22,7 @@ void initPins()
 {
     // ePaper display pins
     pinMode(CHANGE_SUBMENU_PIN, INPUT_PULLDOWN);
+    pinMode(CHANGE_MENU_PIN, INPUT_PULLDOWN);
     pinMode(DISPLAY_CHIP_SELECT, OUTPUT);
     pinMode(SD_CHIP_SELECT, OUTPUT);
     pinMode(DATA_COMMAND, OUTPUT);
