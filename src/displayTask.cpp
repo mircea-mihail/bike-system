@@ -165,7 +165,7 @@ void addNumberCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], in
     
     if(digitsToWrite > 2 && p_scale == 1)
     {
-        p_scale = 1.0 / digitsToWrite + 0.3;
+        p_scale = 1.0 / (0.45 * digitsToWrite);
     }
 
     int xStartPos = (DISPLAY_WIDTH - digitsToWrite * FONT_IMAGE_WIDTH * p_scale) / 2; // to center horisontally

@@ -99,7 +99,7 @@ void Menu::getImmage(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT])
             g_display.print("KM");
 
             clearImmage(p_matrixToDisplay);
-            addNumberCentered(p_matrixToDisplay, (int)(m_tripData.m_magnetDetections * WHEEL_PERIMETER_MM / MM_TO_M * 1000));
+            addNumberCentered(p_matrixToDisplay, (int)(m_tripData.m_magnetDetections * WHEEL_PERIMETER_MM / MM_TO_M));
             
             break;
         
