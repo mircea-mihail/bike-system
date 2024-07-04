@@ -163,6 +163,11 @@ void addNumberCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], in
 {   
     int digitsToWrite = getNumberOfDigits(p_numberToWrite);
     
+    if(digitsToWrite > 2 && p_scale == 1)
+    {
+        p_scale = 1.0 / digitsToWrite + 0.3;
+    }
+
     int xStartPos = (DISPLAY_WIDTH - digitsToWrite * FONT_IMAGE_WIDTH * p_scale) / 2; // to center horisontally
     int yStartPos = (DISPLAY_HEIGHT - FONT_IMAGE_HEIGHT * p_scale) / 2;
 
@@ -179,7 +184,7 @@ void addNumberCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], in
             {      
                 uint8_t pixelToWrite;
 
-                pixelToWrite = pgm_read_byte(&g_digitVector[digit][int((row-yStartPos)/p_scale)][int((col-xStartPos)/p_scale)]);
+                pixelToWrite = pgm_read_byte(&g_digitVector[digit][int((row-yStartPos)/p_scale)][int((col-startColIdx)/p_scale)]);
                 
 
                 if(checkValueWithinBounds(row + p_OyImmageOffset, 0, DISPLAY_HEIGHT)  
