@@ -7,7 +7,8 @@ void Menu::getImmage(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT])
     uint16_t textX;
     uint16_t textY;
     
-    double distanceTravelled;
+    double distanceTravelled = 0;
+    double minutesPassed = 0;
     double currentAcceleration = 0;
 
     switch(m_mainMenuState)
@@ -129,8 +130,9 @@ void Menu::getImmage(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT])
             g_display.setCursor(textX, textY);
             g_display.print("min");
 
+            minutesPassed = esp_timer_get_time() / (double)MICROS_TO_SECONDS / (double)SECONDS_TO_MINUTES;
             clearImmage(p_matrixToDisplay);
-            addNumberCentered(p_matrixToDisplay, (int)(m_tripData.m_magnetDetections * WHEEL_PERIMETER_MM / MM_TO_M));
+            addDoubleCentered(p_matrixToDisplay, minutesPassed, 1);
 
             break;
 
