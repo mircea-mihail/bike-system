@@ -73,6 +73,8 @@ struct TripData
     uint64_t m_rideStart;
     // micros
     int64_t m_latestDetectionTime;
+    // micros
+    int64_t m_previousDetectionTime;
 
     // KMPH
     double m_currentVelocity;
@@ -85,6 +87,9 @@ struct TripData
     {
         m_magnetDetections = 0; 
         m_rideStart = 0;
+        m_latestDetectionTime = 0;
+        m_previousDetectionTime = 0;
+
         m_currentVelocity = 0;
         m_previousVelocity = 0;
         m_tripAvgVelocity = 0;
@@ -95,6 +100,8 @@ struct TripData
         if(this->m_magnetDetections == p_rhs.m_magnetDetections
             && this->m_rideStart == p_rhs.m_rideStart
             && this->m_latestDetectionTime == p_rhs.m_latestDetectionTime
+            && this->m_previousDetectionTime == p_rhs.m_previousDetectionTime
+
             && this->m_currentVelocity == p_rhs.m_currentVelocity
             && this->m_previousVelocity == p_rhs.m_previousVelocity
             && this->m_tripAvgVelocity == p_rhs.m_tripAvgVelocity
@@ -110,6 +117,8 @@ struct TripData
         if(this->m_magnetDetections == p_rhs.m_magnetDetections
             && this->m_rideStart == p_rhs.m_rideStart
             && this->m_latestDetectionTime == p_rhs.m_latestDetectionTime
+            && this->m_previousDetectionTime == p_rhs.m_previousDetectionTime
+
             && this->m_currentVelocity == p_rhs.m_currentVelocity
             && this->m_previousVelocity == p_rhs.m_previousVelocity
             && this->m_tripAvgVelocity == p_rhs.m_tripAvgVelocity
@@ -126,6 +135,8 @@ struct TripData
             this->m_magnetDetections = p_rhs.m_magnetDetections;
             this->m_rideStart = p_rhs.m_rideStart;
             this->m_latestDetectionTime = p_rhs.m_latestDetectionTime;
+            this->m_previousDetectionTime = p_rhs.m_previousDetectionTime;
+            
             this->m_currentVelocity = p_rhs.m_currentVelocity;
             this->m_previousVelocity = p_rhs.m_previousVelocity;
             this->m_tripAvgVelocity = p_rhs.m_tripAvgVelocity;

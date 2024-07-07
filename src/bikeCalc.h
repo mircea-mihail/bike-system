@@ -17,6 +17,7 @@ public:
         m_data.m_magnetDetections = 0;
         m_data.m_currentVelocity = 0;
         m_data.m_latestDetectionTime = 0;
+        m_data.m_previousDetectionTime = 0;
         m_data.m_tripAvgVelocity = 0;
         m_data.m_previousVelocity = 0;
         m_lastWheelDetectionTime = 0;

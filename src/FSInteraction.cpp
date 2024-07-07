@@ -155,7 +155,6 @@ int FSInteraction::getLatestVersion(const char * p_dirname, const char *p_fileNa
     // fileName.txt
     // and the file with the index in front:
     // 1_fileName.txt
-    Serial.println("about to check files");
     while(file)
     {
         Serial.println("found a file: ");

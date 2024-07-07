@@ -99,7 +99,6 @@ void writeToFileTask(void *p_args)
     char errorCheckFilePath[MAX_SIZE_OF_FILE_PATH] = "/data/hall_sensor_errors.txt";
     char velocityAccFilePath[MAX_SIZE_OF_FILE_PATH];
 
-    Serial.print("about to get latest ver");
     int currentFileIdx = FSInteraction::getLatestVersion(writeDirPath, velocityAccFileName);
 
     char fileVersion[MAX_SIZE_OF_FILE_NAME];
@@ -168,8 +167,6 @@ void writeToFileTask(void *p_args)
         {
             if (xSemaphoreTake(g_spiMutex, portMAX_DELAY))
             {
-                Serial.print("about to write to task!\n");
-
                 // record possible error                
                 if(dataToWrite.m_currentVelocity >= SUSPICIOUS_SPEED_KMPH)
                 {

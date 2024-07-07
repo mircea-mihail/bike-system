@@ -6,6 +6,9 @@ void Menu::getImmage(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT])
     uint16_t tbw, tbh;
     uint16_t textX;
     uint16_t textY;
+    
+    double distanceTravelled;
+    double currentAcceleration = 0;
 
     switch(m_mainMenuState)
     {
@@ -99,7 +102,15 @@ void Menu::getImmage(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT])
             g_display.print("KM");
 
             clearImmage(p_matrixToDisplay);
-            addNumberCentered(p_matrixToDisplay, (int)(m_tripData.m_magnetDetections * WHEEL_PERIMETER_MM / MM_TO_M));
+            distanceTravelled = m_tripData.m_magnetDetections * WHEEL_PERIMETER_MM / MM_TO_KM;
+            if(distanceTravelled < 10)
+            {
+                addDoubleCentered(p_matrixToDisplay, distanceTravelled, 2);
+            }
+            else
+            {
+                addDoubleCentered(p_matrixToDisplay, distanceTravelled, 1);
+            }
 
             break;
         
@@ -138,8 +149,18 @@ void Menu::getImmage(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT])
             g_display.setCursor(textX, textY);
             g_display.print("m/s^2");
 
+            if(m_tripData.m_latestDetectionTime == m_tripData.m_previousDetectionTime)
+            {
+                currentAcceleration = 0;
+            }
+            else
+            {
+                currentAcceleration = (m_tripData.m_currentVelocity - m_tripData.m_previousVelocity) * KMPH_TO_MPS / ((m_tripData.m_latestDetectionTime - m_tripData.m_previousDetectionTime) / (double)MICROS_TO_SECONDS);
+            }
+            Serial.println("");
+
             clearImmage(p_matrixToDisplay);
-            addNumberCentered(p_matrixToDisplay, (int)(m_tripData.m_magnetDetections * WHEEL_PERIMETER_MM / MM_TO_M));
+            addDoubleCentered(p_matrixToDisplay, currentAcceleration, 2);
 
             break;
 

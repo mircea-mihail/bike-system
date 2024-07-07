@@ -218,6 +218,8 @@ void displaySlantedDot(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], in
 
 void addDoubleCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], double p_numberToWrite, int p_decimalsToShow, int p_OxImmageOffset, int p_OyImmageOffset, float p_scale)
 {   
+    p_numberToWrite = (p_numberToWrite < 0) ? (p_numberToWrite * (-1)) : p_numberToWrite;
+
     int numberToShow = p_numberToWrite * pow(10, p_decimalsToShow);
     int digitsToWrite = getNumberOfDigits(numberToShow);
     
