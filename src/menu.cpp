@@ -100,9 +100,69 @@ void Menu::getImmage(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT])
 
             clearImmage(p_matrixToDisplay);
             addNumberCentered(p_matrixToDisplay, (int)(m_tripData.m_magnetDetections * WHEEL_PERIMETER_MM / MM_TO_M));
-            
+
             break;
         
+        case Time:
+            g_display.getTextBounds("time", 0, 0, &tbx, &tby, &tbw, &tbh);
+            textX = ((DISPLAY_WIDTH - tbw) / 2) - tbx + SIDE_FONT_OFFSET;
+            textY = TOP_FONT_OFFSET;
+
+            g_display.setCursor(textX, textY);
+            g_display.print("time");
+
+            g_display.getTextBounds("min", 0, 0, &tbx, &tby, &tbw, &tbh);
+            textX = ((DISPLAY_WIDTH - tbw) / 2) - tbx - SIDE_FONT_OFFSET;
+            textY = DISPLAY_HEIGHT - tbh- tby;
+
+            g_display.setCursor(textX, textY);
+            g_display.print("min");
+
+            clearImmage(p_matrixToDisplay);
+            addNumberCentered(p_matrixToDisplay, (int)(m_tripData.m_magnetDetections * WHEEL_PERIMETER_MM / MM_TO_M));
+
+            break;
+
+        case Acceleration:
+            g_display.getTextBounds("acc", 0, 0, &tbx, &tby, &tbw, &tbh);
+            textX = ((DISPLAY_WIDTH - tbw) / 2) - tbx + SIDE_FONT_OFFSET;
+            textY = TOP_FONT_OFFSET;
+
+            g_display.setCursor(textX, textY);
+            g_display.print("acc");
+
+            g_display.getTextBounds("m/s^2", 0, 0, &tbx, &tby, &tbw, &tbh);
+            textX = ((DISPLAY_WIDTH - tbw) / 2) - tbx - SIDE_FONT_OFFSET;
+            textY = DISPLAY_HEIGHT - tbh- tby;
+
+            g_display.setCursor(textX, textY);
+            g_display.print("m/s^2");
+
+            clearImmage(p_matrixToDisplay);
+            addNumberCentered(p_matrixToDisplay, (int)(m_tripData.m_magnetDetections * WHEEL_PERIMETER_MM / MM_TO_M));
+
+            break;
+
+        case Force:
+            g_display.getTextBounds("force", 0, 0, &tbx, &tby, &tbw, &tbh);
+            textX = ((DISPLAY_WIDTH - tbw) / 2) - tbx + SIDE_FONT_OFFSET;
+            textY = TOP_FONT_OFFSET;
+
+            g_display.setCursor(textX, textY);
+            g_display.print("force");
+
+            g_display.getTextBounds("N", 0, 0, &tbx, &tby, &tbw, &tbh);
+            textX = ((DISPLAY_WIDTH - tbw) / 2) - tbx - SIDE_FONT_OFFSET;
+            textY = DISPLAY_HEIGHT - tbh- tby;
+
+            g_display.setCursor(textX, textY);
+            g_display.print("N");
+
+            clearImmage(p_matrixToDisplay);
+            addNumberCentered(p_matrixToDisplay, (int)(m_tripData.m_magnetDetections * WHEEL_PERIMETER_MM / MM_TO_M));
+
+            break;
+
         default: 
             break;
         }
@@ -136,10 +196,11 @@ void Menu::nextMenuState()
 
 void Menu::nextSubmenuState()
 {
-    // Serial.print("current submenu: ");
-    // Serial.println(m_submenuState);
-    switch(m_speedSubmenuState)
+    switch(m_mainMenuState)
     {
+    case Speed:
+        switch(m_speedSubmenuState)
+        {
         case Instant:
             m_speedSubmenuState = TripAvg;
             m_changedState = true;
@@ -157,7 +218,40 @@ void Menu::nextSubmenuState()
         
         default:
             break;
-    }
+        }
+        break;
+
+    case Misc:
+        switch(m_miscSubmenuState)
+        {
+        case Distance:
+            m_miscSubmenuState = Time;
+            m_changedState = true;
+            break;
+
+        case Time:
+            m_miscSubmenuState = Acceleration;
+            m_changedState = true;
+            break;
+
+        case Acceleration:
+            m_miscSubmenuState = Force;
+            m_changedState = true;
+            break;
+
+        case Force:
+            m_miscSubmenuState = Distance;
+            m_changedState = true;
+            break;
+        
+        default: 
+            break;
+        }
+        break;
+
+    default: 
+        break;
+    }   
 }
 
 void Menu::resetChangedState()
@@ -175,6 +269,7 @@ bool Menu::operator== (const Menu p_rhs)
     if(this->m_changedState == p_rhs.m_changedState 
         && this->m_mainMenuState == p_rhs.m_mainMenuState
         && this->m_speedSubmenuState == p_rhs.m_speedSubmenuState
+        && this->m_miscSubmenuState == p_rhs.m_miscSubmenuState
         && this->m_tripData == p_rhs.m_tripData)
     {
         return true;   
@@ -188,6 +283,7 @@ bool Menu::operator!= (const Menu p_rhs)
     if(this->m_changedState == p_rhs.m_changedState 
         && this->m_mainMenuState == p_rhs.m_mainMenuState
         && this->m_speedSubmenuState == p_rhs.m_speedSubmenuState
+        && this->m_miscSubmenuState == p_rhs.m_miscSubmenuState
         && this->m_tripData == p_rhs.m_tripData)
     {
         return false;   
@@ -203,6 +299,7 @@ Menu& Menu::operator= (const Menu& p_rhs)
         this->m_changedState = p_rhs.m_changedState; 
         this->m_mainMenuState = p_rhs.m_mainMenuState;
         this->m_speedSubmenuState = p_rhs.m_speedSubmenuState;
+        this->m_miscSubmenuState = p_rhs.m_miscSubmenuState;
         this->m_tripData = p_rhs.m_tripData;
     }
     return *this;
