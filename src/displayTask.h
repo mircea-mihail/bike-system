@@ -20,10 +20,6 @@
 #define DIGIT_ONE_SHIFT 8
 #define WHOLE_NUMBER_ADJUSTMENT (DIGIT_ONE_SHIFT + 5)
 
-// generic defines
-#define BLACK 0
-#define WHITE 1
-
 // display rotation
 #define ORIENTATION_HORIZONTAL 0
 #define ORIENTATION_VERTICAL 1
@@ -88,6 +84,17 @@ int getOneOffsetValue(int p_number, int p_digitsInNumber);
 /// @param p_OyImmageOffset oy offset to be able to print the immage a little higher or lower 
 /// @param p_scale used to scale the immage, make it bigger or smaller, as a percentage of the original
 void addNumberCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], int p_numberToWrite, int p_OxImmageOffset = 0, int p_OyImmageOffset = 0, float p_scale = 1);
+
+/// @brief same as addNumberCentered but made for floating point numbers. This means that it can display
+///     any number of decimals for the number given to display
+/// @param p_immageBuffer the immage buffer to print the numbers on 
+/// @param p_numberToWrite the number to be converted from int to saved font
+/// @param p_decimalsToShow the number of decimals to display 
+/// @param p_OxImmageOffset ox offset to be able to print the immage a little to the right/left
+/// @param p_OyImmageOffset oy offset to be able to print the immage a little highter or lower 
+/// @param p_scale used to scale the immage, make it bigger or smaller, as a percentage of the original
+void addDoubleCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], double p_numberToWrite, int p_decimalsToShow = 1, int p_OxImmageOffset = 0, int p_OyImmageOffset = 0, float p_scale = 1);
+
 
 /// @brief overlays the "stamp" given by the user on the immage that is going to be displayed
 ///     using the custom immages saved in flash

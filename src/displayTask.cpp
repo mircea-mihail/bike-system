@@ -55,7 +55,7 @@ void displayBlackPixels(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], b
         {
             for(int col = 0; col < DISPLAY_HEIGHT; col += 1)
             {
-                if(g_matrixToDisplay[row][col] == BLACK)
+                if(g_matrixToDisplay[row][col] == BLACK_PIXEL)
                 {
                     g_display.drawPixel(col, row, g_matrixToDisplay[row][col]);
                 }
@@ -73,7 +73,7 @@ void displayBlackPixels(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], b
             {
                 for(int col = 0; col < DISPLAY_HEIGHT; col += 1)
                 {
-                    if(g_matrixToDisplay[row][col] == BLACK)
+                    if(g_matrixToDisplay[row][col] == BLACK_PIXEL)
                     {
                         g_display.drawPixel(col, row, g_matrixToDisplay[row][col]);
                     }
@@ -176,10 +176,11 @@ void addNumberCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], in
     {
         int digit = p_numberToWrite % 10;
 
+        int startColIdx = xStartPos + FONT_IMAGE_WIDTH * p_scale * (digitsToWrite - digitIdx - 1);
+        int stopColIdx = xStartPos + FONT_IMAGE_WIDTH * p_scale * (digitsToWrite - digitIdx - 1) + FONT_IMAGE_WIDTH * p_scale;
+
         for(int row = yStartPos; row < yStartPos + FONT_IMAGE_HEIGHT * p_scale; row++)
         {
-            int startColIdx = xStartPos + FONT_IMAGE_WIDTH * p_scale * (digitsToWrite - digitIdx - 1);
-            int stopColIdx = xStartPos + FONT_IMAGE_WIDTH * p_scale * (digitsToWrite - digitIdx - 1) + FONT_IMAGE_WIDTH * p_scale;
             for(int col = startColIdx; col < stopColIdx; col ++)
             {      
                 uint8_t pixelToWrite;
@@ -195,6 +196,81 @@ void addNumberCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], in
             }
         }
         p_numberToWrite /= 10;
+    }
+}
+
+void displaySlantedDot(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], int p_x, int p_y, int p_width)
+{
+    int slant = 0;
+
+    for(int i = 0; i < p_width; i++)
+    {
+        for(int j = 0; j < p_width; j++)
+        {
+            p_immageBuffer[p_x - i][p_y - j + slant] = BLACK_PIXEL;
+        }
+        if(i % DOT_SLANT_RATE_PX == 0)
+        {
+            slant += 1;
+        }
+    }
+}
+
+void addDoubleCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], double p_numberToWrite, int p_decimalsToShow, int p_OxImmageOffset, int p_OyImmageOffset, float p_scale)
+{   
+    int numberToShow = p_numberToWrite * pow(10, p_decimalsToShow);
+    int digitsToWrite = getNumberOfDigits(numberToShow);
+    
+    if(digitsToWrite < p_decimalsToShow + 1) 
+    {
+        digitsToWrite = p_decimalsToShow + 1;
+    }
+
+    if(digitsToWrite > 2 && p_scale == 1)
+    {
+        p_scale = 1.0 / (0.45 * digitsToWrite);
+    }
+
+    int digitOffsetForDot = 0;
+
+    int xStartPos = (DISPLAY_WIDTH - digitsToWrite * FONT_IMAGE_WIDTH * p_scale) / 2; // to center horisontally
+    int yStartPos = (DISPLAY_HEIGHT - FONT_IMAGE_HEIGHT * p_scale) / 2;
+
+    // takes around 0.8 microseconds to read one digit from flash
+    for(int digitIdx = 0; digitIdx < digitsToWrite; digitIdx ++)
+    {
+        int digit = numberToShow % 10;
+
+        int startColIdx = xStartPos + FONT_IMAGE_WIDTH * p_scale * (digitsToWrite - digitIdx - 1) - digitOffsetForDot;
+        int stopColIdx = xStartPos + FONT_IMAGE_WIDTH * p_scale * (digitsToWrite - digitIdx - 1) + FONT_IMAGE_WIDTH * p_scale - digitOffsetForDot;
+
+        for(int row = yStartPos; row < yStartPos + FONT_IMAGE_HEIGHT * p_scale; row++)
+        {
+            for(int col = startColIdx; col < stopColIdx; col ++)
+            {      
+                uint8_t pixelToWrite;
+
+                pixelToWrite = pgm_read_byte(&g_digitVector[digit][int((row-yStartPos)/p_scale)][int((col-startColIdx)/p_scale)]);
+
+                if(checkValueWithinBounds(row + p_OyImmageOffset, 0, DISPLAY_HEIGHT)  
+                    && checkValueWithinBounds(col + p_OxImmageOffset, 0, DISPLAY_WIDTH))
+                {
+                    p_immageBuffer[row + p_OyImmageOffset][col + p_OxImmageOffset] = pixelToWrite;
+                }
+            }
+        }
+
+        if(digitIdx + 1 == p_decimalsToShow)
+        {
+            digitOffsetForDot = EMPTY_SPACE_FOR_DOT * p_scale;
+        }
+
+        if(digitIdx == p_decimalsToShow)
+        {
+            displaySlantedDot(p_immageBuffer, yStartPos + FONT_IMAGE_HEIGHT * p_scale, startColIdx + FONT_IMAGE_WIDTH * p_scale + DOT_STANDARD_OFFSET * p_scale, DOT_STANDARD_SIZE * p_scale);
+        }
+        
+        numberToShow /= 10;
     }
 }
 

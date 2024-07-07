@@ -38,6 +38,15 @@
 // max size is this value so that a new file is created every 5 minutes for an average speed of 21 kmph
 #define MAX_FILE_SIZE_BYTES 12800
 
+// immage defines
+#define BLACK_PIXEL 0
+#define WHITE_PIXEL 1
+
+#define DOT_STANDARD_SIZE 15
+#define DOT_STANDARD_OFFSET 3
+#define EMPTY_SPACE_FOR_DOT 10
+#define DOT_SLANT_RATE_PX 5
+
 /////////////////////////////// pins
 // input pins
 #define HALL_SENSOR_PIN GPIO_NUM_39
