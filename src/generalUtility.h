@@ -24,7 +24,7 @@
 #define SECONDS_TO_HOURS 3600UL
 #define MS_TO_SECONDS 1000
 
-#define KMPH_TO_MPS (10/36)
+#define KMPH_TO_MPS (10.0/36.0)
 
 // hardware debounce timings
 #define SENSOR_DEBOUNCE_PERIOD_MS 10UL

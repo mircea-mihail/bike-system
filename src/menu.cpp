@@ -155,9 +155,9 @@ void Menu::getImmage(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT])
             }
             else
             {
+                // currentAcceleration = (m_tripData.m_currentVelocity - m_tripData.m_previousVelocity) * KMPH_TO_MPS / (2 * WHEEL_PERIMETER_MM / MM_TO_M);
                 currentAcceleration = (m_tripData.m_currentVelocity - m_tripData.m_previousVelocity) * KMPH_TO_MPS / ((m_tripData.m_latestDetectionTime - m_tripData.m_previousDetectionTime) / (double)MICROS_TO_SECONDS);
             }
-            Serial.println("");
 
             clearImmage(p_matrixToDisplay);
             addDoubleCentered(p_matrixToDisplay, currentAcceleration, 2);
