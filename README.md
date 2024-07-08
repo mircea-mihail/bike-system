@@ -15,7 +15,7 @@ Right now the project is split into 3 main parts:
 * the data analysis part that involves storing data from every trip and drawing conclusions from it
 * the sign detection and behaviour analysis
 
-## Real Time Bike Calculator
+### Real Time Bike Calculator
 The code for this part is C++. It involves reading data from the sensor on the wheel, writing it to an SD Card and regurarly displaying it on the E-Paper screen. I would also say that the casing for the project fits here.
 
 #### Main goal
@@ -25,7 +25,7 @@ The code for this part is C++. It involves reading data from the sensor on the w
 * the buttons need to be reliable (maybe replace the current buttons)
 * add a rechargeable battery
 
-## Data Analisys
+### Data Analisys
 This is written in Python. This part re-structures the data stored on the SD in trip files and shows some interesting graphs to better visualise some aspects of the trip.
 
 #### Main goal
@@ -47,7 +47,7 @@ This is written in Python. This part re-structures the data stored on the SD in 
 		* deceleration spikes
 		* average speeed in parts of trip
 
-## Sign Detection and Behaviour analiysis
+### Sign Detection and Behaviour analiysis
 Detect signs in real time and store the moment of detection in a csv file. Look at the velocity evolution after seeing key street signs and observe behaviour. This part is a mix between the real time calculator and the data analisys. 
 
 #### Main goal
