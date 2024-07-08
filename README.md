@@ -23,7 +23,8 @@ The code for this part is C++. It involves reading data from the sensor on the w
 * display real-time trip data in a nice and readable fashion
 * the case needs to be sturdy and easy to carry
 * the buttons need to be reliable (maybe replace the current buttons)
-* add a rechargeable battery
+* add a rechargeable battery and charge it from usb
+* design and order a custom PCB and a new 3D printed case for it
 
 ### Data Analisys
 This is written in Python. This part re-structures the data stored on the SD in trip files and shows some interesting graphs to better visualise some aspects of the trip.
@@ -38,19 +39,21 @@ This is written in Python. This part re-structures the data stored on the SD in 
 		* going to work
 		* coming from work
 		* going to university
-		*going to gym
+		* going to gym
+		* coming back from gym
 	- potential features: 
 		* length of trip
 		* number of stops
 		* average speed
 		* acceleration spikes
 		* deceleration spikes
-		* average speeed in parts of trip
+		* velocity evolution during trip (am I faster in the beginning and slower at the end?)
 
 ### Sign Detection and Behaviour analiysis
-Detect signs in real time and store the moment of detection in a csv file. Look at the velocity evolution after seeing key street signs and observe behaviour. This part is a mix between the real time calculator and the data analisys. 
+Detect street signs in real time and store the moment of detection in a csv file. Look at the velocity evolution after seeing key street signs and observe behaviour. This part is a mix between the real time calculator and the data analisys. 
 
 #### Main goal
+* mount camera to current case (make an attachment?)
 * detect important street signs in real time
 * store the moment of detection, how well it maches and the type of sign
 * warn the rider if necessary
