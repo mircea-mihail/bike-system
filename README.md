@@ -75,6 +75,26 @@ https://files.waveshare.com/upload/e/e5/1.54inch_e-paper_V2_Datasheet.pdf
 * operating temperatures: 0 - 50 C
 * storing temperatures: -25 - 50 C
 
+## Advice for the project
+
+### Advice for the camera and sign detection
+as putea sa am un flag in care ma uit daca am ceva rosu care vine inspre mine, sau un marker ca ar putea exista un semn de interes in poza si abia atunci sa incerc sa fac detectia
+
+tabel cu ce optiuni sunt, cat de bine se descurca
+
+esp camera
+	posibil underpowered
+	ar putea fi good enough
+
+arduino camera
+	https://store.arduino.cc/products/nicla-vision
+
+raspberry pi zero camera
+	camera mai buna si mai puternica
+
+golden standard
+	opencv oak one camera
+
 ### Project presentation advice
 
 intro -> show a picture of the project
@@ -85,3 +105,13 @@ what would i change, what i don't like about the project
 what would i add, would i like to continue developing the projcet?
 numerotare slideuri
 last slide -> a short summary, something to stick to the viewer
+
+### Plans for near future
+
+* design PCB
+* order from jlcpcb 
+* order ESP32-cam and lead free solder
+* put together a pcb and working calculator
+* put together sign detection module 
+* link them up using battery
+* establish comms using serial or esp-now for less battery
