@@ -46,8 +46,18 @@
 
 int pictureNumber = 0;
 
-void configureCamera(camera_config_t &p_camConf)
+#define FLASH_LED_PIN 4
+
+#define NO_CALIBRATION_PICS 10
+
+void initPins()
 {
+	pinMode(FLASH_LED_PIN, OUTPUT);
+}
+
+bool configureCamera(camera_config_t &p_camConf)
+{
+
 	p_camConf.ledc_channel = LEDC_CHANNEL_0;
 	p_camConf.ledc_timer = LEDC_TIMER_0;
 	p_camConf.pin_d0 = Y2_GPIO_NUM;
@@ -85,6 +95,15 @@ void configureCamera(camera_config_t &p_camConf)
 	// 	p_camConf.jpeg_quality = 12;
 	// 	p_camConf.fb_count = 1;
 	// }
+
+	esp_err_t err = esp_camera_init(&p_camConf);
+	if (err != ESP_OK) 
+	{
+		Serial.printf("Camera init failed with error 0x%x", err);
+		return false;
+	}
+	
+	return true;
 }
 
 bool checkSD()
@@ -104,12 +123,25 @@ bool checkSD()
 	return true;
 }
 
-void takePicture(int p_pictureNumber)
+void takePicture()
 {
-	camera_fb_t *fb = NULL;
-
 	// Take Picture with Camera
-	fb = esp_camera_fb_get();  
+	camera_fb_t *fb = esp_camera_fb_get();  
+	if(!fb) 
+	{
+		Serial.println("Camera capture failed");
+		return;
+	}
+
+	esp_camera_fb_return(fb); 
+	
+	digitalWrite(FLASH_LED_PIN, LOW);
+}
+
+void takeAndStorePicture(int p_pictureNumber)
+{
+	// Take Picture with Camera
+	camera_fb_t *fb = esp_camera_fb_get();  
 	if(!fb) 
 	{
 		Serial.println("Camera capture failed");
@@ -134,34 +166,28 @@ void takePicture(int p_pictureNumber)
 	file.close();
 	esp_camera_fb_return(fb); 
 	
-	// Turns off the ESP32-CAM white on-board LED (flash) connected to GPIO 4
-	pinMode(4, OUTPUT);
-	digitalWrite(4, LOW);
-	rtc_gpio_hold_en(GPIO_NUM_4);
+	digitalWrite(FLASH_LED_PIN, LOW);
 }
 
 void setup() 
 {
+	initPins();
+
 	WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0); //disable brownout detector
-	
+
 	Serial.begin(115200);
 	Serial.print("hello");
-	//Serial.setDebugOutput(true);
-	//Serial.println();
+	// Serial.setDebugOutput(true);
+	// Serial.println();
 	
-	if(!checkSD())
+	if(! checkSD())
 	{
 		return;
 	}
 
 	camera_config_t camConf;
-	configureCamera(camConf);
-
-	// Init Camera
-	esp_err_t err = esp_camera_init(&camConf);
-	if (err != ESP_OK) 
+	if(! configureCamera(camConf))
 	{
-		Serial.printf("Camera init failed with error 0x%x", err);
 		return;
 	}
 
@@ -169,26 +195,20 @@ void setup()
 	EEPROM.begin(EEPROM_SIZE);
 	pictureNumber = EEPROM.read(0) + 1;
 
-	// for(int brightnessLevel = -2; brightnessLevel <= 2; brightnessLevel += 1)
-	// {
-	int brightnessLevel = 0;
-	pictureNumber += 1;
+	for(int i = 0; i < NO_CALIBRATION_PICS; i++)
+	{
+		takePicture();
+	}
 
-	// sensor_t *s = esp_camera_sensor_get();
-	// s->set_brightness(s, brightnessLevel);
-
-	takePicture(pictureNumber);
-	// }
+	takeAndStorePicture(pictureNumber);
 
 	EEPROM.write(0, pictureNumber);
 	EEPROM.commit();
 
-	delay(2000);
-	
-	esp_deep_sleep_start();
+	// esp_deep_sleep_start();
 }
 
 void loop() 
 {
-  
+
 }
