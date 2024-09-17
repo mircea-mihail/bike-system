@@ -123,23 +123,28 @@ bool checkSD()
 	return true;
 }
 
-void takePicture()
+void focusPicture()
 {
-	// Take Picture with Camera
-	camera_fb_t *fb = esp_camera_fb_get();  
-	if(!fb) 
+	for(int i = 0; i < NO_CALIBRATION_PICS; i++)
 	{
-		Serial.println("Camera capture failed");
-		return;
-	}
+		// Take Picture with Camera
+		camera_fb_t *fb = esp_camera_fb_get();  
+		if(!fb) 
+		{
+			Serial.println("Camera capture failed");
+			return;
+		}
 
-	esp_camera_fb_return(fb); 
-	
-	digitalWrite(FLASH_LED_PIN, LOW);
+		esp_camera_fb_return(fb); 
+	}
 }
 
-void takeAndStorePicture(int p_pictureNumber)
+void takePicture(int p_pictureNumber)
 {
+	// digitalWrite(FLASH_LED_PIN, HIGH);
+	focusPicture();
+	
+
 	// Take Picture with Camera
 	camera_fb_t *fb = esp_camera_fb_get();  
 	if(!fb) 
@@ -164,9 +169,8 @@ void takeAndStorePicture(int p_pictureNumber)
 		Serial.printf("Saved file to path: %s\n", path.c_str());
 	}
 	file.close();
+
 	esp_camera_fb_return(fb); 
-	
-	digitalWrite(FLASH_LED_PIN, LOW);
 }
 
 void setup() 
@@ -195,17 +199,12 @@ void setup()
 	EEPROM.begin(EEPROM_SIZE);
 	pictureNumber = EEPROM.read(0) + 1;
 
-	for(int i = 0; i < NO_CALIBRATION_PICS; i++)
-	{
-		takePicture();
-	}
-
-	takeAndStorePicture(pictureNumber);
+	takePicture(pictureNumber);
 
 	EEPROM.write(0, pictureNumber);
 	EEPROM.commit();
 
-	// esp_deep_sleep_start();
+	esp_deep_sleep_start();
 }
 
 void loop() 
