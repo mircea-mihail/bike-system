@@ -62,10 +62,10 @@ bool configureCamera(camera_config_t &p_camConf)
 	p_camConf.pin_pwdn = PWDN_GPIO_NUM;
 	p_camConf.pin_reset = RESET_GPIO_NUM;
 	p_camConf.xclk_freq_hz = 20000000;
-	p_camConf.pixel_format = PIXFORMAT_JPEG; 
 
-	p_camConf.frame_size = FRAMESIZE_CIF;
-	p_camConf.jpeg_quality = 12;
+	p_camConf.pixel_format = PIXFORMAT_RGB565; 
+	p_camConf.frame_size = FRAMESIZE_QVGA;
+	p_camConf.jpeg_quality = 10;
 	p_camConf.fb_count = 1;
 
 	// if(psramFound())
@@ -138,7 +138,7 @@ void takePicture(int p_pictureNumber)
 	}
 
 	// Path where new picture will be saved in SD Card
-	String path = "/picture" + String(p_pictureNumber) +".jpg";
+	String path = "/picture" + String(p_pictureNumber) +".bin";
 
 	fs::FS &fs = SD_MMC; 
 	File file = fs.open(path.c_str(), FILE_WRITE);
