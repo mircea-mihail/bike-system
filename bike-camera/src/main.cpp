@@ -7,6 +7,8 @@
 #include "driver/rtc_io.h"
 #include <EEPROM.h>            // read and write from flash memory
 
+#include <imageEditing.h>
+
 // define the number of bytes you want to access
 #define EEPROM_SIZE 1
 
@@ -124,11 +126,13 @@ void focusPicture()
 	}
 }
 
-void takePicture(int p_pictureNumber)
+void takePicture()
 {
 	// digitalWrite(FLASH_LED_PIN, HIGH);
-	focusPicture();
-	
+
+	EEPROM.begin(EEPROM_SIZE);
+	int pictureNumber = EEPROM.read(0) + 1;
+
 	// Take Picture with Camera
 	camera_fb_t *fb = esp_camera_fb_get();  
 	if(!fb) 
@@ -138,7 +142,7 @@ void takePicture(int p_pictureNumber)
 	}
 
 	// Path where new picture will be saved in SD Card
-	String path = "/picture" + String(p_pictureNumber) +".bin";
+	String path = "/picture" + String(pictureNumber) +".bin";
 
 	fs::FS &fs = SD_MMC; 
 	File file = fs.open(path.c_str(), FILE_WRITE);
@@ -150,11 +154,94 @@ void takePicture(int p_pictureNumber)
 	else 
 	{
 		file.write(fb->buf, fb->len); // payload (image), payload length
-		Serial.printf("Saved file to path: %s\n", path.c_str());
+		// Serial.printf("Saved file to path: %s\n", path.c_str());
 	}
 	file.close();
 
 	esp_camera_fb_return(fb); 
+
+	EEPROM.write(0, pictureNumber);
+	EEPROM.commit();
+}
+
+bool is_red(pixel p_px)
+{
+	if(		p_px.red > MIN_RED_FACTOR * p_px.blue
+		&& 	p_px.red > MIN_RED_FACTOR * p_px.green
+		&& 	p_px.red > MIN_RED_BRIGHTNESS)
+	{
+		return true;
+	}
+	return false;
+}
+
+pixel get_rgb(uint16_t p_pixel16)
+{
+	pixel px;
+	px.red =   uint8_t((p_pixel16 & 0b1111100000000000) >> 11);
+	px.green = uint8_t((p_pixel16 & 0b0000011111100000) >> 5);
+	px.blue =  uint8_t((p_pixel16 & 0b0000000000011111));
+
+	float max_red = 32;
+	float max_green = 64;
+	float max_blue = 32;
+	float max_pixel = 255;
+
+	px.red = uint8_t(max_pixel * (px.red / max_red));
+	px.green = uint8_t(max_pixel * (px.green / max_green));
+	px.blue = uint8_t(max_pixel * (px.blue / max_blue));
+
+	return px;
+}
+
+bool findRedInPic()
+{
+	// Take Picture with Camera
+	
+	camera_fb_t *fb = esp_camera_fb_get();  
+
+	if(!fb) 
+	{
+		Serial.println("Camera capture failed");
+		return false;
+	}
+
+	uint16_t image[IMAGE_HEIGHT][IMAGE_WIDTH];
+	uint16_t pixel16;
+
+	for(int i = 0; i < IMAGE_HEIGHT; i++)
+	{
+		for(int j = 0; j < IMAGE_WIDTH; j++)
+		{
+			pixel16 = uint16_t(fb->buf[(i*IMAGE_HEIGHT + j) * 2]);
+			pixel16 = pixel16 << 8;
+			pixel16 = pixel16 | (uint16_t(fb->buf[(i*IMAGE_HEIGHT + j) * 2 + 1]));
+			image[i][j] = pixel16;
+
+			pixel px = get_rgb(image[i][j]);
+
+			// Serial.print(px.red);
+			// Serial.print(" ");
+			// Serial.print(px.green);
+			// Serial.print(" ");
+			// Serial.print(px.blue);
+			// Serial.print(" ");
+
+			if(is_red(get_rgb(pixel16)))
+			{
+				esp_camera_fb_return(fb); 
+
+				Serial.print("FOUND RED!!!\n");
+				return true;
+			}
+		}
+	}
+
+	Serial.print("no red found...\n");
+
+	esp_camera_fb_return(fb); 
+
+	return false;
 }
 
 void setup() 
@@ -162,36 +249,31 @@ void setup()
 	initPins();
 
 	WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0); //disable brownout detector
-
 	Serial.begin(115200);
-	Serial.print("hello");
-	// Serial.setDebugOutput(true);
-	// Serial.println();
-	
+	while(!Serial);
+	digitalWrite(FLASH_LED_PIN, LOW);
+
 	if(! checkSD())
 	{
 		return;
 	}
-
 	camera_config_t camConf;
 	if(! configureCamera(camConf))
 	{
 		return;
 	}
 
-	// initialize EEPROM with predefined size
-	EEPROM.begin(EEPROM_SIZE);
-	pictureNumber = EEPROM.read(0) + 1;
-
-	takePicture(pictureNumber);
-
-	EEPROM.write(0, pictureNumber);
-	EEPROM.commit();
-
-	esp_deep_sleep_start();
 }
 
 void loop() 
 {
-
+	if(findRedInPic())
+	{
+		analogWrite(FLASH_LED_PIN, 1);
+		// delay(500);
+	}
+	else
+	{
+		analogWrite(FLASH_LED_PIN, 0);
+	}
 }
