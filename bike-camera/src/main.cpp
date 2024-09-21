@@ -251,6 +251,7 @@ void setup()
 	WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0); //disable brownout detector
 	Serial.begin(115200);
 	while(!Serial);
+
 	digitalWrite(FLASH_LED_PIN, LOW);
 
 	if(! checkSD())
@@ -263,17 +264,21 @@ void setup()
 		return;
 	}
 
+	focusPicture();
+	takePicture();
 }
 
 void loop() 
 {
 	if(findRedInPic())
 	{
+		Serial.println("found red");
 		analogWrite(FLASH_LED_PIN, 1);
 		// delay(500);
 	}
 	else
 	{
 		analogWrite(FLASH_LED_PIN, 0);
+		Serial.println("no red...");
 	}
 }
