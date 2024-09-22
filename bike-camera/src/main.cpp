@@ -89,6 +89,17 @@ bool configureCamera(camera_config_t &p_camConf)
 		Serial.printf("Camera init failed with error 0x%x", err);
 		return false;
 	}
+
+	sensor_t * s = esp_camera_sensor_get();
+	// the brighter the whiter the pixels are and the immage is more faded
+	s->set_brightness(s, -2);     // -2 to 2
+	// more contrast, clearer shapes, but too much might not be good
+	s->set_contrast(s, 1);       // -2 to 2
+	// more saturation, more distinct colors
+	s->set_saturation(s, 2);     // -2 to 2
+	s->set_special_effect(s, 0); // 0 to 6 (0 - No Effect, 1 - Negative, 2 - Grayscale, 3 - Red Tint, 4 - Green Tint, 5 - Blue Tint, 6 - Sepia)
+	// yes withe balancing is crucial
+	s->set_whitebal(s, 1);       // 0 = disable , 1 = enable
 	
 	return true;
 }
