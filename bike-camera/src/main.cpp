@@ -35,7 +35,7 @@ int pictureNumber = 0;
 
 #define FLASH_LED_PIN 4
 
-#define NO_CALIBRATION_PICS 10
+#define NO_CALIBRATION_PICS 100 
 
 void initPins()
 {
@@ -91,15 +91,21 @@ bool configureCamera(camera_config_t &p_camConf)
 	}
 
 	sensor_t * s = esp_camera_sensor_get();
+	// INITIAL OPTIMAL GUESS
 	// the brighter the whiter the pixels are and the immage is more faded
 	s->set_brightness(s, -2);     // -2 to 2
 	// more contrast, clearer shapes, but too much might not be good
 	s->set_contrast(s, 1);       // -2 to 2
 	// more saturation, more distinct colors
 	s->set_saturation(s, 2);     // -2 to 2
-	s->set_special_effect(s, 0); // 0 to 6 (0 - No Effect, 1 - Negative, 2 - Grayscale, 3 - Red Tint, 4 - Green Tint, 5 - Blue Tint, 6 - Sepia)
-	// yes withe balancing is crucial
-	s->set_whitebal(s, 1);       // 0 = disable , 1 = enable
+	s->set_special_effect(s, 0); // 1 to 6 (0 - No Effect, 1 - Negative, 2 - Grayscale, 3 - Red Tint, 4 - Green Tint, 5 - Blue Tint, 6 - Sepia)
+	// white balancing seems to ruin the pictures
+	s->set_whitebal(s, 0);       // 0 = disable , 1 = enable
+	s->set_awb_gain(s, 0);                        // Auto White Balance enable (0 or 1)
+
+	s->set_gain_ctrl(s, 1);                       // auto gain on
+	s->set_exposure_ctrl(s, 1);                   // auto exposure on
+	// s->set_aec_value(s, 0);
 	
 	return true;
 }
@@ -276,6 +282,7 @@ void setup()
 	}
 
 	focusPicture();
+
 	takePicture();
 }
 
