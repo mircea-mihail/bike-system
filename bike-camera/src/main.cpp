@@ -35,7 +35,7 @@ int pictureNumber = 0;
 
 #define FLASH_LED_PIN 4
 
-#define NO_CALIBRATION_PICS 100 
+#define NO_CALIBRATION_PICS 25
 
 void initPins()
 {
@@ -99,6 +99,7 @@ bool configureCamera(camera_config_t &p_camConf)
 	// more saturation, more distinct colors
 	s->set_saturation(s, 2);     // -2 to 2
 	s->set_special_effect(s, 0); // 1 to 6 (0 - No Effect, 1 - Negative, 2 - Grayscale, 3 - Red Tint, 4 - Green Tint, 5 - Blue Tint, 6 - Sepia)
+
 	// white balancing seems to ruin the pictures
 	s->set_whitebal(s, 0);       // 0 = disable , 1 = enable
 	s->set_awb_gain(s, 0);                        // Auto White Balance enable (0 or 1)
