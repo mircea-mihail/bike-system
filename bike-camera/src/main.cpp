@@ -181,20 +181,27 @@ void takePicture()
 void takeMultipleSettingsPics()
 {
 	sensor_t * s = esp_camera_sensor_get();
+
+	s->set_ae_level(s, -2);
+	takePicture();
+	delay(100);
+
 	for(int lvl = -2; lvl <= 2; lvl += 1)
 	{
-		// the brighter the whiter the pixels are and the immage is more faded
-		s->set_brightness(s, 0);     // -2 to 2
-		// more contrast, clearer shapes, but too much might not be good
-		s->set_contrast(s, 0);       // -2 to 2
-		// more saturation, more distinct colors
-		s->set_saturation(s, lvl);     // -2 to 2
-		// how much exposure to give the shot
-		s->set_ae_level(s, 0);     	 // -2 to 2
+		// // the brighter the whiter the pixels are and the immage is more faded
+		// s->set_brightness(s, 0);     // -2 to 2
+		// // more contrast, clearer shapes, but too much might not be good
+		// s->set_contrast(s, 0);       // -2 to 2
+		// // more saturation, more distinct colors
+		// s->set_saturation(s, 0);     // -2 to 2
+		// // how much exposure to give the shot
+		s->set_ae_level(s, lvl);     	 // -2 to 2
 
 		takePicture();
 		delay(100);
 	}
+
+	takePicture();
 }
 
 bool is_red(pixel p_px)
@@ -299,12 +306,12 @@ void setup()
 
 	focusPicture();
 
-	// takeMultipleSettingsPics();
+	takeMultipleSettingsPics();
 }
 
 void loop() 
 {
-	takePicture();
+	// takePicture();
 	// if(findRedInPic())
 	// {
 	// 	Serial.println("found red");
