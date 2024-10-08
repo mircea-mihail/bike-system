@@ -1,3 +1,24 @@
+///////////////////////////// for SVGA
+//pic format- pics/sec and overshoot of second pic
+// rgb 565 	- 2 pix 0.19 os 
+// yuv 422 	- 2 pix 0.19 os 
+// yuv 422 	- 2 pix 0.19 os 
+// jpeg q10	- 25 pix no os 
+// jpeg q3 	- 25 pix no os 
+// jpeg w saving - 3 pix
+
+///////////////////////////// jpeg no saving different screen sizes:
+// res      - pics / sec
+// cif 		- 51 
+// hvga		- 25
+// vga		- 25
+// svga		- 25
+// xga		- 11
+// hd		- 11
+// sxga		- 11
+// uxga		- 11
+	
+
 #include "esp_camera.h"
 #include "Arduino.h"
 #include "FS.h"                // SD Card ESP32
@@ -68,16 +89,6 @@ bool configureCamera(camera_config_t &p_camConf)
 	p_camConf.pixel_format = PIXFORMAT_JPEG; 
 	// p_camConf.frame_size = FRAMESIZE_QVGA;
 
-	///////////////////////////// for SVGA
-	// rgb 565 	- 2 pix 0.19 os 
-	// yuv 422 	- 2 pix 0.19 os 
-	// yuv 422 	- 2 pix 0.19 os 
-	// jpeg q10	- 25 pix no os 
-	// jpeg q3 	- 25 pix no os 
-	// jpeg w saving - 3 pix
-
-	///////////////////////////// jpeg no saving different screen sizes:
-	
 
 	p_camConf.frame_size = FRAMESIZE_SVGA;
 	p_camConf.jpeg_quality = 3;
@@ -346,10 +357,9 @@ void setup()
 		return;
 	}
 
-	// focusPicture();
+	focusPicture();
 
-	// takePicture();
-	oneSecTakePicture();
+	takePicture();
 }
 
 void loop() 
