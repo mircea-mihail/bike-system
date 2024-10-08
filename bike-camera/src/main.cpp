@@ -25,6 +25,7 @@ bool checkSD()
 		Serial.println("No SD Card attached");
 		return false;
 	}
+
 	return true;
 }
 
@@ -38,11 +39,7 @@ void setup()
 
 	digitalWrite(FLASH_LED_PIN, LOW);
 
-	if(! checkSD())
-	{
-		return;
-	}
-	if(!configureCamera())
+	if(!checkSD() || !configureCamera())
 	{
 		return;
 	}
@@ -54,14 +51,14 @@ void setup()
 void loop() 
 {
 	// takePicture();
-	if(findRedInPic())
-	{
-		Serial.println("found red");
-		analogWrite(FLASH_LED_PIN, 1);
-	}
-	else
-	{
-		analogWrite(FLASH_LED_PIN, 0);
-		Serial.println("no red...");
-	}
+	// if(findRedInPic())
+	// {
+	// 	Serial.println("found red");
+	// 	analogWrite(FLASH_LED_PIN, 1);
+	// }
+	// else
+	// {
+	// 	analogWrite(FLASH_LED_PIN, 0);
+	// 	Serial.println("no red...");
+	// }
 }
