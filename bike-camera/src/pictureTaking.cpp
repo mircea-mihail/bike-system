@@ -97,8 +97,6 @@ void takePicture()
 
 	EEPROM.begin(EEPROM_SIZE);
 	int32_t pictureNumber = EEPROM.readInt(EEPROM_WRITE_ADDR);
-	Serial.print("read int ");
-	Serial.println(pictureNumber);
 	pictureNumber += (int32_t)1;
 
 	// Take Picture with Camera
@@ -110,7 +108,7 @@ void takePicture()
 	}
 
 	// Path where new picture will be saved in SD Card
-	String path = "/picture" + String(pictureNumber) +".bin";
+	String path = "/picture" + String(pictureNumber) +".jpeg";
 
 	fs::FS &fs = SD_MMC; 
 	File file = fs.open(path.c_str(), FILE_WRITE);
@@ -128,11 +126,8 @@ void takePicture()
 
 	esp_camera_fb_return(fb); 
 
-	Serial.print("trying to write int ");
-	Serial.println(pictureNumber);
 	EEPROM.writeInt(EEPROM_WRITE_ADDR, pictureNumber);
 	EEPROM.commit();
-	Serial.println("write successful?");
 }
 
 void takeMultipleSettingsPics()
