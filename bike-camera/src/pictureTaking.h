@@ -29,9 +29,49 @@
 #define HREF_GPIO_NUM     23
 #define PCLK_GPIO_NUM     22
 
-/// @brief configures the esp camera
-/// @param p_camConf configures the camera struct and initialises the camera objec in the esp cam library
+#define NO_CALIBRATION_PICS 50 
+
+#define EEPROM_SIZE 1
+
+/// @brief configures the esp camera by populating a config camera struct 
+/// with the desired values and then initialising the camera using it
 /// @return true on success, false on failure
-bool configureCamera(camera_config_t &p_camConf);
+bool configureCamera();
+
+/// @brief takes NO_CALIBRATION_PICS and does nothing to them
+/// to give time for the camera to adjust itself
+void focusPicture();
+
+/// @brief takes a picture and stores it to flash
+void takePicture();
+
+///////////////////////////// TESTING
+
+/// @brief takes multiple pictures, each one with a different sensor setting in order to compare them
+void takeMultipleSettingsPics();
+
+/// @brief takes pictures for one second and prints how many it managed to take
+void oneSecTakePicture();
+
+// tests results
+///////////////////////////// for SVGA
+//pic format- pics/sec and overshoot of second pic
+// rgb 565 	- 2 pix 0.19 os 
+// yuv 422 	- 2 pix 0.19 os 
+// yuv 422 	- 2 pix 0.19 os 
+// jpeg q10	- 25 pix no os 
+// jpeg q3 	- 25 pix no os 
+// jpeg w saving - 3 pix
+
+///////////////////////////// jpeg no saving different screen sizes:
+// res      - pics / sec
+// cif 		- 51 
+// hvga		- 25
+// vga		- 25
+// svga		- 25
+// xga		- 11
+// hd		- 11
+// sxga		- 11
+// uxga		- 11
 
 #endif
