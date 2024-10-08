@@ -96,7 +96,10 @@ void takePicture()
 	// digitalWrite(FLASH_LED_PIN, HIGH);
 
 	EEPROM.begin(EEPROM_SIZE);
-	int pictureNumber = EEPROM.read(0) + 1;
+	int32_t pictureNumber = EEPROM.readInt(EEPROM_WRITE_ADDR);
+	Serial.print("read int ");
+	Serial.println(pictureNumber);
+	pictureNumber += (int32_t)1;
 
 	// Take Picture with Camera
 	camera_fb_t *fb = esp_camera_fb_get();  
@@ -125,8 +128,11 @@ void takePicture()
 
 	esp_camera_fb_return(fb); 
 
-	EEPROM.write(0, pictureNumber);
+	Serial.print("trying to write int ");
+	Serial.println(pictureNumber);
+	EEPROM.writeInt(EEPROM_WRITE_ADDR, pictureNumber);
 	EEPROM.commit();
+	Serial.println("write successful?");
 }
 
 void takeMultipleSettingsPics()

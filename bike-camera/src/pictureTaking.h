@@ -31,7 +31,8 @@
 
 #define NO_CALIBRATION_PICS 50 
 
-#define EEPROM_SIZE 1
+#define EEPROM_SIZE 8
+#define EEPROM_WRITE_ADDR 1
 
 /// @brief configures the esp camera by populating a config camera struct 
 /// with the desired values and then initialising the camera using it
