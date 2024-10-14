@@ -1,3 +1,24 @@
+// tests results
+///////////////////////////// for SVGA
+//pic format- pics/sec and overshoot of second pic
+// rgb 565 	- 2 pix 0.19 os 
+// yuv 422 	- 2 pix 0.19 os 
+// yuv 422 	- 2 pix 0.19 os 
+// jpeg q10	- 25 pix no os 
+// jpeg q3 	- 25 pix no os 
+// jpeg w saving - 3 pix
+
+///////////////////////////// jpeg no saving different screen sizes:
+// res      - pics / sec
+// cif 		- 51 
+// hvga		- 25
+// vga		- 25
+// svga		- 25
+// xga		- 11
+// hd		- 11
+// sxga		- 11
+// uxga		- 11
+
 #ifndef PICTURE_TAKING_H
 #define PICTURE_TAKING_H
 
@@ -9,6 +30,8 @@
 #include <EEPROM.h>            // read and write from flash memory
 
 #include "esp_camera.h"
+#include "imageEditing.h"
+#include "img_converters.h"
 
 // Pin definition for CAMERA_MODEL_AI_THINKER
 #define PWDN_GPIO_NUM     32
@@ -46,6 +69,8 @@ void focusPicture();
 /// @brief takes a picture and stores it to flash
 void takePicture();
 
+bool getPicture(uint16_t p_pic[IMAGE_HEIGHT][IMAGE_WIDTH]);
+
 ///////////////////////////// TESTING
 
 /// @brief takes multiple pictures, each one with a different sensor setting in order to compare them
@@ -53,26 +78,5 @@ void takeMultipleSettingsPics();
 
 /// @brief takes pictures for one second and prints how many it managed to take
 void oneSecTakePicture();
-
-// tests results
-///////////////////////////// for SVGA
-//pic format- pics/sec and overshoot of second pic
-// rgb 565 	- 2 pix 0.19 os 
-// yuv 422 	- 2 pix 0.19 os 
-// yuv 422 	- 2 pix 0.19 os 
-// jpeg q10	- 25 pix no os 
-// jpeg q3 	- 25 pix no os 
-// jpeg w saving - 3 pix
-
-///////////////////////////// jpeg no saving different screen sizes:
-// res      - pics / sec
-// cif 		- 51 
-// hvga		- 25
-// vga		- 25
-// svga		- 25
-// xga		- 11
-// hd		- 11
-// sxga		- 11
-// uxga		- 11
 
 #endif
