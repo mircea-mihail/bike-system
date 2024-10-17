@@ -28,10 +28,11 @@
 #include "soc/rtc_cntl_reg.h"  // Disable brownour problems
 #include "driver/rtc_io.h"
 #include <EEPROM.h>            // read and write from flash memory
+// #include "img_converters.h"
+#include <Arduino.h>
 
 #include "esp_camera.h"
-#include "imageEditing.h"
-#include "img_converters.h"
+#include "imageDefines.h"
 
 // Pin definition for CAMERA_MODEL_AI_THINKER
 #define PWDN_GPIO_NUM     32
@@ -69,7 +70,7 @@ void focusPicture();
 /// @brief takes a picture and stores it to flash
 void takePicture();
 
-bool getPicture(uint16_t p_pic[IMAGE_HEIGHT][IMAGE_WIDTH]);
+bool getPicture(uint8_t *p_pic);
 
 ///////////////////////////// TESTING
 

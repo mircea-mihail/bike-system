@@ -4,13 +4,11 @@
 #include <Arduino.h>
 #include <pictureTaking.h>
 
+#include "imageDefines.h"
+
 // tweak-able values
 #define MIN_RED_FACTOR 1.6
 #define MIN_RED_BRIGHTNESS 70
-
-// image characteristics
-#define IMAGE_HEIGHT 240
-#define IMAGE_WIDTH 320
 
 struct pixel
 {

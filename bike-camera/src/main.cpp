@@ -6,7 +6,7 @@
 // define the number of bytes you want to access
 #define FLASH_LED_PIN 4
 
-uint16_t g_pic[IMAGE_HEIGHT][IMAGE_WIDTH];
+uint8_t *g_pic;
 
 void initPins()
 {
@@ -31,6 +31,11 @@ bool checkSD()
 	return true;
 }
 
+uint16_t getPixel16(uint8_t *p_pic, uint32_t p_height, uint32_t p_width)
+{
+	return (p_pic[(p_height * IMAGE_WIDTH + p_width) * 2]) | (p_pic[(p_height * IMAGE_WIDTH + p_width) * 2 + 1]) << 8;
+}
+
 void setup() 
 {
 	initPins();
@@ -39,31 +44,66 @@ void setup()
 	Serial.begin(115200);
 	while(!Serial);
 
+	// Serial.print("Total heap: ");
+	// Serial.println(ESP.getHeapSize());
+	// Serial.print("Free heap:");
+	// Serial.println(ESP.getFreeHeap());
+	// Serial.print("Total PSRAM:");
+	// Serial.println(ESP.getPsramSize());
+	// Serial.print("Free PSRAM:");
+	// Serial.println(ESP.getFreePsram());
+
 	digitalWrite(FLASH_LED_PIN, LOW);
 
-	if(!checkSD() || !configureCamera())
+	// if(!checkSD() )
+	// {
+	// 	return;
+	// }
+	if(!configureCamera())
 	{
 		return;
 	}
 
+	g_pic = (uint8_t *)ps_malloc(IMAGE_HEIGHT * IMAGE_WIDTH * BYTES_PER_PIXEL);
+	Serial.println("allocated pic");
+
 	focusPicture();
 	// takePicture();
 	getPicture(g_pic);
+	Serial.println("stored pic in psram");
 
+	Serial.print("[");
 	for(int i = 0; i < IMAGE_HEIGHT; i+=1)
 	{
+		Serial.print("[");
 		for(int j = 0; j < IMAGE_WIDTH; j+=1)
 		{
-			pixel px = get_rgb888_from_rgb565(g_pic[i][j]);
+			pixel px = get_rgb888_from_rgb565(getPixel16(g_pic, i, j));
+
+			Serial.print("[");
+
 			Serial.print(px.red);
-			Serial.print(" ");
+			Serial.print(", ");
 			Serial.print(px.green);
-			Serial.print(" ");
+			Serial.print(", ");
 			Serial.print(px.blue);
+
+			Serial.print("]");
+			if(j != IMAGE_WIDTH - 1)
+			{
+				Serial.print(", ");
+			}
+		}
+		Serial.print("]");
+		if(i != IMAGE_HEIGHT - 1)
+		{
 			Serial.print(", ");
 		}
 		Serial.print("\n");
 	}
+	Serial.print("]");
+
+	free(g_pic);
 }
 
 void loop() 

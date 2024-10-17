@@ -44,10 +44,10 @@ bool configureCamera()
 
 	p_camConf.pixel_format = PIXFORMAT_JPEG; 
 
-	// p_camConf.frame_size = FRAMESIZE_QVGA;
+	p_camConf.frame_size = FRAMESIZE_QVGA;
 
 	// 640 x 480 to scale down to qvga, 320 x 240
-	p_camConf.frame_size = FRAMESIZE_VGA;
+	// p_camConf.frame_size = FRAMESIZE_VGA
 	p_camConf.jpeg_quality = 3;
 	// p_camConf.fb_count = 1;
 
@@ -132,7 +132,7 @@ void takePicture()
 	EEPROM.commit();
 }
 
-bool getPicture(uint16_t p_pic[IMAGE_HEIGHT][IMAGE_WIDTH])
+bool getPicture(uint8_t *p_pic)
 {
 	// Take Picture with Camera
 	camera_fb_t *fb = esp_camera_fb_get();  
@@ -142,18 +142,18 @@ bool getPicture(uint16_t p_pic[IMAGE_HEIGHT][IMAGE_WIDTH])
 		return false;
 	}
 	
-	uint8_t buffer[IMAGE_HEIGHT * IMAGE_WIDTH];
 
-	jpg2rgb565(fb->buf, fb->len, buffer, JPG_SCALE_2X);
+	// jpg2rgb565(fb->buf, fb->len, buffer, JPG_SCALE_2X);
+	jpg2rgb565(fb->buf, fb->len, p_pic, JPG_SCALE_NONE);
 
-	for(int i = 0; i < IMAGE_HEIGHT; i+=1)
-	{
-		for(int j = 0; j < IMAGE_WIDTH; j+=1)
-		{
-			uint16_t px_buf = (buffer[(i + j) * 2] << 8) | buffer[(i + j) * 2 + 1];
-			p_pic[i][j] = px_buf;
-		} 
-	}
+	// for(int i = 0; i < IMAGE_HEIGHT; i+=1)
+	// {
+	// 	for(int j = 0; j < IMAGE_WIDTH; j+=1)
+	// 	{
+	// 		uint16_t px_buf = (buffer[(i + j) * 2] << 8) | buffer[(i + j) * 2 + 1];
+	// 		p_pic[i][j] = px_buf;
+	// 	} 
+	// }
 
 	esp_camera_fb_return(fb); 
 	return true;
