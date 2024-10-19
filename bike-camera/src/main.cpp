@@ -6,7 +6,8 @@
 // define the number of bytes you want to access
 #define FLASH_LED_PIN 4
 
-uint8_t *g_pic;
+
+enum pixel_component{red = 0, green = 1, blue = 2};
 
 void initPins()
 {
@@ -31,9 +32,38 @@ bool checkSD()
 	return true;
 }
 
-uint16_t getPixel16(uint8_t *p_pic, uint32_t p_height, uint32_t p_width)
+uint8_t getColorComponent(uint8_t * p_pic, uint32_t p_height, uint32_t p_width, pixel_component p_px_comp)
 {
-	return (p_pic[(p_height * IMAGE_WIDTH + p_width) * 2]) | (p_pic[(p_height * IMAGE_WIDTH + p_width) * 2 + 1]) << 8;
+	return p_pic[p_height * IMAGE_WIDTH * BYTES_PER_PIXEL + p_width + p_px_comp];
+}
+
+void pictureTaking(void *p_args)
+{
+	uint8_t *pic;
+	pic = (uint8_t *)ps_malloc(IMAGE_HEIGHT * IMAGE_WIDTH * BYTES_PER_PIXEL);
+
+	Serial.println("created task");
+	while(true)
+	{
+		unsigned long start = millis();
+		int pics_taken = 0;
+		int dummy = 9;
+		while(millis() - start < 1000)
+		{
+			// takePicture();
+			getPicture(pic);
+			pics_taken += 1;
+			for(int i = 0; i < IMAGE_HEIGHT; i+=1)
+			{
+				for(int j = 0; j < IMAGE_WIDTH * BYTES_PER_PIXEL; j+= BYTES_PER_PIXEL)
+				{
+					dummy +=1;
+				}
+			}
+		}
+		Serial.print("\ntook ");
+		Serial.println(pics_taken);
+	}
 }
 
 void setup() 
@@ -43,15 +73,6 @@ void setup()
 	WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0); //disable brownout detector
 	Serial.begin(115200);
 	while(!Serial);
-
-	// Serial.print("Total heap: ");
-	// Serial.println(ESP.getHeapSize());
-	// Serial.print("Free heap:");
-	// Serial.println(ESP.getFreeHeap());
-	// Serial.print("Total PSRAM:");
-	// Serial.println(ESP.getPsramSize());
-	// Serial.print("Free PSRAM:");
-	// Serial.println(ESP.getFreePsram());
 
 	digitalWrite(FLASH_LED_PIN, LOW);
 
@@ -64,61 +85,14 @@ void setup()
 		return;
 	}
 
-	g_pic = (uint8_t *)ps_malloc(IMAGE_HEIGHT * IMAGE_WIDTH * BYTES_PER_PIXEL);
-	Serial.println("allocated pic");
-
 	focusPicture();
-	// takePicture();
-	getPicture(g_pic);
-	Serial.println("stored pic in psram");
 
-	Serial.print("[");
-	for(int i = 0; i < IMAGE_HEIGHT; i+=1)
-	{
-		Serial.print("[");
-		for(int j = 0; j < IMAGE_WIDTH; j+=1)
-		{
-			pixel px = get_rgb888_from_rgb565(getPixel16(g_pic, i, j));
+	TaskHandle_t pictureTakingHandle = NULL;
+    xTaskCreate(pictureTaking, "pictureTaking", 65536, NULL, tskIDLE_PRIORITY, &pictureTakingHandle); 
 
-			Serial.print("[");
-
-			Serial.print(px.red);
-			Serial.print(", ");
-			Serial.print(px.green);
-			Serial.print(", ");
-			Serial.print(px.blue);
-
-			Serial.print("]");
-			if(j != IMAGE_WIDTH - 1)
-			{
-				Serial.print(", ");
-			}
-		}
-		Serial.print("]");
-		if(i != IMAGE_HEIGHT - 1)
-		{
-			Serial.print(", ");
-		}
-		Serial.print("\n");
-	}
-	Serial.print("]");
-
-	free(g_pic);
 }
 
 void loop() 
 {
-	delay(100);
-	// takePicture();
-
-	// if(findRedInPic())
-	// {
-	// 	Serial.println("found red");
-	// 	analogWrite(FLASH_LED_PIN, 1);
-	// }
-	// else
-	// {
-	// 	analogWrite(FLASH_LED_PIN, 0);
-	// 	Serial.println("no red...");
-	// }
+	vTaskDelete(NULL);
 }
