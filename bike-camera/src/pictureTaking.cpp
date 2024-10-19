@@ -48,7 +48,7 @@ bool configureCamera()
 
 	// 640 x 480 to scale down to qvga, 320 x 240
 	// p_camConf.frame_size = FRAMESIZE_VGA
-	p_camConf.jpeg_quality = 3;
+	p_camConf.jpeg_quality = 10;
 	// p_camConf.fb_count = 1;
 
 	if(psramFound())
@@ -142,18 +142,8 @@ bool getPicture(uint8_t *p_pic)
 		return false;
 	}
 	
-
 	// jpg2rgb565(fb->buf, fb->len, buffer, JPG_SCALE_2X);
-	jpg2rgb565(fb->buf, fb->len, p_pic, JPG_SCALE_NONE);
-
-	// for(int i = 0; i < IMAGE_HEIGHT; i+=1)
-	// {
-	// 	for(int j = 0; j < IMAGE_WIDTH; j+=1)
-	// 	{
-	// 		uint16_t px_buf = (buffer[(i + j) * 2] << 8) | buffer[(i + j) * 2 + 1];
-	// 		p_pic[i][j] = px_buf;
-	// 	} 
-	// }
+	fmt2rgb888(fb->buf, fb->len, PIXFORMAT_JPEG, p_pic);
 
 	esp_camera_fb_return(fb); 
 	return true;
