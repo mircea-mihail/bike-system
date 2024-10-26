@@ -13,9 +13,9 @@ def view_hsv_pixel(p_hue, p_saturation, p_value):
     hsv_px = cv.cvtColor(rgb_px, cv.COLOR_RGB2HSV)
     np.shape(hsv_px)
 
-    hsv_px[0][0][HUE] = 40
-    hsv_px[0][0][SATURATION] = 255
-    hsv_px[0][0][VALUE] = 255
+    hsv_px[0][0][HUE] = p_hue 
+    hsv_px[0][0][SATURATION] = p_saturation 
+    hsv_px[0][0][VALUE] = p_value
 
     rgb_px = cv.cvtColor(hsv_px, cv.COLOR_HSV2RGB)
 
