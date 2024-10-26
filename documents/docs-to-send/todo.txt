@@ -1,0 +1,19 @@
+so, pt data viitoare, trebuie sa aveti minim:
+	1. Descriere a proiectului (ce face, cum face)
+	2. Schita / Diagrama conceptuala. Sa fie clara.
+	3. Orice altceva ajuta pt claritate
+	4. Mentionati ce aveti deja
+
+Asteptam orarul intr-o versiune mai stabila, dar planul e sa ne auzim tot la 18:00,
+	in batch-uri de cate 20 min (deci 18:00 - 21:00ish. NU trebuie sa intrati la fiecare 
+	(dar sunteti bineveniti), dar e o idee buna sa intrati la cei cu licente similare.
+
+Orientativ, cred ca sunteti impartiti in 3 mini grupuri:
+	1. Masinute: Horia, Dani si Artemis
+	2. Smart stuff/iot: Smaranda, Tudor si Ana
+	3. Wearables: Mircea si Ioan
+
+Cand avem un orar mai stabil va pun un excep in care sa va programati exact.
+	Intrati minim la toata "grupa" voastra, deci vedeti cum va organizati sa fiti unii dupa altii.
+
+React la mesajul asta sa stiu ca l-ati citit.
