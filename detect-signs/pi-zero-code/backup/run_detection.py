@@ -6,7 +6,7 @@ from detect_give_way import *
 
 def get_photo():
     # write take picture algorithm
-    IMG_DIR = '/home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/my-dataset/give-way/phone-cam/easy_thick_sign_set/'
+    IMG_DIR = '/home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/my-dataset/give-way/phone-cam/easy_thick_sign_set/the_dataset/'
     return cv.imread(IMG_DIR + sorted(os.listdir(IMG_DIR))[2])
 
 total_start = time.time()
