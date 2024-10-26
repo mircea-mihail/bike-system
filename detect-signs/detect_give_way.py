@@ -61,6 +61,7 @@ def check_for_gw(p_hsv_img, p_chunk, p_label_mat):
             
     # if there are a lot of red pixels outside of triangle, likely not a give way
     if red_outside_gw / px_outside_gw > RED_OUTSIDE_GW_THRESHOLD:
+        print("too much red outside:", red_outside_gw/px_outside_gw)
         return 0
     
     #get final score for thin
@@ -78,10 +79,14 @@ def check_for_gw(p_hsv_img, p_chunk, p_label_mat):
     thick_red_checked = pixels_checked - thick_white_checked
     final_thick_score = (min(thick_white_score / thick_white_checked, 1) + min(thick_red_score / thick_red_checked, 1)) / 2
 
-
+    if final_thin_score > final_thick_score:
+        print("outer:", thin_white_score/thin_white_checked, "inner", thin_red_score/thin_red_checked) 
+    else:
+        print("outer:", thick_white_score/thick_white_checked, "inner", thick_red_score/thick_red_checked) 
     return max(final_thin_score, final_thick_score)
 
 def fill_in_shape(p_img, p_label_mat, p_hsv_img, p_label, p_x, p_y):
+    highest_point_in_sign = point(len(p_hsv_img[0]-1), len(p_hsv_img-1))
     gw_chunk = give_way_chunk(point(p_x, p_y), point(p_x, p_y), point(p_x, p_y))
 
     chunk_size = 1 
@@ -122,10 +127,18 @@ def fill_in_shape(p_img, p_label_mat, p_hsv_img, p_label, p_x, p_y):
                                 gw_chunk.bottom_point.y = curr_y + i
                                 gw_chunk.bottom_point.x = curr_x + j
 
+                            if(curr_y + i < highest_point_in_sign.y):
+                                highest_point_in_sign.x = curr_x + i
+                                highest_point_in_sign.y = curr_y + j 
+
+
         # current_node += 1 
         p_fronteer.popleft()
+
+    sign_height = gw_chunk.bottom_point.y - (gw_chunk.top_left_point.y + gw_chunk.top_right_point.y)/2
+    allowed_y_position = min(gw_chunk.top_left_point.y, gw_chunk.top_right_point.y) - RED_ABOVE_SIGN * sign_height
     
-    if chunk_size >= MIN_CHUNK_SIZE:
+    if chunk_size >= MIN_CHUNK_SIZE and highest_point_in_sign.y > allowed_y_position:
         chunk_score = check_for_gw(p_hsv_img, gw_chunk, p_label_mat)
         if chunk_score > MIN_CHUNK_SCORE:
             # print("similitude:", chunk_score)
