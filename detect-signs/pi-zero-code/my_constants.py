@@ -48,3 +48,7 @@ BLUE_PX = 2
 HUE = 0
 SATURATION = 1
 VALUE = 2
+
+# ------------------------------- PICTURE
+INITIAL_IMG_WIDTH = 1600
+INITIAL_IMG_HEIGHT = 1200

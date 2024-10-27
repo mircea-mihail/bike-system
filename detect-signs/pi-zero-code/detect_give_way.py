@@ -143,9 +143,9 @@ def fill_in_shape(p_img, p_label_mat, p_hsv_img, p_label, p_x, p_y):
         chunk_score = check_for_gw(p_hsv_img, gw_chunk, p_label_mat)
         if chunk_score > MIN_CHUNK_SCORE:
             # print("similitude:", chunk_score)
-            return chunk_score, gw_chunk
+            return chunk_score
     
-    return 0, 0
+    return 0
 
 
 def detect_gw(p_img):
@@ -159,11 +159,11 @@ def detect_gw(p_img):
     for i in range(1, len(p_img) - 2):
         for j in range(1, len(p_img[0]) - 2):
             if is_red(hsv_image[i][j]) and label_mat[i][j] == 0:
-                current_score, gw_chunk = fill_in_shape(p_img, label_mat, hsv_image, current_label, j, i)
+                current_score = fill_in_shape(p_img, label_mat, hsv_image, current_label, j, i)
 
                 # if found a sign
                 if(current_score > 0):
-                    return current_score, gw_chunk
+                    return current_score
 
                 current_label += 1
                 if current_label > total_labels:
