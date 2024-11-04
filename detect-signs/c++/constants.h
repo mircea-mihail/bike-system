@@ -4,15 +4,41 @@
 ///////////////////////////////// useful structs
 struct point
 {
-    float x;
-    float y;
+    double x;
+    double y;
+
+    point()
+    {
+        x = 0; 
+        y = 0;
+    }
+
+    point(double p_x, double p_y)
+    {
+        this->x = p_x;
+        this->y = p_y;
+    }
 };
 
 struct give_way_chunk
 {
-    point top_left_point;
-    point top_right_point;
-    point bottom_point;
+    point top_left;
+    point top_right;
+    point bottom;
+
+    give_way_chunk(point p_top_left, point p_top_right, point p_bottom)
+    {
+        top_left = p_top_left;
+        top_right = p_top_right;
+        bottom = p_bottom;
+    }
+
+    give_way_chunk()
+    {
+        top_left = point();
+        top_right = point();
+        bottom = point();
+    }
 };
 
 ///////////////////////////////// tweak-able constants
@@ -39,7 +65,8 @@ struct give_way_chunk
 #define DARK_MIN_RED_VALUE 50
 
 // ------------------------------- WHITE COLOR DETECTION 
-#define MIN_WHITE_BRIGHTNESS 40
+// before min val 40
+#define MIN_WHITE_VALUE 100
 #define MAX_WHITE_SATURATION 130
 
 ///////////////////////////////// rarely modified constants

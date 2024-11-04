@@ -15,14 +15,16 @@ int main(int argc, char** argv)
 
 	cv::Mat image; 
 	image = cv::imread(argv[1], 1); 
+	cv::Point2i image_size = cv::Point2i(1200, 1600);
+	cv::resize(image, image, cv::Size(image_size));
 
 	if (!image.data) { 
 		printf("No image data \n"); 
 		return -1; 
 	} 
 
-	cv::Mat hsvImage;
-	cv::cvtColor(image, hsvImage, cv::COLOR_BGR2HSV); 
+	cv::Mat hsv_image;
+	cv::cvtColor(image, hsv_image, cv::COLOR_BGR2HSV); 
 
 	std::chrono::time_point start = std::chrono::high_resolution_clock::now();
 
@@ -32,27 +34,35 @@ int main(int argc, char** argv)
 	{
 		for (int j = 0; j < image.cols; j++)
 		{
-			cv::Vec3b hsv_px = hsvImage.at<cv::Vec3b>(i, j);
+			cv::Vec3b hsv_px = hsv_image.at<cv::Vec3b>(i, j);
 
-			if(isRed(hsv_px[HUE], hsv_px[SATURATION], hsv_px[VALUE]))
+			if(is_red(hsv_px[HUE], hsv_px[SATURATION], hsv_px[VALUE]))
 			{
-				// image.at<cv::Vec3b>(i, j) = cv::Vec3b({255, 0, 255});
+				image.at<cv::Vec3b>(i, j) = cv::Vec3b({0, 0, 255});
 				found_red += 1;
 			} 
+
+			if(is_white(hsv_px[HUE], hsv_px[SATURATION], hsv_px[VALUE]))
+			{
+				image.at<cv::Vec3b>(i, j) = cv::Vec3b({255, 255, 255});
+				found_red += 1;
+			}
 		}
 	}
 
 	std::chrono::time_point end = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double, std::milli> duration = end - start;
 
-	std::cout << "to iterate and change rgb took " << duration.count() << "ms" << std::endl;
+	std::cout << "to iterate and change rgb took " << duration.count() << " ms" << std::endl;
 	std::cout << "found " << found_red << " red" << std::endl;
+	std::cout << "total pixels: " << image.cols * image.rows << std::endl;
 
-	cv::Mat resizedImg;
-	resize(image, resizedImg, cv::Size(), 0.3, 0.3);
+	cv::Mat resized_img;
+	float scale_for_print = 0.6;
+	cv::resize(image, resized_img, cv::Size(), scale_for_print , scale_for_print);
 
 	cv::namedWindow("Display Image", cv::WINDOW_FULLSCREEN); 
-	cv::imshow("Display Image", resizedImg); 
+	cv::imshow("Display Image", resized_img); 
 	cv::waitKey(0); 
 
 	return 0; 
