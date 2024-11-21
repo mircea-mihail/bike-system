@@ -424,8 +424,21 @@ CMakeFiles/DisplayImage.dir/DisplayImage.cpp.o: DisplayImage.cpp \
   /usr/local/include/opencv4/opencv2/video/tracking.hpp \
   /usr/local/include/opencv4/opencv2/video/background_segm.hpp \
   utility.h \
-  constants.h
+  constants.h \
+  detect_signs.h \
+  /usr/include/c++/11/fstream \
+  /usr/include/x86_64-linux-gnu/c++/11/bits/basic_file.h \
+  /usr/include/x86_64-linux-gnu/c++/11/bits/c++io.h \
+  /usr/include/c++/11/bits/fstream.tcc
 
+
+/usr/include/c++/11/bits/fstream.tcc:
+
+/usr/include/x86_64-linux-gnu/c++/11/bits/c++io.h:
+
+/usr/include/x86_64-linux-gnu/c++/11/bits/basic_file.h:
+
+detect_signs.h:
 
 utility.h:
 
@@ -532,6 +545,8 @@ utility.h:
 /usr/local/include/opencv4/opencv2/flann/nn_index.h:
 
 /usr/local/include/opencv4/opencv2/flann/params.h:
+
+/usr/include/c++/11/fstream:
 
 /usr/local/include/opencv4/opencv2/flann/matrix.h:
 

@@ -18,6 +18,25 @@ struct point
         this->x = p_x;
         this->y = p_y;
     }
+
+    point &operator=(const point &rhs)
+    {
+        if(this == &rhs)
+        {
+            return *this;
+        }
+    
+        this->x = rhs.x;
+        this->y = rhs.y;
+
+        return *this;
+    }
+
+    cv::Point get_cv_point()
+    {
+        return cv::Point(x, y);
+    }
+
 };
 
 struct give_way_chunk
@@ -42,6 +61,10 @@ struct give_way_chunk
 };
 
 ///////////////////////////////// tweak-able constants
+// ------------------------------- IMAGE
+#define IMAGE_HEIGHT (1600)
+#define IMAGE_WIDTH (1200)
+
 // ------------------------------- CHUNK
 #define MIN_CHUNK_SIZE 10
 #define MIN_CHUNK_SCORE 0.60

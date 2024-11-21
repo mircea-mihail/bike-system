@@ -363,4 +363,9 @@ CMakeFiles/DisplayImage.dir/DisplayImage.cpp.o: \
  /usr/local/include/opencv4/opencv2/video/tracking.hpp \
  /usr/local/include/opencv4/opencv2/video/background_segm.hpp \
  /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/utility.h \
- /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/constants.h
+ /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/constants.h \
+ /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/detect_signs.h \
+ /usr/include/c++/11/fstream \
+ /usr/include/x86_64-linux-gnu/c++/11/bits/basic_file.h \
+ /usr/include/x86_64-linux-gnu/c++/11/bits/c++io.h \
+ /usr/include/c++/11/bits/fstream.tcc
