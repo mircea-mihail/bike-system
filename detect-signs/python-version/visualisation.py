@@ -2,6 +2,7 @@ import numpy as np
 import cv2 as cv
 from my_constants import *
 from matplotlib import pyplot as plt 
+import time
 
 from utility import *
 
@@ -26,6 +27,7 @@ def view_red_in_pictures(p_gwImages, p_imagesToShow):
     # for img_idx in range(len(gw_images)):
     # img_idx = CUR_IMG 
     for img_idx in p_imagesToShow: 
+        start = time.time()
         img = p_gwImages[img_idx].copy()
         # img = cv.medianBlur(img, 3)
         hsv_img = cv.cvtColor(img, cv.COLOR_RGB2HSV)
@@ -36,6 +38,9 @@ def view_red_in_pictures(p_gwImages, p_imagesToShow):
                     img[i][j][0] = 255
                     img[i][j][1] = 0
                     img[i][j][2] = 0
+
+        
+        print("took ", time.time()- start, "to find only red")
                     
         plt.figure(dpi = 150)
 

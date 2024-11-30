@@ -1,6 +1,7 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#include <opencv2/opencv.hpp> 
 ///////////////////////////////// useful structs
 struct point
 {

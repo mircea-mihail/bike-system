@@ -15,7 +15,7 @@ class give_way_chunk:
 ################################# tweak-able constants
 # ------------------------------- CHUNK
 MIN_CHUNK_SIZE = 10
-MIN_CHUNK_SCORE = 0.60
+MIN_CHUNK_SCORE = 0.75
 MAX_CLUMPING_VARIANCE = 5 
 
 # ------------------------------- GIVE WAY RED BORDER   

@@ -7,6 +7,7 @@
 
 #include "constants.h"
 #include "utility.h"
+#include "memory_pool_list.h"
 
 // iau din coltul din stanga sus labelul formei curente si verific cu asta la is red
 float check_for_gw(cv::Mat &p_hsv_img, give_way_chunk p_chunk, std::array<std::array<int, IMAGE_WIDTH>, IMAGE_HEIGHT> &p_label_mat)
@@ -137,7 +138,7 @@ float fill_in_shape(cv::Mat &p_img, std::array<std::array<int, IMAGE_WIDTH>, IMA
     give_way_chunk gw_chunk = give_way_chunk(point(p_x, p_y), point(p_x, p_y), point(p_x, p_y));
 
     int32_t chunk_size = 1;
-    std::deque<point> p_fronteer;
+    mp_list p_fronteer;
 
     p_fronteer.push_front(point(p_x, p_y));
 
