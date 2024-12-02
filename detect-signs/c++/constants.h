@@ -68,6 +68,7 @@ struct give_way_chunk
 
 // ------------------------------- CHUNK
 #define MIN_CHUNK_SIZE 10
+#define MIN_BOUNDING_BOX_AREA 50
 #define MIN_CHUNK_SCORE 0.60
 #define MAX_CLUMPING_VARIANCE 5 
 
@@ -87,6 +88,9 @@ struct give_way_chunk
 
 #define DARK_MIN_RED_SATURATION 80
 #define DARK_MIN_RED_VALUE 50
+
+#define MAX_SATURATION 255
+#define MAX_VALUE 255
 
 // ------------------------------- WHITE COLOR DETECTION 
 // before min val 40
