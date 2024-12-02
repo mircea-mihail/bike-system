@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++
+CMAKE_SOURCE_DIR = /home/mircea/uni/bike-system/detect-signs/c++
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++
+CMAKE_BINARY_DIR = /home/mircea/uni/bike-system/detect-signs/c++
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/CMakeFiles /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/mircea/uni/bike-system/detect-signs/c++/CMakeFiles /home/mircea/uni/bike-system/detect-signs/c++//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/mircea/uni/bike-system/detect-signs/c++/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -117,41 +117,41 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named DisplayImage
+# Target rules for targets named main_detect
 
 # Build rule for target.
-DisplayImage: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 DisplayImage
-.PHONY : DisplayImage
+main_detect: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 main_detect
+.PHONY : main_detect
 
 # fast build rule for target.
-DisplayImage/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/DisplayImage.dir/build.make CMakeFiles/DisplayImage.dir/build
-.PHONY : DisplayImage/fast
+main_detect/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/build
+.PHONY : main_detect/fast
 
-DisplayImage.o: DisplayImage.cpp.o
-.PHONY : DisplayImage.o
+main_detect.o: main_detect.cpp.o
+.PHONY : main_detect.o
 
 # target to build an object file
-DisplayImage.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/DisplayImage.dir/build.make CMakeFiles/DisplayImage.dir/DisplayImage.cpp.o
-.PHONY : DisplayImage.cpp.o
+main_detect.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/main_detect.cpp.o
+.PHONY : main_detect.cpp.o
 
-DisplayImage.i: DisplayImage.cpp.i
-.PHONY : DisplayImage.i
+main_detect.i: main_detect.cpp.i
+.PHONY : main_detect.i
 
 # target to preprocess a source file
-DisplayImage.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/DisplayImage.dir/build.make CMakeFiles/DisplayImage.dir/DisplayImage.cpp.i
-.PHONY : DisplayImage.cpp.i
+main_detect.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/main_detect.cpp.i
+.PHONY : main_detect.cpp.i
 
-DisplayImage.s: DisplayImage.cpp.s
-.PHONY : DisplayImage.s
+main_detect.s: main_detect.cpp.s
+.PHONY : main_detect.s
 
 # target to generate assembly for a file
-DisplayImage.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/DisplayImage.dir/build.make CMakeFiles/DisplayImage.dir/DisplayImage.cpp.s
-.PHONY : DisplayImage.cpp.s
+main_detect.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/main_detect.cpp.s
+.PHONY : main_detect.cpp.s
 
 # Help Target
 help:
@@ -161,10 +161,10 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... DisplayImage"
-	@echo "... DisplayImage.o"
-	@echo "... DisplayImage.i"
-	@echo "... DisplayImage.s"
+	@echo "... main_detect"
+	@echo "... main_detect.o"
+	@echo "... main_detect.i"
+	@echo "... main_detect.s"
 .PHONY : help
 
 

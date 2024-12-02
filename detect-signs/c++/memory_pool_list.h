@@ -4,7 +4,8 @@
 #include "constants.h"
 #include <iostream>
 
-struct node{
+struct node
+{
     node *m_prev;
     point m_point;
     node *m_next;
@@ -62,13 +63,15 @@ private:
             return return_node;
         }
 
-        m_freed_head->m_prev->m_next = nullptr;
+        node *ret_node = m_freed_head;
+        m_freed_head = m_freed_head->m_prev;
+        m_freed_head->m_next = nullptr;
 
-        m_freed_head->m_prev = p_prev_node;
-        m_freed_head->m_next = p_next_node;
-        m_freed_head->m_point = p_pt;
+        ret_node->m_prev = p_prev_node;
+        ret_node->m_next = p_next_node;
+        ret_node->m_point = p_pt;
         
-        return m_freed_head;
+        return ret_node;
     }
 
 public:
@@ -99,12 +102,12 @@ public:
     {
         if(m_head == nullptr && m_tail == nullptr)
         {
-            m_head = new node(nullptr, p_pt, nullptr);
+            m_head = get_freed(nullptr, p_pt, nullptr);
             m_tail = m_head;
             return;
         }
 
-        node *new_tail = new node(nullptr, p_pt, m_tail);
+        node *new_tail = get_freed(nullptr, p_pt, m_tail);
         m_tail->m_prev = new_tail;
 
         m_tail = new_tail;
@@ -127,10 +130,10 @@ public:
             return;
         }
 
-        node *node_to_keep = m_tail;
+        node *node_to_push = m_tail;
         m_tail = m_tail->m_next;
         m_tail->m_prev = nullptr;
-        push_freed(m_tail);
+        push_freed(node_to_push);
     }
     
     bool empty()
@@ -150,13 +153,35 @@ public:
 
     void print_list()
     {
+        std::cout << "current list:"<< std::endl;
         node *n = m_head;
         while(n != nullptr)
         {
             std::cout << n->m_point.x << " " << n->m_point.y << std::endl;
+            n = n->m_prev;
         }
     }
 
+    ~mp_list()
+    {
+        node *n = m_head;
+        while(n != nullptr)
+        {
+            node *next_node = n->m_prev;
+            delete n;
+
+            n = next_node;
+        }
+
+        n = m_freed_head;
+        while(n != nullptr)
+        {
+            node *next_node = n->m_prev;
+            delete n;
+
+            n = next_node;
+        }
+    }
 };
 
 #endif

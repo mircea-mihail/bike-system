@@ -131,7 +131,15 @@ void print_detection(cv::Mat &p_img, give_way_chunk gw_chunk)
     cv::line(p_img, gw_chunk.top_right.get_cv_point(), gw_chunk.bottom.get_cv_point(), color, thickness);
 }
 
+
 // metoda de expansiune de la cursul de IA
+/* performance updates
+ *      normal photo:   69 - 70 ms
+ * red stress:
+ *      std::list:      676 - 680 ms
+ *      std::deque:     550 - 558 ms
+ *      mp_list:        476 - 484 ms 
+*/
 float fill_in_shape(cv::Mat &p_img, std::array<std::array<int, IMAGE_WIDTH>, IMAGE_HEIGHT> &p_label_mat, cv::Mat &p_hsv_img, int32_t p_label, double p_x, double p_y)
 {
     point highest_point_in_sign = point(p_hsv_img.cols, p_hsv_img.rows);
@@ -139,6 +147,8 @@ float fill_in_shape(cv::Mat &p_img, std::array<std::array<int, IMAGE_WIDTH>, IMA
 
     int32_t chunk_size = 1;
     mp_list p_fronteer;
+    // std::deque<point> p_fronteer;
+    // std::list<point> p_fronteer;
 
     p_fronteer.push_front(point(p_x, p_y));
 

@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/DisplayImage.cpp" "CMakeFiles/DisplayImage.dir/DisplayImage.cpp.o" "gcc" "CMakeFiles/DisplayImage.dir/DisplayImage.cpp.o.d"
+  "/home/mircea/uni/bike-system/detect-signs/c++/main_detect.cpp" "CMakeFiles/main_detect.dir/main_detect.cpp.o" "gcc" "CMakeFiles/main_detect.dir/main_detect.cpp.o.d"
   )
 
 # Targets to which this target links.
