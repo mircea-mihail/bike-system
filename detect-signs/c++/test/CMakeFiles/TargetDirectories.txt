@@ -1,3 +1,0 @@
-/home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/test/CMakeFiles/DisplayImage.dir
-/home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/test/CMakeFiles/edit_cache.dir
-/home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/test/CMakeFiles/rebuild_cache.dir
