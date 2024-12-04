@@ -28,160 +28,26 @@ private:
 
     node *m_freed_head;
 
-    void push_freed(node *p_node)
-    {
-        if(m_freed_head == nullptr) 
-        {
-            p_node->m_next = nullptr;
-            p_node->m_prev = nullptr;
-            m_freed_head = p_node;
-            return;
-        }
+    void push_freed(node *p_node);
 
-        m_freed_head->m_next = p_node;
-        p_node->m_prev = m_freed_head;
-        p_node->m_next = nullptr;
-        m_freed_head = p_node;
-    }
-
-    node *get_freed(node *p_prev_node, point p_pt, node *p_next_node)
-    {
-        if(m_freed_head == nullptr)
-        {
-            return new node(p_prev_node, p_pt, p_next_node);
-        }
-
-        if(m_freed_head->m_prev == nullptr)
-        {
-            node *return_node = m_freed_head;
-            m_freed_head = nullptr;
-
-            return_node->m_prev = p_prev_node;
-            return_node->m_next = p_next_node;
-            return_node->m_point = p_pt;
-            
-            return return_node;
-        }
-
-        node *ret_node = m_freed_head;
-        m_freed_head = m_freed_head->m_prev;
-        m_freed_head->m_next = nullptr;
-
-        ret_node->m_prev = p_prev_node;
-        ret_node->m_next = p_next_node;
-        ret_node->m_point = p_pt;
-        
-        return ret_node;
-    }
+    node *get_freed(node *p_prev_node, point p_pt, node *p_next_node);
 
 public:
-    mp_list()
-    {
-        m_head = nullptr;
-        m_tail = nullptr;
+    mp_list();
 
-        m_freed_head = nullptr;
-    }
+    void push_front(point p_pt);
 
-    void push_front(point p_pt)
-    {
-        if(m_head == nullptr && m_tail == nullptr)
-        {
-            m_head = get_freed(nullptr, p_pt, nullptr);
-            m_tail = m_head;
-            return;
-        }
+    void push_back(point p_pt);
 
-        node *new_head = get_freed(m_head, p_pt, nullptr);
-        m_head->m_next = new_head;
+    void pop_back();
+       
+    bool empty();
 
-        m_head = new_head;
-    }
+    point back();
 
-    void push_back(point p_pt)
-    {
-        if(m_head == nullptr && m_tail == nullptr)
-        {
-            m_head = get_freed(nullptr, p_pt, nullptr);
-            m_tail = m_head;
-            return;
-        }
+    void print_list();
 
-        node *new_tail = get_freed(nullptr, p_pt, m_tail);
-        m_tail->m_prev = new_tail;
-
-        m_tail = new_tail;
-    }
-
-    void pop_back()
-    {
-        if(m_tail == nullptr)
-        {
-            return;
-        }
-
-        if(m_tail == m_head)
-        {
-            node *node_to_keep = m_tail;
-            m_tail = nullptr;
-            m_head = nullptr;
-
-            push_freed(node_to_keep);
-            return;
-        }
-
-        node *node_to_push = m_tail;
-        m_tail = m_tail->m_next;
-        m_tail->m_prev = nullptr;
-        push_freed(node_to_push);
-    }
-    
-    bool empty()
-    {
-        if(m_head == nullptr && m_tail == nullptr)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    point back()
-    {
-        return m_tail->m_point;
-    }
-
-    void print_list()
-    {
-        std::cout << "current list:"<< std::endl;
-        node *n = m_head;
-        while(n != nullptr)
-        {
-            std::cout << n->m_point.x << " " << n->m_point.y << std::endl;
-            n = n->m_prev;
-        }
-    }
-
-    ~mp_list()
-    {
-        node *n = m_head;
-        while(n != nullptr)
-        {
-            node *next_node = n->m_prev;
-            delete n;
-
-            n = next_node;
-        }
-
-        n = m_freed_head;
-        while(n != nullptr)
-        {
-            node *next_node = n->m_prev;
-            delete n;
-
-            n = next_node;
-        }
-    }
+    ~mp_list();
 };
 
 #endif
