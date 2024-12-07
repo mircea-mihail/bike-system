@@ -23,11 +23,11 @@ bool is_red(uint8_t p_hue, uint8_t p_saturation, uint8_t p_value)
     return false;
 }
 
-bool is_red(cv::Vec3b hsv_px)
+bool is_red(cv::Vec3b p_hsv_px)
 {
-    uint8_t hue = hsv_px[HUE];
-    uint8_t saturation = hsv_px[SATURATION];
-    uint8_t value = hsv_px[VALUE];
+    uint8_t hue = p_hsv_px[HUE];
+    uint8_t saturation = p_hsv_px[SATURATION];
+    uint8_t value = p_hsv_px[VALUE];
 
     if (hue < ALLOWED_RED_HUE_OFFSET || hue > MAX_HUE - ALLOWED_RED_HUE_OFFSET)
     {
@@ -60,11 +60,11 @@ bool is_white(uint8_t p_hue, uint8_t p_saturation, uint8_t p_value)
     return false;
 }
 
-bool is_white(cv::Vec3b hsv_px)
+bool is_white(cv::Vec3b p_hsv_px)
 {
-    uint8_t hue = hsv_px[HUE];
-    uint8_t saturation = hsv_px[SATURATION];
-    uint8_t value = hsv_px[VALUE];
+    uint8_t hue = p_hsv_px[HUE];
+    uint8_t saturation = p_hsv_px[SATURATION];
+    uint8_t value = p_hsv_px[VALUE];
 
     if(value > MIN_WHITE_VALUE && saturation < MAX_WHITE_SATURATION)
     {
@@ -156,15 +156,15 @@ bool check_color_variance(uint8_t p_red_1, uint8_t p_green_1, uint8_t p_blue_1, 
     return (variance < MAX_CLUMPING_VARIANCE);
 }
 
-bool check_color_variance(cv::Vec3b p_hsv_px_1, cv::Vec3b p_hsv_px_2)
+bool check_color_variance(cv::Vec3b p_rgb_px_1, cv::Vec3b p_rgb_px_2)
 {
-    uint8_t red_1 = p_hsv_px_1[RED];
-    uint8_t green_1 = p_hsv_px_1[GREEN];
-    uint8_t blue_1 = p_hsv_px_1[BLUE];
+    uint8_t red_1 = p_rgb_px_1[RED];
+    uint8_t green_1 = p_rgb_px_1[GREEN];
+    uint8_t blue_1 = p_rgb_px_1[BLUE];
 
-    uint8_t red_2 = p_hsv_px_2[RED];
-    uint8_t green_2 = p_hsv_px_2[GREEN];
-    uint8_t blue_2 = p_hsv_px_2[BLUE];
+    uint8_t red_2 = p_rgb_px_2[RED];
+    uint8_t green_2 = p_rgb_px_2[GREEN];
+    uint8_t blue_2 = p_rgb_px_2[BLUE];
        
     int variance = abs(red_1 - red_2) + abs(green_1 - green_2) + abs(blue_1 - blue_2);
     
