@@ -55,8 +55,6 @@ point scale_point_towards_centroid(point p_point, point p_centroid, double p_sca
 /// @return a give way chunk struct containing the coordonates of the inner white triangle
 give_way_chunk get_inner_triangle_chunk(give_way_chunk p_chunk, double p_scale);
 
-// 
-
 /// @brief gets what side a point is on in relation to a vertex
 /// used to determine if a point is inside a triangle
 /// @param p_point the point to check on
