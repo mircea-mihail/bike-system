@@ -2,35 +2,77 @@
 #include <iostream>
 #include <chrono>
 
+#include <filesystem>
+
 #include "utility.h"
 #include "detect_signs.h"
+#include "old_detect_signs.h"
 
-int main(int argc, char** argv) 
-{ 
-	typedef cv::Point3_<uint8_t> Pixel;
+void detect_dir_images(std::string p_input_dir)
+{
+    const std::vector<std::string> validExtensions = {".jpg", ".jpeg", ".png", ".bmp", ".tiff"};
+	std::string ouptut_dir = p_input_dir + "_solved";
 
-	if (argc != 2) { 
-		printf("usage: DisplayImage.out <Image_Path>\n"); 
-		return -1; 
-	} 
+	if (! std::filesystem::exists(ouptut_dir)) 
+	{
+        if (! std::filesystem::create_directory(ouptut_dir))
+		{
+            std::cerr << "Failed to create directory!" << std::endl;
+			return ;
+		}
+	}
+
+    for (const auto& entry : std::filesystem::directory_iterator(p_input_dir)) {
+        // Get file path and extension
+        const auto& path = entry.path();
+        std::string extension = path.extension().string();
+
+        // Convert extension to lowercase for comparison
+        std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+
+        // Check if the file has a valid image extension
+        if (std::find(validExtensions.begin(), validExtensions.end(), extension) != validExtensions.end()) {
+            std::cout << "Opening image: " << path.string() << std::endl;
+
+            // Read the image using OpenCV
+            cv::Mat image = cv::imread(path.string());
+
+            if (! image.data) {
+                std::cerr << "Failed to load image: " << path.string() << std::endl;
+                continue;
+            }
+
+			cv::Point2i image_size = cv::Point2i(IMAGE_WIDTH, IMAGE_HEIGHT);
+			cv::resize(image, image, cv::Size(image_size));
+
+			uint32_t gw_detected = detect_gw_cv(image);
+
+			std::string output_path = ouptut_dir + "/" + path.filename().string();
+			cv::imwrite(output_path, image);
+        }
+    }
+
+    cv::destroyAllWindows();	
+}
+
+void detect_image(std::string p_image_name)
+{
 
 	cv::Mat image; 
-	image = cv::imread(argv[1], 1); 
+	image = cv::imread(p_image_name); 
+
+	if (!image.data) { 
+		std::cerr << "Failed to load image: " << p_image_name << std::endl;
+		return; 
+	} 
+
 	cv::Point2i image_size = cv::Point2i(IMAGE_WIDTH, IMAGE_HEIGHT);
 	cv::resize(image, image, cv::Size(image_size));
 
-	if (!image.data) { 
-		printf("No image data \n"); 
-		return -1; 
-	} 
 
-	cv::Mat hsv_image;
-	
 	std::chrono::time_point start = std::chrono::high_resolution_clock::now();
-    cv::Mat red_pixels = cv::Mat::zeros(image.size(), CV_8UC1);
 
-	uint32_t gw_detected = detect_gw_cv(image, red_pixels);
-	// uint32_t gw_detected = detect_gw(image);
+	uint32_t gw_detected = detect_gw_cv(image);
 
 	std::cout << "found " << gw_detected << " give way signs" << std::endl;
 
@@ -41,11 +83,25 @@ int main(int argc, char** argv)
 
 	// ------------ show img 
 	cv::namedWindow("Display Image", cv::WINDOW_GUI_NORMAL); 
-	// cv::imshow("Display Image", resized_img); 
 	cv::imshow("Display Image", image); 
 	cv::waitKey(0); 
+}
 
-	// ----------- shwo mask
+int main(int argc, char** argv) 
+{ 
+	typedef cv::Point3_<uint8_t> Pixel;
+
+	if (argc != 2) { 
+		printf("usage: main_detect <Images Dir>\n"); 
+		return -1; 
+	} 
+
+	// detect_image(argv[1]);
+	detect_dir_images(argv[1]);
+	return 0; 
+}
+
+// ----------- shwo mask
 	// cv::namedWindow("Display Image", cv::WINDOW_GUI_NORMAL); 
 	// // cv::imshow("Display Image", resized_img); 
 	// cv::imshow("Display Image", red_pixels); 
@@ -59,10 +115,6 @@ int main(int argc, char** argv)
 	// // cv::imshow("Display Image", resized_img); 
 	// cv::imshow("Display Image", image); 
 	// cv::waitKey(0); 
-
-	return 0; 
-}
-
 
 // code for checking each pixel in an image
 	// int found_red = 0;
