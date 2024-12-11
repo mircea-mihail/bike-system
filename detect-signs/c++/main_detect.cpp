@@ -11,6 +11,12 @@
 void detect_dir_images(std::string p_input_dir)
 {
     const std::vector<std::string> validExtensions = {".jpg", ".jpeg", ".png", ".bmp", ".tiff"};
+	
+	if (p_input_dir[p_input_dir.length() - 1] == '/')
+	{
+		p_input_dir.pop_back();
+	}
+
 	std::string ouptut_dir = p_input_dir + "_solved";
 
 	if (! std::filesystem::exists(ouptut_dir)) 
