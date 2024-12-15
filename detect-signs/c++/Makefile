@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/mircea/uni/bike-system/detect-signs/c++
+CMAKE_SOURCE_DIR = /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/mircea/uni/bike-system/detect-signs/c++
+CMAKE_BINARY_DIR = /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/mircea/uni/bike-system/detect-signs/c++/CMakeFiles /home/mircea/uni/bike-system/detect-signs/c++//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/CMakeFiles /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/mircea/uni/bike-system/detect-signs/c++/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -129,6 +129,30 @@ main_detect/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/build
 .PHONY : main_detect/fast
 
+detect_signs.o: detect_signs.cpp.o
+.PHONY : detect_signs.o
+
+# target to build an object file
+detect_signs.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/detect_signs.cpp.o
+.PHONY : detect_signs.cpp.o
+
+detect_signs.i: detect_signs.cpp.i
+.PHONY : detect_signs.i
+
+# target to preprocess a source file
+detect_signs.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/detect_signs.cpp.i
+.PHONY : detect_signs.cpp.i
+
+detect_signs.s: detect_signs.cpp.s
+.PHONY : detect_signs.s
+
+# target to generate assembly for a file
+detect_signs.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/detect_signs.cpp.s
+.PHONY : detect_signs.cpp.s
+
 main_detect.o: main_detect.cpp.o
 .PHONY : main_detect.o
 
@@ -153,6 +177,78 @@ main_detect.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/main_detect.cpp.s
 .PHONY : main_detect.cpp.s
 
+memory_pool_list.o: memory_pool_list.cpp.o
+.PHONY : memory_pool_list.o
+
+# target to build an object file
+memory_pool_list.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/memory_pool_list.cpp.o
+.PHONY : memory_pool_list.cpp.o
+
+memory_pool_list.i: memory_pool_list.cpp.i
+.PHONY : memory_pool_list.i
+
+# target to preprocess a source file
+memory_pool_list.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/memory_pool_list.cpp.i
+.PHONY : memory_pool_list.cpp.i
+
+memory_pool_list.s: memory_pool_list.cpp.s
+.PHONY : memory_pool_list.s
+
+# target to generate assembly for a file
+memory_pool_list.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/memory_pool_list.cpp.s
+.PHONY : memory_pool_list.cpp.s
+
+old_detect_signs.o: old_detect_signs.cpp.o
+.PHONY : old_detect_signs.o
+
+# target to build an object file
+old_detect_signs.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/old_detect_signs.cpp.o
+.PHONY : old_detect_signs.cpp.o
+
+old_detect_signs.i: old_detect_signs.cpp.i
+.PHONY : old_detect_signs.i
+
+# target to preprocess a source file
+old_detect_signs.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/old_detect_signs.cpp.i
+.PHONY : old_detect_signs.cpp.i
+
+old_detect_signs.s: old_detect_signs.cpp.s
+.PHONY : old_detect_signs.s
+
+# target to generate assembly for a file
+old_detect_signs.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/old_detect_signs.cpp.s
+.PHONY : old_detect_signs.cpp.s
+
+utility.o: utility.cpp.o
+.PHONY : utility.o
+
+# target to build an object file
+utility.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/utility.cpp.o
+.PHONY : utility.cpp.o
+
+utility.i: utility.cpp.i
+.PHONY : utility.i
+
+# target to preprocess a source file
+utility.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/utility.cpp.i
+.PHONY : utility.cpp.i
+
+utility.s: utility.cpp.s
+.PHONY : utility.s
+
+# target to generate assembly for a file
+utility.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/utility.cpp.s
+.PHONY : utility.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -162,9 +258,21 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... main_detect"
+	@echo "... detect_signs.o"
+	@echo "... detect_signs.i"
+	@echo "... detect_signs.s"
 	@echo "... main_detect.o"
 	@echo "... main_detect.i"
 	@echo "... main_detect.s"
+	@echo "... memory_pool_list.o"
+	@echo "... memory_pool_list.i"
+	@echo "... memory_pool_list.s"
+	@echo "... old_detect_signs.o"
+	@echo "... old_detect_signs.i"
+	@echo "... old_detect_signs.s"
+	@echo "... utility.o"
+	@echo "... utility.i"
+	@echo "... utility.s"
 .PHONY : help
 
 

@@ -223,20 +223,21 @@ void get_red_pixels(cv::Mat &p_hsv_img, cv::Mat &p_red_pixels)
     p_red_pixels |= mask;
 }
 
-uint32_t detect_gw_cv(cv::Mat &p_img, cv::Mat &p_red_pixels)
+uint32_t detect_gw_cv(cv::Mat &p_img)
 {
     cv::Mat hsv_image;
     cv::cvtColor(p_img, hsv_image, cv::COLOR_BGR2HSV);
-    get_red_pixels(hsv_image, p_red_pixels);
+    cv::Mat red_pixels;
+    get_red_pixels(hsv_image, red_pixels);
 
     uint8_t erode_size = 3;
     cv::Mat kernel = cv::Mat::ones(erode_size, erode_size, CV_8U); 
-    cv::erode(p_red_pixels, p_red_pixels, kernel); 
+    cv::erode(red_pixels, red_pixels, kernel); 
 
     cv::Mat labels;
     cv::Mat stats;
     cv::Mat centroids;
-    cv::connectedComponentsWithStats(p_red_pixels, labels, stats, centroids);
+    cv::connectedComponentsWithStats(red_pixels, labels, stats, centroids);
 
     float best_score = 0;
     int32_t detection_number = 0;

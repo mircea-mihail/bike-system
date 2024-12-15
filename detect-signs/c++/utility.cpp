@@ -109,7 +109,6 @@ give_way_chunk get_inner_triangle_chunk(give_way_chunk p_chunk, double p_scale)
     return give_way_chunk(scaled_left, scaled_right, scaled_bottom);
 }
 
-// gets what side the point is on in relation to a line
 float get_side(point p_point, point p_vertex_p1, point p_vertex_p2)
 {
     return  (p_point.x - p_vertex_p2.x) * (p_vertex_p1.y - p_vertex_p2.y) -
@@ -128,7 +127,6 @@ bool point_in_triangle(point p_point, point p_point_tr_1, point p_point_tr_2, po
     return !(has_neg && has_pos);
 }
 
-// try to find a condition to filter based on shape
 bool has_small_angle(give_way_chunk p_chunk)
 {
     float a_side = sqrt(pow(p_chunk.top_left.x - p_chunk.top_right.x, 2) + pow(p_chunk.top_left.y - p_chunk.top_right.y, 2));

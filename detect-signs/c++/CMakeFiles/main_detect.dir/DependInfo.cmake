@@ -8,7 +8,11 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/mircea/uni/bike-system/detect-signs/c++/main_detect.cpp" "CMakeFiles/main_detect.dir/main_detect.cpp.o" "gcc" "CMakeFiles/main_detect.dir/main_detect.cpp.o.d"
+  "/home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/detect_signs.cpp" "CMakeFiles/main_detect.dir/detect_signs.cpp.o" "gcc" "CMakeFiles/main_detect.dir/detect_signs.cpp.o.d"
+  "/home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/main_detect.cpp" "CMakeFiles/main_detect.dir/main_detect.cpp.o" "gcc" "CMakeFiles/main_detect.dir/main_detect.cpp.o.d"
+  "/home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/memory_pool_list.cpp" "CMakeFiles/main_detect.dir/memory_pool_list.cpp.o" "gcc" "CMakeFiles/main_detect.dir/memory_pool_list.cpp.o.d"
+  "/home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/old_detect_signs.cpp" "CMakeFiles/main_detect.dir/old_detect_signs.cpp.o" "gcc" "CMakeFiles/main_detect.dir/old_detect_signs.cpp.o.d"
+  "/home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/utility.cpp" "CMakeFiles/main_detect.dir/utility.cpp.o" "gcc" "CMakeFiles/main_detect.dir/utility.cpp.o.d"
   )
 
 # Targets to which this target links.
