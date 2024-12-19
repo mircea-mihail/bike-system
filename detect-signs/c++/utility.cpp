@@ -168,3 +168,19 @@ bool check_color_variance(cv::Vec3b p_rgb_px_1, cv::Vec3b p_rgb_px_2)
     
     return (variance < MAX_CLUMPING_VARIANCE);
 }
+
+void print_detection(cv::Mat &p_img, give_way_chunk gw_chunk, float p_score)
+{
+    cv::Scalar color = cv::Scalar(0, 255, 0);
+    int thickness = 3;
+
+    cv::line(p_img, gw_chunk.bottom.get_cv_point(), gw_chunk.top_left.get_cv_point(), color, thickness);
+    cv::line(p_img, gw_chunk.top_left.get_cv_point(), gw_chunk.top_right.get_cv_point(), color, thickness);
+    cv::line(p_img, gw_chunk.top_right.get_cv_point(), gw_chunk.bottom.get_cv_point(), color, thickness);
+
+    char stringed_score[5];
+    snprintf(stringed_score, sizeof(stringed_score), "%.1f", p_score * 100);
+
+    cv::Point text_pt(gw_chunk.top_left.x, gw_chunk.top_left.y);
+    cv::putText(p_img, stringed_score, text_pt, 1, 3, cv::Scalar(0, 255, 0), 2);   
+}

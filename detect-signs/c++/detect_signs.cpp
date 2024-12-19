@@ -99,7 +99,6 @@ float check_for_gw_cv(cv::Mat &p_hsv_img, give_way_chunk p_chunk, cv::Mat &p_lab
         }
  
     }
-
   
     // get final score for thin
     double thin_white_area = chunk_area(thin_inner_triangle);
@@ -118,14 +117,13 @@ float check_for_gw_cv(cv::Mat &p_hsv_img, give_way_chunk p_chunk, cv::Mat &p_lab
     return std::max(final_thin_score, final_thick_score);
 }
 
-void print_detection(cv::Mat &p_img, give_way_chunk gw_chunk)
+void print_bounding_box(cv::Mat &p_img, int32_t p_x, int32_t p_y, int32_t p_w, int32_t p_h)
 {
-    cv::Scalar color = cv::Scalar(0, 255, 0);
-    int thickness = 3;
-
-    cv::line(p_img, gw_chunk.bottom.get_cv_point(), gw_chunk.top_left.get_cv_point(), color, thickness);
-    cv::line(p_img, gw_chunk.top_left.get_cv_point(), gw_chunk.top_right.get_cv_point(), color, thickness);
-    cv::line(p_img, gw_chunk.top_right.get_cv_point(), gw_chunk.bottom.get_cv_point(), color, thickness);
+    // print a bounding box above all checked shapes
+    cv::Scalar color(255,0,0);
+    cv::Rect rect(p_x, p_y, p_w, p_h);
+    uint8_t thickness = 2;
+    cv::rectangle(p_img, rect, color, thickness);
 }
 
 float find_sign(cv::Mat &p_img, cv::Mat &p_hsv_img, cv::Mat &p_labels, cv::Mat &p_stats, int32_t p_label)
@@ -140,11 +138,7 @@ float find_sign(cv::Mat &p_img, cv::Mat &p_hsv_img, cv::Mat &p_labels, cv::Mat &
         return 0;
     }
 
-    // print a bounding box above all checked shapes
-    cv::Scalar color(255,0,0);
-    cv::Rect rect(x,y,w,h);
-    uint8_t thickness = 2;
-    cv::rectangle(p_img, rect, color, thickness);
+    print_bounding_box(p_img, x, y, w, h);
 
     point left_pt;
     for (int i = y; i < y + h; i++)
@@ -180,12 +174,11 @@ float find_sign(cv::Mat &p_img, cv::Mat &p_hsv_img, cv::Mat &p_labels, cv::Mat &
     }
 
     give_way_chunk gw_chunk = give_way_chunk(left_pt, right_pt, bottom_pt);
-    // print_detection(p_img, gw_chunk);
 
     float chunk_score = check_for_gw_cv(p_hsv_img, gw_chunk, p_labels, p_label);
     if(chunk_score > MIN_CHUNK_SCORE)
     {
-        print_detection(p_img, gw_chunk);
+        print_detection(p_img, gw_chunk, chunk_score);
         return chunk_score;
     }
 
@@ -250,6 +243,7 @@ uint32_t detect_gw_cv(cv::Mat &p_img)
             {
                 best_score = detection_res;
             }
+
             detection_number ++;
         }
     }

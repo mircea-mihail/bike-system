@@ -2,6 +2,7 @@
 #define UTILITY_H
 
 #include <cstdint>
+
 #include "constants.h"
 
 /// @brief aplies hue saturation and value constraints to determine if a pixel is red
@@ -98,5 +99,7 @@ bool check_color_variance(uint8_t p_red_1, uint8_t p_green_1, uint8_t p_blue_1, 
 /// @param p_hsv_px_2 vector with rgb components of second pixel
 /// @return true if the two pixels are close enough in color
 bool check_color_variance(cv::Vec3b p_rgb_px_1, cv::Vec3b p_rgb_px_2);
+
+void print_detection(cv::Mat &p_img, give_way_chunk gw_chunk, float p_score);
 
 #endif

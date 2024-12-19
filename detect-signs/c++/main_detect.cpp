@@ -102,8 +102,8 @@ int main(int argc, char** argv)
 		return -1; 
 	} 
 
-	// detect_image(argv[1]);
-	detect_dir_images(argv[1]);
+	detect_image(argv[1]);
+	// detect_dir_images(argv[1]);
 	return 0; 
 }
 
