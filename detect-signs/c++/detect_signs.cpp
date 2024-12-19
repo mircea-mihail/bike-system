@@ -221,7 +221,7 @@ void get_red_pixels(cv::Mat &p_hsv_img, cv::Mat &p_red_pixels)
     p_red_pixels |= mask;
 }
 
-uint32_t detect_gw_cv(cv::Mat &p_img)
+float detect_gw_cv(cv::Mat &p_img)
 {
     cv::Mat hsv_image;
     cv::cvtColor(p_img, hsv_image, cv::COLOR_BGR2HSV);
@@ -259,5 +259,5 @@ uint32_t detect_gw_cv(cv::Mat &p_img)
         cv::putText(p_img, img_desc, desc_pt, 1, 3, cv::Scalar(0, 255, 0), 3);   
     #endif
 
-    return detection_number;
+    return best_score;
 }

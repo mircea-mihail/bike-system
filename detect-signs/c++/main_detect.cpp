@@ -27,8 +27,10 @@ void detect_dir_images(std::string p_input_dir)
 			return ;
 		}
 	}
+	double avg_score = 0;
 	double avg_duration = 0;
 	uint32_t images_cout = 0;
+	uint32_t scored_images_count = 0;
 
     for (const auto& entry : std::filesystem::directory_iterator(p_input_dir)) {
         // Get file path and extension
@@ -54,12 +56,14 @@ void detect_dir_images(std::string p_input_dir)
 			cv::resize(image, image, cv::Size(image_size));
 
 			std::chrono::time_point start = std::chrono::high_resolution_clock::now();
-
-			uint32_t gw_detected = detect_gw_cv(image);
-
+			float score = detect_gw_cv(image);
 			std::chrono::time_point end = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> duration = end - start;
+
+			avg_score += score;
+			scored_images_count += 1 ? score > 0 : 0;
 			avg_duration += duration.count();
+
 			images_cout ++;
 			std::cout << "took " << duration.count() << " milis\n";
 
@@ -68,6 +72,7 @@ void detect_dir_images(std::string p_input_dir)
         }
     }
 	std::cout << "\nOn average it took " << avg_duration / images_cout << " milis\n";
+	std::cout << "Avg score:" << avg_score / scored_images_count << std::endl;
 
     cv::destroyAllWindows();	
 }

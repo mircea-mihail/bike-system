@@ -38,7 +38,7 @@ void get_red_pixels(cv::Mat &p_hsv_img, cv::Mat &p_red_pixels);
 /// gets all the connex components in the mask using an opencv function and if they are big enough 
 /// tries to find a give way sign in the current connex components
 /// @param p_img the rgb image to try to find give way sign in 
-/// @return the number of give way signs found in the current image
-uint32_t detect_gw_cv(cv::Mat &p_img);
+/// @return the best score found in the img
+float detect_gw_cv(cv::Mat &p_img);
 
 #endif
