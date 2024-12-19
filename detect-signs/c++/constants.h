@@ -75,8 +75,8 @@ struct give_way_chunk
 #define MAX_CLUMPING_VARIANCE 5 
 
 // ------------------------------- GIVE WAY RED BORDER   
-#define THICK_GW_BORDER_PER_CENT 0.356
-#define THIN_GW_BORDER_PER_CENT 0.72
+#define THICK_GW_BORDER_PER_CENT 0.376
+#define THIN_GW_BORDER_PER_CENT 0.78
 #define MIN_TRIANGLE_ANGLE 35
 #define RED_OUTSIDE_GW_THRESHOLD 0.4
 #define RED_ABOVE_SIGN (1/4)
