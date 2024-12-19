@@ -194,7 +194,10 @@ float fill_in_shape(cv::Mat &p_img, std::array<std::array<int, IMAGE_WIDTH>, IMA
         float chunk_score = check_for_gw(p_hsv_img, gw_chunk, p_label_mat);
         if(chunk_score > MIN_CHUNK_SCORE)
         {
-            print_detection(p_img, gw_chunk, chunk_score);
+            #ifdef PRINT_STATS
+                print_detection(p_img, gw_chunk, chunk_score);
+            #endif
+
             return chunk_score;
         }
     }

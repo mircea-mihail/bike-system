@@ -138,7 +138,9 @@ float find_sign(cv::Mat &p_img, cv::Mat &p_hsv_img, cv::Mat &p_labels, cv::Mat &
         return 0;
     }
 
-    print_bounding_box(p_img, x, y, w, h);
+    #ifdef PRINT_STATS
+        print_bounding_box(p_img, x, y, w, h);
+    #endif
 
     point left_pt;
     for (int i = y; i < y + h; i++)
@@ -178,7 +180,10 @@ float find_sign(cv::Mat &p_img, cv::Mat &p_hsv_img, cv::Mat &p_labels, cv::Mat &
     float chunk_score = check_for_gw_cv(p_hsv_img, gw_chunk, p_labels, p_label);
     if(chunk_score > MIN_CHUNK_SCORE)
     {
-        print_detection(p_img, gw_chunk, chunk_score);
+        #ifdef PRINT_STATS
+            print_detection(p_img, gw_chunk, chunk_score);
+        #endif
+
         return chunk_score;
     }
 
@@ -247,6 +252,12 @@ uint32_t detect_gw_cv(cv::Mat &p_img)
             detection_number ++;
         }
     }
+    #ifdef PRINT_STATS
+        std::string img_desc = "Found " + std::to_string(detection_number) + " gw signs";
+        cv::Point desc_pt(10, 40);
+        cv::putText(p_img, img_desc, desc_pt, 1, 3, cv::Scalar(0, 0, 0), 7);   
+        cv::putText(p_img, img_desc, desc_pt, 1, 3, cv::Scalar(0, 255, 0), 3);   
+    #endif
 
     return detection_number;
 }

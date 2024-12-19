@@ -18,11 +18,6 @@
 /// @return how well the current chunk matches a give way sign
 float check_for_gw_cv(cv::Mat &p_hsv_img, give_way_chunk p_chunk, cv::Mat &p_label_mat, int32_t p_label);
 
-/// @brief draws on the image the current give way sign detected
-/// @param p_img the image to write on 
-/// @param gw_chunk the coordonates of the points in the sign
-// void print_detection(cv::Mat &p_img, give_way_chunk gw_chunk);
-
 /// @brief builds the gw_chunk using the data provided by the opencv connectedComponentsWithStats function 
 /// and calls the check_for_gw_cv function to do a template matching on the chunk
 /// @param p_img the original image, passed to visualise detections by drawing directly on it

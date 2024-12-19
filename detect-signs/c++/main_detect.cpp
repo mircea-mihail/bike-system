@@ -27,6 +27,8 @@ void detect_dir_images(std::string p_input_dir)
 			return ;
 		}
 	}
+	double avg_duration = 0;
+	uint32_t images_cout = 0;
 
     for (const auto& entry : std::filesystem::directory_iterator(p_input_dir)) {
         // Get file path and extension
@@ -51,12 +53,21 @@ void detect_dir_images(std::string p_input_dir)
 			cv::Point2i image_size = cv::Point2i(IMAGE_WIDTH, IMAGE_HEIGHT);
 			cv::resize(image, image, cv::Size(image_size));
 
+			std::chrono::time_point start = std::chrono::high_resolution_clock::now();
+
 			uint32_t gw_detected = detect_gw_cv(image);
+
+			std::chrono::time_point end = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<double, std::milli> duration = end - start;
+			avg_duration += duration.count();
+			images_cout ++;
+			std::cout << "took " << duration.count() << " milis\n";
 
 			std::string output_path = ouptut_dir + "/" + path.filename().string();
 			cv::imwrite(output_path, image);
         }
     }
+	std::cout << "\nOn average it took " << avg_duration / images_cout << " milis\n";
 
     cv::destroyAllWindows();	
 }
@@ -71,10 +82,8 @@ void detect_image(std::string p_image_name)
 		std::cerr << "Failed to load image: " << p_image_name << std::endl;
 		return; 
 	} 
-
 	cv::Point2i image_size = cv::Point2i(IMAGE_WIDTH, IMAGE_HEIGHT);
 	cv::resize(image, image, cv::Size(image_size));
-
 
 	std::chrono::time_point start = std::chrono::high_resolution_clock::now();
 
@@ -102,8 +111,8 @@ int main(int argc, char** argv)
 		return -1; 
 	} 
 
-	detect_image(argv[1]);
-	// detect_dir_images(argv[1]);
+	// detect_image(argv[1]);
+	detect_dir_images(argv[1]);
 	return 0; 
 }
 
