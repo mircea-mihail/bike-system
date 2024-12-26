@@ -1,12 +1,20 @@
 #include <opencv2/opencv.hpp> 
 #include <iostream>
 #include <chrono>
+#include <thread>
 
 #include <filesystem>
 
 #include "utility.h"
 #include "detect_signs.h"
 #include "old_detect_signs.h"
+
+void show_pic(cv::Mat p_img, std::string p_img_name)
+{
+	cv::namedWindow("Display Image", cv::WINDOW_GUI_NORMAL); 
+	cv::imshow("Display Image", p_img); 
+	cv::waitKey(0); 
+}
 
 void detect_dir_images(std::string p_input_dir)
 {
@@ -74,12 +82,10 @@ void detect_dir_images(std::string p_input_dir)
 	std::cout << "\nOn average it took " << avg_duration / images_cout << " milis\n";
 	std::cout << "Avg score:" << avg_score / scored_images_count << std::endl;
 
-    cv::destroyAllWindows();	
 }
 
-void detect_image(std::string p_image_name)
+void detect_from_name(std::string p_image_name)
 {
-
 	cv::Mat image; 
 	image = cv::imread(p_image_name); 
 
@@ -101,23 +107,76 @@ void detect_image(std::string p_image_name)
 
 	std::cout << "detect gw took " << duration.count() << " ms" << std::endl;
 
-	// ------------ show img 
-	cv::namedWindow("Display Image", cv::WINDOW_GUI_NORMAL); 
-	cv::imshow("Display Image", image); 
-	cv::waitKey(0); 
+	show_pic(image, "img");
+}
+
+void detect_pic(cv::Mat p_pic)
+{
+	cv::Point2i image_size = cv::Point2i(IMAGE_WIDTH, IMAGE_HEIGHT);
+	cv::resize(p_pic, p_pic, cv::Size(image_size));
+
+	std::chrono::time_point start = std::chrono::high_resolution_clock::now();
+
+	uint32_t gw_detected = detect_gw_cv(p_pic);
+
+	std::cout << "found " << gw_detected << " give way signs" << std::endl;
+
+	std::chrono::time_point end = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double, std::milli> duration = end - start;
+	std::cout << "detect gw took " << duration.count() << " ms" << std::endl;
+
+	show_pic(p_pic, "img");
+}
+
+int take_picture(cv::Mat &p_pic, cv::VideoCapture &p_camera)
+{
+	// Capture a p_pic from the camera
+	p_camera >> p_pic;
+
+        // Check if the p_pic was captured successfully
+	if (p_pic.empty()) {
+		std::cerr << "Error: Failed to capture a p_pic.\n";
+		return -1;
+	}
+
+    return 0;
 }
 
 int main(int argc, char** argv) 
 { 
-	typedef cv::Point3_<uint8_t> Pixel;
+    cv::VideoCapture camera(0);
 
-	if (argc != 2) { 
-		printf("usage: main_detect <Images Dir>\n"); 
-		return -1; 
-	} 
+    if (!camera.isOpened()) {
+        std::cerr << "Error: Could not open the camera.\n";
+        return -1;
+    }
+    // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+	cv::Mat temp;
+	for (int i = 0; i < 10; ++i) {
+		camera >> temp;
+	}
 
-	// detect_image(argv[1]);
-	detect_dir_images(argv[1]);
+	cv::Mat pic;
+
+	std::chrono::time_point start = std::chrono::high_resolution_clock::now();
+	if(take_picture(pic, camera) == 0)
+	{
+		std::chrono::time_point end = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<double, std::milli> duration = end - start;
+		std::cout << "detect gw took " << duration.count() << " ms" << std::endl;
+
+		detect_pic(pic);
+	}
+
+    camera.release();
+
+
+	// if (argc != 2) { 
+	// 	printf("usage: main_detect <Images Dir>\n"); 
+	// 	return -1; 
+	// } 
+	// detect_from_name(argv[1]);
+	// detect_dir_images(argv[1]);
 	return 0; 
 }
 
