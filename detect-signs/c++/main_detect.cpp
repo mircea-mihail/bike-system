@@ -166,7 +166,7 @@ int main(int argc, char** argv)
 
 	cv::Mat pic;
 	int32_t pic_idx = 0;
-	int8_t maybe_idx = 0;
+	int32_t maybe_idx = 0;
 
 	while(true)
 	{
@@ -179,11 +179,6 @@ int main(int argc, char** argv)
 			float detection_score = detect_pic(pic);
 
 			maybe_idx = detection_score > 0 ? maybe_idx+1 : 0;
-
-			if(maybe_idx >= 1)
-			{
-				std::cout << "maybe idx:" << maybe_idx << std::endl;
-			}
 
 			if(maybe_idx >= MIN_MAYBE_IDX)
 			{
