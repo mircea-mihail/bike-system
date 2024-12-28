@@ -154,6 +154,7 @@ int main(int argc, char** argv)
         std::cerr << "Error: Could not open the camera.\n";
         return -1;
     }
+	std::cout << "opened the camera\n";
 	// camera.set(cv::CAP_PROP_BUFFERSIZE, 1);
 	// camera.set(cv::CAP_PROP_FRAME_WIDTH, IMAGE_WIDTH);
 	// camera.set(cv::CAP_PROP_FRAME_HEIGHT, IMAGE_HEIGHT);
@@ -163,6 +164,7 @@ int main(int argc, char** argv)
 	{
 		camera >> temp;
 	}
+	std::cout << "took temporary photos\n";
 
 	cv::Mat pic;
 	int32_t pic_idx = 0;
@@ -191,6 +193,7 @@ int main(int argc, char** argv)
 		}
 	}
 
+	std::cout << "about to enter while true\n";
 	while(true)
 	{
 		std::chrono::time_point start = std::chrono::high_resolution_clock::now();
