@@ -1,6 +1,9 @@
-CMakeFiles/main_detect.dir/main_detect.cpp.o: \
- /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/main_detect.cpp \
- /usr/include/stdc-predef.h /usr/local/include/opencv4/opencv2/opencv.hpp \
+CMakeFiles/main_detect.dir/src/memory_pool_list.cpp.o: \
+ /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/src/memory_pool_list.cpp \
+ /usr/include/stdc-predef.h \
+ /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/include/memory_pool_list.h \
+ /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/include/constants.h \
+ /usr/local/include/opencv4/opencv2/opencv.hpp \
  /usr/local/include/opencv4/opencv2/opencv_modules.hpp \
  /usr/local/include/opencv4/opencv2/core.hpp \
  /usr/local/include/opencv4/opencv2/core/cvdef.h \
@@ -361,18 +364,4 @@ CMakeFiles/main_detect.dir/main_detect.cpp.o: \
  /usr/local/include/opencv4/opencv2/stitching/detail/camera.hpp \
  /usr/local/include/opencv4/opencv2/video.hpp \
  /usr/local/include/opencv4/opencv2/video/tracking.hpp \
- /usr/local/include/opencv4/opencv2/video/background_segm.hpp \
- /usr/include/c++/11/thread /usr/include/c++/11/bits/std_thread.h \
- /usr/include/c++/11/bits/this_thread_sleep.h \
- /usr/include/c++/11/filesystem /usr/include/c++/11/bits/fs_fwd.h \
- /usr/include/c++/11/bits/fs_path.h /usr/include/c++/11/codecvt \
- /usr/include/c++/11/bits/fs_dir.h /usr/include/c++/11/bits/fs_ops.h \
- /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/utility.h \
- /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/constants.h \
- /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/detect_signs.h \
- /usr/include/c++/11/fstream \
- /usr/include/x86_64-linux-gnu/c++/11/bits/basic_file.h \
- /usr/include/x86_64-linux-gnu/c++/11/bits/c++io.h \
- /usr/include/c++/11/bits/fstream.tcc \
- /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/memory_pool_list.h \
- /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/old_detect_signs.h
+ /usr/local/include/opencv4/opencv2/video/background_segm.hpp

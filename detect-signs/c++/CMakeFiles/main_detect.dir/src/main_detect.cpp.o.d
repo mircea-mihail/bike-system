@@ -1,5 +1,5 @@
-CMakeFiles/main_detect.dir/main_detect.cpp.o: \
- /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/main_detect.cpp \
+CMakeFiles/main_detect.dir/src/main_detect.cpp.o: \
+ /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/src/main_detect.cpp \
  /usr/include/stdc-predef.h /usr/local/include/opencv4/opencv2/opencv.hpp \
  /usr/local/include/opencv4/opencv2/opencv_modules.hpp \
  /usr/local/include/opencv4/opencv2/core.hpp \
@@ -367,12 +367,14 @@ CMakeFiles/main_detect.dir/main_detect.cpp.o: \
  /usr/include/c++/11/filesystem /usr/include/c++/11/bits/fs_fwd.h \
  /usr/include/c++/11/bits/fs_path.h /usr/include/c++/11/codecvt \
  /usr/include/c++/11/bits/fs_dir.h /usr/include/c++/11/bits/fs_ops.h \
- /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/utility.h \
- /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/constants.h \
- /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/detect_signs.h \
+ /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/include/utility.h \
+ /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/include/constants.h \
+ /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/include/detect_signs.h \
  /usr/include/c++/11/fstream \
  /usr/include/x86_64-linux-gnu/c++/11/bits/basic_file.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++io.h \
  /usr/include/c++/11/bits/fstream.tcc \
- /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/memory_pool_list.h \
- /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/old_detect_signs.h
+ /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/include/utility.h \
+ /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/include/memory_pool_list.h \
+ /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/include/old_detect_signs.h \
+ /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/include/detect_signs.h

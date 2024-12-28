@@ -129,125 +129,125 @@ main_detect/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/build
 .PHONY : main_detect/fast
 
-detect_signs.o: detect_signs.cpp.o
-.PHONY : detect_signs.o
+src/detect_signs.o: src/detect_signs.cpp.o
+.PHONY : src/detect_signs.o
 
 # target to build an object file
-detect_signs.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/detect_signs.cpp.o
-.PHONY : detect_signs.cpp.o
+src/detect_signs.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/src/detect_signs.cpp.o
+.PHONY : src/detect_signs.cpp.o
 
-detect_signs.i: detect_signs.cpp.i
-.PHONY : detect_signs.i
+src/detect_signs.i: src/detect_signs.cpp.i
+.PHONY : src/detect_signs.i
 
 # target to preprocess a source file
-detect_signs.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/detect_signs.cpp.i
-.PHONY : detect_signs.cpp.i
+src/detect_signs.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/src/detect_signs.cpp.i
+.PHONY : src/detect_signs.cpp.i
 
-detect_signs.s: detect_signs.cpp.s
-.PHONY : detect_signs.s
+src/detect_signs.s: src/detect_signs.cpp.s
+.PHONY : src/detect_signs.s
 
 # target to generate assembly for a file
-detect_signs.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/detect_signs.cpp.s
-.PHONY : detect_signs.cpp.s
+src/detect_signs.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/src/detect_signs.cpp.s
+.PHONY : src/detect_signs.cpp.s
 
-main_detect.o: main_detect.cpp.o
-.PHONY : main_detect.o
+src/main_detect.o: src/main_detect.cpp.o
+.PHONY : src/main_detect.o
 
 # target to build an object file
-main_detect.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/main_detect.cpp.o
-.PHONY : main_detect.cpp.o
+src/main_detect.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/src/main_detect.cpp.o
+.PHONY : src/main_detect.cpp.o
 
-main_detect.i: main_detect.cpp.i
-.PHONY : main_detect.i
+src/main_detect.i: src/main_detect.cpp.i
+.PHONY : src/main_detect.i
 
 # target to preprocess a source file
-main_detect.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/main_detect.cpp.i
-.PHONY : main_detect.cpp.i
+src/main_detect.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/src/main_detect.cpp.i
+.PHONY : src/main_detect.cpp.i
 
-main_detect.s: main_detect.cpp.s
-.PHONY : main_detect.s
+src/main_detect.s: src/main_detect.cpp.s
+.PHONY : src/main_detect.s
 
 # target to generate assembly for a file
-main_detect.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/main_detect.cpp.s
-.PHONY : main_detect.cpp.s
+src/main_detect.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/src/main_detect.cpp.s
+.PHONY : src/main_detect.cpp.s
 
-memory_pool_list.o: memory_pool_list.cpp.o
-.PHONY : memory_pool_list.o
+src/memory_pool_list.o: src/memory_pool_list.cpp.o
+.PHONY : src/memory_pool_list.o
 
 # target to build an object file
-memory_pool_list.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/memory_pool_list.cpp.o
-.PHONY : memory_pool_list.cpp.o
+src/memory_pool_list.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/src/memory_pool_list.cpp.o
+.PHONY : src/memory_pool_list.cpp.o
 
-memory_pool_list.i: memory_pool_list.cpp.i
-.PHONY : memory_pool_list.i
+src/memory_pool_list.i: src/memory_pool_list.cpp.i
+.PHONY : src/memory_pool_list.i
 
 # target to preprocess a source file
-memory_pool_list.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/memory_pool_list.cpp.i
-.PHONY : memory_pool_list.cpp.i
+src/memory_pool_list.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/src/memory_pool_list.cpp.i
+.PHONY : src/memory_pool_list.cpp.i
 
-memory_pool_list.s: memory_pool_list.cpp.s
-.PHONY : memory_pool_list.s
+src/memory_pool_list.s: src/memory_pool_list.cpp.s
+.PHONY : src/memory_pool_list.s
 
 # target to generate assembly for a file
-memory_pool_list.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/memory_pool_list.cpp.s
-.PHONY : memory_pool_list.cpp.s
+src/memory_pool_list.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/src/memory_pool_list.cpp.s
+.PHONY : src/memory_pool_list.cpp.s
 
-old_detect_signs.o: old_detect_signs.cpp.o
-.PHONY : old_detect_signs.o
+src/old_detect_signs.o: src/old_detect_signs.cpp.o
+.PHONY : src/old_detect_signs.o
 
 # target to build an object file
-old_detect_signs.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/old_detect_signs.cpp.o
-.PHONY : old_detect_signs.cpp.o
+src/old_detect_signs.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/src/old_detect_signs.cpp.o
+.PHONY : src/old_detect_signs.cpp.o
 
-old_detect_signs.i: old_detect_signs.cpp.i
-.PHONY : old_detect_signs.i
+src/old_detect_signs.i: src/old_detect_signs.cpp.i
+.PHONY : src/old_detect_signs.i
 
 # target to preprocess a source file
-old_detect_signs.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/old_detect_signs.cpp.i
-.PHONY : old_detect_signs.cpp.i
+src/old_detect_signs.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/src/old_detect_signs.cpp.i
+.PHONY : src/old_detect_signs.cpp.i
 
-old_detect_signs.s: old_detect_signs.cpp.s
-.PHONY : old_detect_signs.s
+src/old_detect_signs.s: src/old_detect_signs.cpp.s
+.PHONY : src/old_detect_signs.s
 
 # target to generate assembly for a file
-old_detect_signs.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/old_detect_signs.cpp.s
-.PHONY : old_detect_signs.cpp.s
+src/old_detect_signs.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/src/old_detect_signs.cpp.s
+.PHONY : src/old_detect_signs.cpp.s
 
-utility.o: utility.cpp.o
-.PHONY : utility.o
+src/utility.o: src/utility.cpp.o
+.PHONY : src/utility.o
 
 # target to build an object file
-utility.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/utility.cpp.o
-.PHONY : utility.cpp.o
+src/utility.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/src/utility.cpp.o
+.PHONY : src/utility.cpp.o
 
-utility.i: utility.cpp.i
-.PHONY : utility.i
+src/utility.i: src/utility.cpp.i
+.PHONY : src/utility.i
 
 # target to preprocess a source file
-utility.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/utility.cpp.i
-.PHONY : utility.cpp.i
+src/utility.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/src/utility.cpp.i
+.PHONY : src/utility.cpp.i
 
-utility.s: utility.cpp.s
-.PHONY : utility.s
+src/utility.s: src/utility.cpp.s
+.PHONY : src/utility.s
 
 # target to generate assembly for a file
-utility.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/utility.cpp.s
-.PHONY : utility.cpp.s
+src/utility.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main_detect.dir/build.make CMakeFiles/main_detect.dir/src/utility.cpp.s
+.PHONY : src/utility.cpp.s
 
 # Help Target
 help:
@@ -258,21 +258,21 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... main_detect"
-	@echo "... detect_signs.o"
-	@echo "... detect_signs.i"
-	@echo "... detect_signs.s"
-	@echo "... main_detect.o"
-	@echo "... main_detect.i"
-	@echo "... main_detect.s"
-	@echo "... memory_pool_list.o"
-	@echo "... memory_pool_list.i"
-	@echo "... memory_pool_list.s"
-	@echo "... old_detect_signs.o"
-	@echo "... old_detect_signs.i"
-	@echo "... old_detect_signs.s"
-	@echo "... utility.o"
-	@echo "... utility.i"
-	@echo "... utility.s"
+	@echo "... src/detect_signs.o"
+	@echo "... src/detect_signs.i"
+	@echo "... src/detect_signs.s"
+	@echo "... src/main_detect.o"
+	@echo "... src/main_detect.i"
+	@echo "... src/main_detect.s"
+	@echo "... src/memory_pool_list.o"
+	@echo "... src/memory_pool_list.i"
+	@echo "... src/memory_pool_list.s"
+	@echo "... src/old_detect_signs.o"
+	@echo "... src/old_detect_signs.i"
+	@echo "... src/old_detect_signs.s"
+	@echo "... src/utility.o"
+	@echo "... src/utility.i"
+	@echo "... src/utility.s"
 .PHONY : help
 
 

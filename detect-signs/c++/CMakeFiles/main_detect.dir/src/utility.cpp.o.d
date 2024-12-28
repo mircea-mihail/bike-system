@@ -1,11 +1,8 @@
-CMakeFiles/main_detect.dir/main_detect.cpp.o: \
- /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/main_detect.cpp \
- /usr/include/stdc-predef.h /usr/local/include/opencv4/opencv2/opencv.hpp \
- /usr/local/include/opencv4/opencv2/opencv_modules.hpp \
- /usr/local/include/opencv4/opencv2/core.hpp \
- /usr/local/include/opencv4/opencv2/core/cvdef.h \
- /usr/local/include/opencv4/opencv2/core/version.hpp \
- /usr/include/c++/11/limits \
+CMakeFiles/main_detect.dir/src/utility.cpp.o: \
+ /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/src/utility.cpp \
+ /usr/include/stdc-predef.h \
+ /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/include/utility.h \
+ /usr/include/c++/11/cstdint \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h \
  /usr/include/features.h /usr/include/features-time64.h \
@@ -17,10 +14,6 @@ CMakeFiles/main_detect.dir/main_detect.cpp.o: \
  /usr/include/x86_64-linux-gnu/gnu/stubs-64.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/cpu_defines.h \
  /usr/include/c++/11/pstl/pstl_config.h \
- /usr/local/include/opencv4/opencv2/core/hal/interface.h \
- /usr/include/c++/11/cstddef \
- /usr/lib/gcc/x86_64-linux-gnu/11/include/stddef.h \
- /usr/include/c++/11/cstdint \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/stdint.h /usr/include/stdint.h \
  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
  /usr/include/x86_64-linux-gnu/bits/types.h \
@@ -29,6 +22,16 @@ CMakeFiles/main_detect.dir/main_detect.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/wchar.h \
  /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
  /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
+ /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/include/constants.h \
+ /usr/local/include/opencv4/opencv2/opencv.hpp \
+ /usr/local/include/opencv4/opencv2/opencv_modules.hpp \
+ /usr/local/include/opencv4/opencv2/core.hpp \
+ /usr/local/include/opencv4/opencv2/core/cvdef.h \
+ /usr/local/include/opencv4/opencv2/core/version.hpp \
+ /usr/include/c++/11/limits \
+ /usr/local/include/opencv4/opencv2/core/hal/interface.h \
+ /usr/include/c++/11/cstddef \
+ /usr/lib/gcc/x86_64-linux-gnu/11/include/stddef.h \
  /usr/local/include/opencv4/opencv2/core/cv_cpu_dispatch.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/emmintrin.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/xmmintrin.h \
@@ -361,18 +364,4 @@ CMakeFiles/main_detect.dir/main_detect.cpp.o: \
  /usr/local/include/opencv4/opencv2/stitching/detail/camera.hpp \
  /usr/local/include/opencv4/opencv2/video.hpp \
  /usr/local/include/opencv4/opencv2/video/tracking.hpp \
- /usr/local/include/opencv4/opencv2/video/background_segm.hpp \
- /usr/include/c++/11/thread /usr/include/c++/11/bits/std_thread.h \
- /usr/include/c++/11/bits/this_thread_sleep.h \
- /usr/include/c++/11/filesystem /usr/include/c++/11/bits/fs_fwd.h \
- /usr/include/c++/11/bits/fs_path.h /usr/include/c++/11/codecvt \
- /usr/include/c++/11/bits/fs_dir.h /usr/include/c++/11/bits/fs_ops.h \
- /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/utility.h \
- /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/constants.h \
- /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/detect_signs.h \
- /usr/include/c++/11/fstream \
- /usr/include/x86_64-linux-gnu/c++/11/bits/basic_file.h \
- /usr/include/x86_64-linux-gnu/c++/11/bits/c++io.h \
- /usr/include/c++/11/bits/fstream.tcc \
- /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/memory_pool_list.h \
- /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/old_detect_signs.h
+ /usr/local/include/opencv4/opencv2/video/background_segm.hpp

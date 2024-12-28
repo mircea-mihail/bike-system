@@ -69,92 +69,92 @@ include CMakeFiles/main_detect.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/main_detect.dir/flags.make
 
-CMakeFiles/main_detect.dir/main_detect.cpp.o: CMakeFiles/main_detect.dir/flags.make
-CMakeFiles/main_detect.dir/main_detect.cpp.o: main_detect.cpp
-CMakeFiles/main_detect.dir/main_detect.cpp.o: CMakeFiles/main_detect.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/main_detect.dir/main_detect.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main_detect.dir/main_detect.cpp.o -MF CMakeFiles/main_detect.dir/main_detect.cpp.o.d -o CMakeFiles/main_detect.dir/main_detect.cpp.o -c /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/main_detect.cpp
+CMakeFiles/main_detect.dir/src/detect_signs.cpp.o: CMakeFiles/main_detect.dir/flags.make
+CMakeFiles/main_detect.dir/src/detect_signs.cpp.o: src/detect_signs.cpp
+CMakeFiles/main_detect.dir/src/detect_signs.cpp.o: CMakeFiles/main_detect.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/main_detect.dir/src/detect_signs.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main_detect.dir/src/detect_signs.cpp.o -MF CMakeFiles/main_detect.dir/src/detect_signs.cpp.o.d -o CMakeFiles/main_detect.dir/src/detect_signs.cpp.o -c /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/src/detect_signs.cpp
 
-CMakeFiles/main_detect.dir/main_detect.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main_detect.dir/main_detect.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/main_detect.cpp > CMakeFiles/main_detect.dir/main_detect.cpp.i
+CMakeFiles/main_detect.dir/src/detect_signs.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main_detect.dir/src/detect_signs.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/src/detect_signs.cpp > CMakeFiles/main_detect.dir/src/detect_signs.cpp.i
 
-CMakeFiles/main_detect.dir/main_detect.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main_detect.dir/main_detect.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/main_detect.cpp -o CMakeFiles/main_detect.dir/main_detect.cpp.s
+CMakeFiles/main_detect.dir/src/detect_signs.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main_detect.dir/src/detect_signs.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/src/detect_signs.cpp -o CMakeFiles/main_detect.dir/src/detect_signs.cpp.s
 
-CMakeFiles/main_detect.dir/utility.cpp.o: CMakeFiles/main_detect.dir/flags.make
-CMakeFiles/main_detect.dir/utility.cpp.o: utility.cpp
-CMakeFiles/main_detect.dir/utility.cpp.o: CMakeFiles/main_detect.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/main_detect.dir/utility.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main_detect.dir/utility.cpp.o -MF CMakeFiles/main_detect.dir/utility.cpp.o.d -o CMakeFiles/main_detect.dir/utility.cpp.o -c /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/utility.cpp
+CMakeFiles/main_detect.dir/src/main_detect.cpp.o: CMakeFiles/main_detect.dir/flags.make
+CMakeFiles/main_detect.dir/src/main_detect.cpp.o: src/main_detect.cpp
+CMakeFiles/main_detect.dir/src/main_detect.cpp.o: CMakeFiles/main_detect.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/main_detect.dir/src/main_detect.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main_detect.dir/src/main_detect.cpp.o -MF CMakeFiles/main_detect.dir/src/main_detect.cpp.o.d -o CMakeFiles/main_detect.dir/src/main_detect.cpp.o -c /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/src/main_detect.cpp
 
-CMakeFiles/main_detect.dir/utility.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main_detect.dir/utility.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/utility.cpp > CMakeFiles/main_detect.dir/utility.cpp.i
+CMakeFiles/main_detect.dir/src/main_detect.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main_detect.dir/src/main_detect.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/src/main_detect.cpp > CMakeFiles/main_detect.dir/src/main_detect.cpp.i
 
-CMakeFiles/main_detect.dir/utility.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main_detect.dir/utility.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/utility.cpp -o CMakeFiles/main_detect.dir/utility.cpp.s
+CMakeFiles/main_detect.dir/src/main_detect.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main_detect.dir/src/main_detect.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/src/main_detect.cpp -o CMakeFiles/main_detect.dir/src/main_detect.cpp.s
 
-CMakeFiles/main_detect.dir/memory_pool_list.cpp.o: CMakeFiles/main_detect.dir/flags.make
-CMakeFiles/main_detect.dir/memory_pool_list.cpp.o: memory_pool_list.cpp
-CMakeFiles/main_detect.dir/memory_pool_list.cpp.o: CMakeFiles/main_detect.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/main_detect.dir/memory_pool_list.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main_detect.dir/memory_pool_list.cpp.o -MF CMakeFiles/main_detect.dir/memory_pool_list.cpp.o.d -o CMakeFiles/main_detect.dir/memory_pool_list.cpp.o -c /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/memory_pool_list.cpp
+CMakeFiles/main_detect.dir/src/memory_pool_list.cpp.o: CMakeFiles/main_detect.dir/flags.make
+CMakeFiles/main_detect.dir/src/memory_pool_list.cpp.o: src/memory_pool_list.cpp
+CMakeFiles/main_detect.dir/src/memory_pool_list.cpp.o: CMakeFiles/main_detect.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/main_detect.dir/src/memory_pool_list.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main_detect.dir/src/memory_pool_list.cpp.o -MF CMakeFiles/main_detect.dir/src/memory_pool_list.cpp.o.d -o CMakeFiles/main_detect.dir/src/memory_pool_list.cpp.o -c /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/src/memory_pool_list.cpp
 
-CMakeFiles/main_detect.dir/memory_pool_list.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main_detect.dir/memory_pool_list.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/memory_pool_list.cpp > CMakeFiles/main_detect.dir/memory_pool_list.cpp.i
+CMakeFiles/main_detect.dir/src/memory_pool_list.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main_detect.dir/src/memory_pool_list.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/src/memory_pool_list.cpp > CMakeFiles/main_detect.dir/src/memory_pool_list.cpp.i
 
-CMakeFiles/main_detect.dir/memory_pool_list.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main_detect.dir/memory_pool_list.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/memory_pool_list.cpp -o CMakeFiles/main_detect.dir/memory_pool_list.cpp.s
+CMakeFiles/main_detect.dir/src/memory_pool_list.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main_detect.dir/src/memory_pool_list.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/src/memory_pool_list.cpp -o CMakeFiles/main_detect.dir/src/memory_pool_list.cpp.s
 
-CMakeFiles/main_detect.dir/detect_signs.cpp.o: CMakeFiles/main_detect.dir/flags.make
-CMakeFiles/main_detect.dir/detect_signs.cpp.o: detect_signs.cpp
-CMakeFiles/main_detect.dir/detect_signs.cpp.o: CMakeFiles/main_detect.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/main_detect.dir/detect_signs.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main_detect.dir/detect_signs.cpp.o -MF CMakeFiles/main_detect.dir/detect_signs.cpp.o.d -o CMakeFiles/main_detect.dir/detect_signs.cpp.o -c /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/detect_signs.cpp
+CMakeFiles/main_detect.dir/src/old_detect_signs.cpp.o: CMakeFiles/main_detect.dir/flags.make
+CMakeFiles/main_detect.dir/src/old_detect_signs.cpp.o: src/old_detect_signs.cpp
+CMakeFiles/main_detect.dir/src/old_detect_signs.cpp.o: CMakeFiles/main_detect.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/main_detect.dir/src/old_detect_signs.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main_detect.dir/src/old_detect_signs.cpp.o -MF CMakeFiles/main_detect.dir/src/old_detect_signs.cpp.o.d -o CMakeFiles/main_detect.dir/src/old_detect_signs.cpp.o -c /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/src/old_detect_signs.cpp
 
-CMakeFiles/main_detect.dir/detect_signs.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main_detect.dir/detect_signs.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/detect_signs.cpp > CMakeFiles/main_detect.dir/detect_signs.cpp.i
+CMakeFiles/main_detect.dir/src/old_detect_signs.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main_detect.dir/src/old_detect_signs.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/src/old_detect_signs.cpp > CMakeFiles/main_detect.dir/src/old_detect_signs.cpp.i
 
-CMakeFiles/main_detect.dir/detect_signs.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main_detect.dir/detect_signs.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/detect_signs.cpp -o CMakeFiles/main_detect.dir/detect_signs.cpp.s
+CMakeFiles/main_detect.dir/src/old_detect_signs.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main_detect.dir/src/old_detect_signs.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/src/old_detect_signs.cpp -o CMakeFiles/main_detect.dir/src/old_detect_signs.cpp.s
 
-CMakeFiles/main_detect.dir/old_detect_signs.cpp.o: CMakeFiles/main_detect.dir/flags.make
-CMakeFiles/main_detect.dir/old_detect_signs.cpp.o: old_detect_signs.cpp
-CMakeFiles/main_detect.dir/old_detect_signs.cpp.o: CMakeFiles/main_detect.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/main_detect.dir/old_detect_signs.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main_detect.dir/old_detect_signs.cpp.o -MF CMakeFiles/main_detect.dir/old_detect_signs.cpp.o.d -o CMakeFiles/main_detect.dir/old_detect_signs.cpp.o -c /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/old_detect_signs.cpp
+CMakeFiles/main_detect.dir/src/utility.cpp.o: CMakeFiles/main_detect.dir/flags.make
+CMakeFiles/main_detect.dir/src/utility.cpp.o: src/utility.cpp
+CMakeFiles/main_detect.dir/src/utility.cpp.o: CMakeFiles/main_detect.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/main_detect.dir/src/utility.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main_detect.dir/src/utility.cpp.o -MF CMakeFiles/main_detect.dir/src/utility.cpp.o.d -o CMakeFiles/main_detect.dir/src/utility.cpp.o -c /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/src/utility.cpp
 
-CMakeFiles/main_detect.dir/old_detect_signs.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main_detect.dir/old_detect_signs.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/old_detect_signs.cpp > CMakeFiles/main_detect.dir/old_detect_signs.cpp.i
+CMakeFiles/main_detect.dir/src/utility.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main_detect.dir/src/utility.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/src/utility.cpp > CMakeFiles/main_detect.dir/src/utility.cpp.i
 
-CMakeFiles/main_detect.dir/old_detect_signs.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main_detect.dir/old_detect_signs.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/old_detect_signs.cpp -o CMakeFiles/main_detect.dir/old_detect_signs.cpp.s
+CMakeFiles/main_detect.dir/src/utility.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main_detect.dir/src/utility.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++/src/utility.cpp -o CMakeFiles/main_detect.dir/src/utility.cpp.s
 
 # Object files for target main_detect
 main_detect_OBJECTS = \
-"CMakeFiles/main_detect.dir/main_detect.cpp.o" \
-"CMakeFiles/main_detect.dir/utility.cpp.o" \
-"CMakeFiles/main_detect.dir/memory_pool_list.cpp.o" \
-"CMakeFiles/main_detect.dir/detect_signs.cpp.o" \
-"CMakeFiles/main_detect.dir/old_detect_signs.cpp.o"
+"CMakeFiles/main_detect.dir/src/detect_signs.cpp.o" \
+"CMakeFiles/main_detect.dir/src/main_detect.cpp.o" \
+"CMakeFiles/main_detect.dir/src/memory_pool_list.cpp.o" \
+"CMakeFiles/main_detect.dir/src/old_detect_signs.cpp.o" \
+"CMakeFiles/main_detect.dir/src/utility.cpp.o"
 
 # External object files for target main_detect
 main_detect_EXTERNAL_OBJECTS =
 
-main_detect: CMakeFiles/main_detect.dir/main_detect.cpp.o
-main_detect: CMakeFiles/main_detect.dir/utility.cpp.o
-main_detect: CMakeFiles/main_detect.dir/memory_pool_list.cpp.o
-main_detect: CMakeFiles/main_detect.dir/detect_signs.cpp.o
-main_detect: CMakeFiles/main_detect.dir/old_detect_signs.cpp.o
+main_detect: CMakeFiles/main_detect.dir/src/detect_signs.cpp.o
+main_detect: CMakeFiles/main_detect.dir/src/main_detect.cpp.o
+main_detect: CMakeFiles/main_detect.dir/src/memory_pool_list.cpp.o
+main_detect: CMakeFiles/main_detect.dir/src/old_detect_signs.cpp.o
+main_detect: CMakeFiles/main_detect.dir/src/utility.cpp.o
 main_detect: CMakeFiles/main_detect.dir/build.make
 main_detect: /usr/local/lib/libopencv_gapi.so.4.10.0
 main_detect: /usr/local/lib/libopencv_highgui.so.4.10.0
