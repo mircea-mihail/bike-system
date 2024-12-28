@@ -65,14 +65,17 @@ struct give_way_chunk
 #define PRINT_STATS
 
 // ------------------------------- IMAGE
-#define IMAGE_HEIGHT (1600)
-#define IMAGE_WIDTH (1200)
+#define IMAGE_HEIGHT (1200)
+#define IMAGE_WIDTH (1600)
 
 // ------------------------------- CHUNK
 #define MIN_CHUNK_SIZE 10
 #define MIN_BOUNDING_BOX_AREA 50
 #define MIN_CHUNK_SCORE 0.75
 #define MAX_CLUMPING_VARIANCE 5 
+
+// ------------------------------- DETECTION RELATED
+#define MIN_MAYBE_IDX 3
 
 // ------------------------------- GIVE WAY RED BORDER   
 #define THICK_GW_BORDER_PER_CENT 0.376
