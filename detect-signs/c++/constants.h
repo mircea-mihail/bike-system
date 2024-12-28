@@ -74,6 +74,9 @@ struct give_way_chunk
 #define MIN_CHUNK_SCORE 0.75
 #define MAX_CLUMPING_VARIANCE 5 
 
+// ------------------------------- TIMING
+#define CONTROL_PIC_INTERVAL_MS 10000 // 10 s
+
 // ------------------------------- DETECTION RELATED
 #define MIN_MAYBE_IDX 3
 

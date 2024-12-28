@@ -166,7 +166,30 @@ int main(int argc, char** argv)
 
 	cv::Mat pic;
 	int32_t pic_idx = 0;
+	int32_t ctrl_pic_idx = 0;
 	int32_t maybe_idx = 0;
+
+	std::chrono::time_point control_pic_start = std::chrono::high_resolution_clock::now();
+
+	std::string output_dir = "./detections/";
+	std::string ctrl_output_dir = "./control/";
+
+	if (! std::filesystem::exists(output_dir)) 
+	{
+		if (! std::filesystem::create_directory(output_dir))
+		{
+			std::cerr << "Failed to create directory!" << std::endl;
+			return -1;
+		}
+	}
+	if (! std::filesystem::exists(ctrl_output_dir)) 
+	{
+		if (! std::filesystem::create_directory(ctrl_output_dir))
+		{
+			std::cerr << "Failed to create directory!" << std::endl;
+			return -1;
+		}
+	}
 
 	while(true)
 	{
@@ -184,19 +207,20 @@ int main(int argc, char** argv)
 			{
 				std::cout << "take picture took " << duration.count() << " ms" << std::endl;
 				// show_pic(pic);
-				std::string output_dir = "./detections/";
 
-				if (! std::filesystem::exists(output_dir)) 
-				{
-					if (! std::filesystem::create_directory(output_dir))
-					{
-						std::cerr << "Failed to create directory!" << std::endl;
-						return -1;
-					}
-				}
-
-				cv::imwrite("./detections/" + std::to_string(pic_idx) + ".jpg", pic);
+				cv::imwrite(output_dir + std::to_string(pic_idx) + ".jpg", pic);
 				pic_idx ++;
+			}
+
+			std::chrono::time_point control_pic_end = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<double, std::milli> control_delta = control_pic_end - control_pic_start; 
+			if(control_delta.count() > CONTROL_PIC_INTERVAL_MS)
+			{
+				control_pic_start = std::chrono::high_resolution_clock::now();
+
+				cv::imwrite(ctrl_output_dir + std::to_string(ctrl_pic_idx) + ".jpg", pic);
+				std::cout << "took control pic..." << std::endl;
+				ctrl_pic_idx ++;
 			}
 		}
 	}
