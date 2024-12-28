@@ -1,4 +1,5 @@
 #include <opencv2/opencv.hpp> 
+#include <lccv.hpp>
 #include <iostream>
 #include <chrono>
 #include <thread>
@@ -149,21 +150,27 @@ int take_picture(cv::Mat &p_pic, cv::VideoCapture &p_camera)
 int main(int argc, char** argv) 
 { 
 
-    cv::VideoCapture camera(0);
+	// for USB cameras
+//	cv::VideoCapture camera(0);
+//	if (!camera.isOpened()) {
+//		std::cerr << "Error: Could not open the camera.\n";
+//		return -1;
+//	}
 
-    if (!camera.isOpened()) {
-        std::cerr << "Error: Could not open the camera.\n";
-        return -1;
-    }
+	// for raspi
+	lccv::PiCamera camera;
+	
+	camera.options->photo_width=IMAGE_WIDTH;
+	camera.options->photo_height=IMAGE_HEIGHT;
+	camera.options->verbose=false;
+	
 	std::cout << "opened the camera\n";
-	// camera.set(cv::CAP_PROP_BUFFERSIZE, 1);
-	// camera.set(cv::CAP_PROP_FRAME_WIDTH, IMAGE_WIDTH);
-	// camera.set(cv::CAP_PROP_FRAME_HEIGHT, IMAGE_HEIGHT);
-
+	
 	cv::Mat temp;
 	for (int i = 0; i < 10; ++i) 
 	{
-		camera >> temp;
+//		camera >> temp;
+		camera.capturePhoto(temp);
 	}
 	std::cout << "took temporary photos\n";
 
@@ -198,7 +205,8 @@ int main(int argc, char** argv)
 	while(true)
 	{
 		std::chrono::time_point start = std::chrono::high_resolution_clock::now();
-		if(take_picture(pic, camera) == 0)
+//		if(take_picture(pic, camera) == 0)
+		if(camera.capturePhoto(pic))
 		{
 			std::chrono::time_point end = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> duration = end - start;
@@ -229,7 +237,7 @@ int main(int argc, char** argv)
 		}
 	}
 
-    camera.release();
+//	camera.release();
 
 
 	// if (argc != 2) { 

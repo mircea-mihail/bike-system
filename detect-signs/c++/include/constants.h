@@ -65,8 +65,8 @@ struct give_way_chunk
 #define PRINT_STATS
 
 // ------------------------------- IMAGE
-#define IMAGE_HEIGHT (1200)
-#define IMAGE_WIDTH (1600)
+#define IMAGE_HEIGHT (960)
+#define IMAGE_WIDTH (1280)
 
 // ------------------------------- CHUNK
 #define MIN_CHUNK_SIZE 10
