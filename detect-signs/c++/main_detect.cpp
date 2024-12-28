@@ -148,6 +148,7 @@ int take_picture(cv::Mat &p_pic, cv::VideoCapture &p_camera)
 
 int main(int argc, char** argv) 
 { 
+
     cv::VideoCapture camera(0);
 
     if (!camera.isOpened()) {
