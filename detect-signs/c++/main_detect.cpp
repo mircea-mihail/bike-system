@@ -9,11 +9,12 @@
 #include "detect_signs.h"
 #include "old_detect_signs.h"
 
-void show_pic(cv::Mat p_img, std::string p_img_name)
+void show_pic(cv::Mat p_img)
 {
 	cv::namedWindow("Display Image", cv::WINDOW_GUI_NORMAL); 
 	cv::imshow("Display Image", p_img); 
 	cv::waitKey(0); 
+	cv::destroyAllWindows();
 }
 
 void detect_dir_images(std::string p_input_dir)
@@ -107,25 +108,28 @@ void detect_from_name(std::string p_image_name)
 
 	std::cout << "detect gw took " << duration.count() << " ms" << std::endl;
 
-	show_pic(image, "img");
+	show_pic(image);
 }
 
-void detect_pic(cv::Mat p_pic)
+float detect_pic(cv::Mat &p_pic)
 {
 	cv::Point2i image_size = cv::Point2i(IMAGE_WIDTH, IMAGE_HEIGHT);
 	cv::resize(p_pic, p_pic, cv::Size(image_size));
 
 	std::chrono::time_point start = std::chrono::high_resolution_clock::now();
 
-	uint32_t gw_detected = detect_gw_cv(p_pic);
-
-	std::cout << "found " << gw_detected << " give way signs" << std::endl;
+	float score = detect_gw_cv(p_pic);
 
 	std::chrono::time_point end = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double, std::milli> duration = end - start;
-	std::cout << "detect gw took " << duration.count() << " ms" << std::endl;
 
-	show_pic(p_pic, "img");
+	if(score)
+	{
+		std::cout << "detect gw took " << duration.count() << " ms" << std::endl;
+	}
+
+	// show_pic(p_pic, "img");
+	return score;
 }
 
 int take_picture(cv::Mat &p_pic, cv::VideoCapture &p_camera)
@@ -150,22 +154,56 @@ int main(int argc, char** argv)
         std::cerr << "Error: Could not open the camera.\n";
         return -1;
     }
-    // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+	// camera.set(cv::CAP_PROP_BUFFERSIZE, 1);
+	// camera.set(cv::CAP_PROP_FRAME_WIDTH, IMAGE_WIDTH);
+	// camera.set(cv::CAP_PROP_FRAME_HEIGHT, IMAGE_HEIGHT);
+
 	cv::Mat temp;
-	for (int i = 0; i < 10; ++i) {
+	for (int i = 0; i < 10; ++i) 
+	{
 		camera >> temp;
 	}
 
 	cv::Mat pic;
+	int32_t pic_idx = 0;
+	int8_t maybe_idx = 0;
 
-	std::chrono::time_point start = std::chrono::high_resolution_clock::now();
-	if(take_picture(pic, camera) == 0)
+	while(true)
 	{
-		std::chrono::time_point end = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<double, std::milli> duration = end - start;
-		std::cout << "detect gw took " << duration.count() << " ms" << std::endl;
+		std::chrono::time_point start = std::chrono::high_resolution_clock::now();
+		if(take_picture(pic, camera) == 0)
+		{
+			std::chrono::time_point end = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<double, std::milli> duration = end - start;
 
-		detect_pic(pic);
+			float detection_score = detect_pic(pic);
+
+			maybe_idx = detection_score > 0 ? maybe_idx+1 : 0;
+
+			if(maybe_idx >= 1)
+			{
+				std::cout << "maybe idx:" << maybe_idx << std::endl;
+			}
+
+			if(maybe_idx >= MIN_MAYBE_IDX)
+			{
+				std::cout << "take picture took " << duration.count() << " ms" << std::endl;
+				// show_pic(pic);
+				std::string output_dir = "./detections/";
+
+				if (! std::filesystem::exists(output_dir)) 
+				{
+					if (! std::filesystem::create_directory(output_dir))
+					{
+						std::cerr << "Failed to create directory!" << std::endl;
+						return -1;
+					}
+				}
+
+				cv::imwrite("./detections/" + std::to_string(pic_idx) + ".jpg", pic);
+				pic_idx ++;
+			}
+		}
 	}
 
     camera.release();
