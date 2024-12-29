@@ -160,19 +160,11 @@ int main(int argc, char** argv)
 	// for raspi
 	lccv::PiCamera camera;
 	
-	camera.options->photo_width=IMAGE_WIDTH;
-	camera.options->photo_height=IMAGE_HEIGHT;
+	camera.options->video_width=IMAGE_WIDTH;
+	camera.options->video_height=IMAGE_HEIGHT;
 	camera.options->verbose=false;
 	
 	std::cout << "opened the camera\n";
-	
-	cv::Mat temp;
-	for (int i = 0; i < 10; ++i) 
-	{
-//		camera >> temp;
-		camera.capturePhoto(temp);
-	}
-	std::cout << "took temporary photos\n";
 
 	cv::Mat pic;
 	int32_t pic_idx = 0;
@@ -202,11 +194,13 @@ int main(int argc, char** argv)
 	}
 
 	std::cout << "about to enter while true\n";
+	
+	camera.startVideo();
 	while(true)
 	{
 		std::chrono::time_point start = std::chrono::high_resolution_clock::now();
 //		if(take_picture(pic, camera) == 0)
-		if(camera.capturePhoto(pic))
+		if(camera.getVideoFrame(pic, 1000))
 		{
 			std::chrono::time_point end = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> duration = end - start;
@@ -238,7 +232,7 @@ int main(int argc, char** argv)
 	}
 
 //	camera.release();
-
+	camera.stopVideo();
 
 	// if (argc != 2) { 
 	// 	printf("usage: main_detect <Images Dir>\n"); 
