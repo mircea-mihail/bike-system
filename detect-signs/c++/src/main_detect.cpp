@@ -1,5 +1,7 @@
 #include <opencv2/opencv.hpp> 
-#include <lccv.hpp>
+#ifdef IN_RASPI
+	#include <lccv.hpp>
+#endif
 #include <iostream>
 #include <chrono>
 #include <thread>
@@ -147,24 +149,97 @@ int take_picture(cv::Mat &p_pic, cv::VideoCapture &p_camera)
     return 0;
 }
 
-int main(int argc, char** argv) 
-{ 
+void save_pic(cv::Mat &p_pic, std::string p_output_dir, int32_t p_pic_idx)
+{
+	cv::Mat pic_to_save;
+	cv::resize(p_pic, pic_to_save, cv::Size(cv::Point2i(SAVED_IMG_WIDTH, SAVED_IMG_HEIGHT)));
 
-	// for USB cameras
-//	cv::VideoCapture camera(0);
-//	if (!camera.isOpened()) {
-//		std::cerr << "Error: Could not open the camera.\n";
-//		return -1;
-//	}
+	cv::imwrite(p_output_dir + std::to_string(p_pic_idx) + ".jpg", pic_to_save);
+}
 
-	// for raspi
+#ifdef IN_RASPI
+void pi_loop()
+{
 	lccv::PiCamera camera;
 	
 	camera.options->video_width=IMAGE_WIDTH;
 	camera.options->video_height=IMAGE_HEIGHT;
 	camera.options->verbose=false;
 	
-	std::cout << "opened the camera\n";
+	cv::Mat pic;
+	int32_t pic_idx = 0;
+	int32_t ctrl_pic_idx = 0;
+	int32_t maybe_idx = 0;
+
+	std::chrono::time_point control_pic_start = std::chrono::high_resolution_clock::now();
+
+	std::string output_dir = "./detections/";
+	std::string ctrl_output_dir = "./control/";
+
+	if (! std::filesystem::exists(output_dir)) 
+	{
+		if (! std::filesystem::create_directory(output_dir))
+		{
+			std::cerr << "Failed to create directory!" << std::endl;
+			return;
+		}
+	}
+	if (! std::filesystem::exists(ctrl_output_dir)) 
+	{
+		if (! std::filesystem::create_directory(ctrl_output_dir))
+		{
+			std::cerr << "Failed to create directory!" << std::endl;
+			return;
+		}
+	}
+	
+	camera.startVideo();
+	while(true)
+	{
+		std::chrono::time_point start = std::chrono::high_resolution_clock::now();
+		if(camera.getVideoFrame(pic, 1000))
+		{
+			std::chrono::time_point end = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<double, std::milli> duration = end - start;
+
+			float detection_score = detect_pic(pic);
+
+			maybe_idx = detection_score > 0 ? maybe_idx+1 : 0;
+
+			if(maybe_idx >= MIN_MAYBE_IDX)
+			{
+				std::cout << "take picture took " << duration.count() << " ms" << std::endl;
+
+				save_pic(pic, output_dir, pic_idx);
+				pic_idx ++;
+			}
+
+			std::chrono::time_point control_pic_end = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<double, std::milli> control_delta = control_pic_end - control_pic_start; 
+			if(control_delta.count() > CONTROL_PIC_INTERVAL_MS)
+			{
+				control_pic_start = std::chrono::high_resolution_clock::now();
+				std::cout << "took control pic..." << std::endl;
+
+				save_pic(pic, ctrl_output_dir, ctrl_pic_idx);
+				ctrl_pic_idx ++;
+			}
+		}
+	}
+
+	camera.stopVideo();
+}
+#endif
+
+void linux_loop()
+{
+
+	// for USB cameras
+	cv::VideoCapture camera(0);
+	if (!camera.isOpened()) {
+		std::cerr << "Error: Could not open the camera.\n";
+		return;
+	}
 
 	cv::Mat pic;
 	int32_t pic_idx = 0;
@@ -181,7 +256,7 @@ int main(int argc, char** argv)
 		if (! std::filesystem::create_directory(output_dir))
 		{
 			std::cerr << "Failed to create directory!" << std::endl;
-			return -1;
+			return;
 		}
 	}
 	if (! std::filesystem::exists(ctrl_output_dir)) 
@@ -189,18 +264,14 @@ int main(int argc, char** argv)
 		if (! std::filesystem::create_directory(ctrl_output_dir))
 		{
 			std::cerr << "Failed to create directory!" << std::endl;
-			return -1;
+			return;
 		}
 	}
 
-	std::cout << "about to enter while true\n";
-	
-	camera.startVideo();
 	while(true)
 	{
 		std::chrono::time_point start = std::chrono::high_resolution_clock::now();
-//		if(take_picture(pic, camera) == 0)
-		if(camera.getVideoFrame(pic, 1000))
+		if(take_picture(pic, camera) == 0)
 		{
 			std::chrono::time_point end = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> duration = end - start;
@@ -213,8 +284,8 @@ int main(int argc, char** argv)
 			{
 				std::cout << "take picture took " << duration.count() << " ms" << std::endl;
 				// show_pic(pic);
+				save_pic(pic, output_dir, pic_idx);
 
-				cv::imwrite(output_dir + std::to_string(pic_idx) + ".jpg", pic);
 				pic_idx ++;
 			}
 
@@ -223,16 +294,20 @@ int main(int argc, char** argv)
 			if(control_delta.count() > CONTROL_PIC_INTERVAL_MS)
 			{
 				control_pic_start = std::chrono::high_resolution_clock::now();
-
-				cv::imwrite(ctrl_output_dir + std::to_string(ctrl_pic_idx) + ".jpg", pic);
 				std::cout << "took control pic..." << std::endl;
+
+				save_pic(pic, ctrl_output_dir, ctrl_pic_idx);
 				ctrl_pic_idx ++;
 			}
 		}
 	}
 
-//	camera.release();
-	camera.stopVideo();
+	camera.release();
+}
+
+int main(int argc, char** argv) 
+{ 
+	linux_loop();
 
 	// if (argc != 2) { 
 	// 	printf("usage: main_detect <Images Dir>\n"); 
@@ -242,41 +317,3 @@ int main(int argc, char** argv)
 	// detect_dir_images(argv[1]);
 	return 0; 
 }
-
-// ----------- shwo mask
-	// cv::namedWindow("Display Image", cv::WINDOW_GUI_NORMAL); 
-	// // cv::imshow("Display Image", resized_img); 
-	// cv::imshow("Display Image", red_pixels); 
-	// cv::waitKey(0); 
-
-	// // cv::Mat resized_img;
-	// // float scale_for_print = 0.6;
-	// // cv::resize(image, resized_img, cv::Size(), scale_for_print , scale_for_print);
-
-	// cv::namedWindow("Display Image", cv::WINDOW_GUI_NORMAL); 
-	// // cv::imshow("Display Image", resized_img); 
-	// cv::imshow("Display Image", image); 
-	// cv::waitKey(0); 
-
-// code for checking each pixel in an image
-	// int found_red = 0;
-	// for (int i = 0; i < image.rows; i++)
-	// {
-	// 	for (int j = 0; j < image.cols; j++)
-	// 	{
-	// 		if(is_red(hsv_image.at<cv::Vec3b>(i, j)))
-	// 		{
-	// 			image.at<cv::Vec3b>(i, j) = cv::Vec3b({0, 0, 255});
-	// 			found_red += 1;
-	// 		} 
-
-	// 		if(is_white(hsv_image.at<cv::Vec3b>(i, j)))
-	// 		{
-	// 			image.at<cv::Vec3b>(i, j) = cv::Vec3b({255, 255, 255});
-	// 			found_red += 1;
-	// 		}
-	// 	}
-	// }
-	// std::cout << "found " << found_red << " red or white" << std::endl;
-	// std::cout << "total pixels: " << image.cols * image.rows << std::endl;
-
