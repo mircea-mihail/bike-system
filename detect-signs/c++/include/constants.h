@@ -63,10 +63,15 @@ struct give_way_chunk
 
 ///////////////////////////////// tweak-able constants
 #define PRINT_STATS
+// #define IN_RASPI
 
 // ------------------------------- IMAGE
 #define IMAGE_HEIGHT (960)
 #define IMAGE_WIDTH (1280)
+
+#define SAVE_IMG_RATIO 2
+#define SAVED_IMG_HEIGHT (IMAGE_HEIGHT / SAVE_IMG_RATIO) 
+#define SAVED_IMG_WIDTH (IMAGE_WIDTH / SAVE_IMG_RATIO)
 
 // ------------------------------- CHUNK
 #define MIN_CHUNK_SIZE 10
