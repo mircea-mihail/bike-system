@@ -5,7 +5,7 @@ set (CMAKE_CXX_STANDARD 17)
 
 find_package( OpenCV REQUIRED )
 find_package( PkgConfig REQUIRED )
-pkg_check_modules(LIBCAMERA REQUIRED libcamera)
+#pkg_check_modules(LIBCAMERA REQUIRED libcamera)
 
 include_directories( 
 	${OpenCV_INCLUDE_DIRS} 
@@ -16,4 +16,5 @@ include_directories(
 file(GLOB_RECURSE SRC_FILES ${CMAKE_SOURCE_DIR}/src/*.cpp)
 
 add_executable( main_detect ${SRC_FILES})
-target_link_libraries( main_detect -llccv ${OpenCV_LIBS} )
+#target_link_libraries( main_detect -llccv ${OpenCV_LIBS} )
+target_link_libraries( main_detect  ${OpenCV_LIBS} )
