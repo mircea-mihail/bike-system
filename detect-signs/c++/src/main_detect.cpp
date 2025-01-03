@@ -1,7 +1,5 @@
 #include <opencv2/opencv.hpp> 
-#ifdef IN_RASPI
-	#include <lccv.hpp>
-#endif
+
 #include <iostream>
 #include <chrono>
 #include <thread>
@@ -11,6 +9,10 @@
 #include "utility.h"
 #include "detect_signs.h"
 #include "old_detect_signs.h"
+
+#ifdef IN_RASPI
+	#include <lccv.hpp>
+#endif
 
 void show_pic(cv::Mat p_img)
 {
@@ -165,89 +167,22 @@ void save_pic(cv::Mat &p_pic, std::string p_output_dir, int32_t p_pic_idx)
 	cv::imwrite(p_output_dir + std::to_string(p_pic_idx) + ".jpg", pic_to_save);
 }
 
-#ifdef IN_RASPI
-void pi_loop()
+void detection_loop()
 {
-	lccv::PiCamera camera;
-	
-	camera.options->video_width=IMAGE_WIDTH;
-	camera.options->video_height=IMAGE_HEIGHT;
-	camera.options->verbose=false;
-	
-	cv::Mat pic;
-	int32_t pic_idx = 0;
-	int32_t ctrl_pic_idx = 0;
-	int32_t maybe_idx = 0;
-
-	std::chrono::time_point control_pic_start = std::chrono::high_resolution_clock::now();
-
-	std::string output_dir = "./detections/";
-	std::string ctrl_output_dir = "./control/";
-
-	if (! std::filesystem::exists(output_dir)) 
-	{
-		if (! std::filesystem::create_directory(output_dir))
-		{
-			std::cerr << "Failed to create directory!" << std::endl;
+	#ifdef IN_RASPI
+		lccv::PiCamera camera;
+		
+		camera.options->video_width=IMAGE_WIDTH;
+		camera.options->video_height=IMAGE_HEIGHT;
+		camera.options->verbose=false;
+	#else
+		// for USB cameras
+		cv::VideoCapture camera(0);
+		if (!camera.isOpened()) {
+			std::cerr << "Error: Could not open the camera.\n";
 			return;
 		}
-	}
-	if (! std::filesystem::exists(ctrl_output_dir)) 
-	{
-		if (! std::filesystem::create_directory(ctrl_output_dir))
-		{
-			std::cerr << "Failed to create directory!" << std::endl;
-			return;
-		}
-	}
-	
-	camera.startVideo();
-	while(true)
-	{
-		std::chrono::time_point take_pic_start = std::chrono::high_resolution_clock::now();
-		if(camera.getVideoFrame(pic, 1000))
-		{
-			std::chrono::time_point take_pic_end = std::chrono::high_resolution_clock::now();
-			std::chrono::duration<double, std::milli> take_pic_duration = take_pic_end - take_pic_start;
-
-			float detection_score = detect_pic(pic);
-
-			maybe_idx = detection_score > 0 ? maybe_idx+1 : 0;
-
-			if(maybe_idx >= MIN_MAYBE_IDX)
-			{
-				std::cout << "take picture took " << take_pic_duration.count() << " ms" << std::endl;
-
-				save_pic(pic, output_dir, pic_idx);
-				pic_idx ++;
-			}
-
-			std::chrono::time_point control_pic_end = std::chrono::high_resolution_clock::now();
-			std::chrono::duration<double, std::milli> control_delta = control_pic_end - control_pic_start; 
-			if(control_delta.count() > CONTROL_PIC_INTERVAL_MS)
-			{
-				control_pic_start = std::chrono::high_resolution_clock::now();
-				std::cout << "took control pic..." << std::endl;
-
-				save_pic(pic, ctrl_output_dir, ctrl_pic_idx);
-				ctrl_pic_idx ++;
-			}
-		}
-	}
-
-	camera.stopVideo();
-}
-#endif
-
-void linux_loop()
-{
-
-	// for USB cameras
-	cv::VideoCapture camera(0);
-	if (!camera.isOpened()) {
-		std::cerr << "Error: Could not open the camera.\n";
-		return;
-	}
+	#endif
 
 	cv::Mat pic;
 	int32_t pic_idx = 0;
@@ -256,30 +191,39 @@ void linux_loop()
 
 	std::chrono::time_point control_pic_start = std::chrono::high_resolution_clock::now();
 
-	std::string output_dir = "./detections/";
-	std::string ctrl_output_dir = "./control/";
+	std::string output_dir = std::string(LOG_PIC_PATH).append("/detections/");
+	std::string ctrl_output_dir = std::string(LOG_PIC_PATH).append("/control/");
 
-	if (! std::filesystem::exists(output_dir)) 
-	{
-		if (! std::filesystem::create_directory(output_dir))
-		{
-			std::cerr << "Failed to create directory!" << std::endl;
-			return;
-		}
-	}
-	if (! std::filesystem::exists(ctrl_output_dir)) 
-	{
-		if (! std::filesystem::create_directory(ctrl_output_dir))
-		{
-			std::cerr << "Failed to create directory!" << std::endl;
-			return;
-		}
-	}
-
+	#ifdef IN_RASPI
+		camera.startVideo();
+	#endif
 	while(true)
 	{
+
+		if (! std::filesystem::exists(output_dir)) 
+		{
+			if (! std::filesystem::create_directory(output_dir))
+			{
+				std::cerr << "Failed to create directory!" << std::endl;
+				break;
+			}
+		}
+		if (! std::filesystem::exists(ctrl_output_dir)) 
+		{
+			if (! std::filesystem::create_directory(ctrl_output_dir))
+			{
+				std::cerr << "Failed to create directory!" << std::endl;
+				break;
+			}
+		}
+
 		std::chrono::time_point take_pic_start = std::chrono::high_resolution_clock::now();
-		if(take_picture(pic, camera) == 0)
+
+		#ifdef IN_RASPI
+			if(camera.getVideoFrame(pic, 1000))
+		#else
+			if(take_picture(pic, camera) == 0)
+		#endif
 		{
 			std::chrono::time_point take_pic_end = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> take_pic_duration = take_pic_end - take_pic_start;
@@ -309,13 +253,16 @@ void linux_loop()
 			}
 		}
 	}
-
-	camera.release();
+	#ifdef IN_RASPI
+		camera.stopVideo();
+	#else
+		camera.release();
+	#endif
 }
 
 int main(int argc, char** argv) 
 { 
-	linux_loop();
+	detection_loop();
 
 	// if (argc != 2) { 
 	// 	printf("usage: main_detect <Images Dir>\n"); 
