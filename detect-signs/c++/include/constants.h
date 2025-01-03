@@ -65,8 +65,7 @@ struct give_way_chunk
 #define PRINT_STATS
 // #define IN_RASPI
 
-#define LOG_PIC_PATH "/home/mircea/Documents/hobbies/proiectePersonale/bike-system/detect-signs/c++"
-// #define LOG_PIC_PATH "/home/mircea/bike-system/detect-signs/c++"
+#define LOG_PIC_PATH "/home/mircea/.bike-sys-data"
 
 // ------------------------------- IMAGE
 #define IMAGE_HEIGHT (960)
