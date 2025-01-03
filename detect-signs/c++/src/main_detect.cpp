@@ -132,7 +132,7 @@ float detect_pic(cv::Mat &p_pic)
 		std::cout << "detect gw took " << duration.count() << " ms" << std::endl;
 
 		#ifdef PRINT_STATS
-			std::string img_desc = "Detection took " + std::to_string(duration.count()) + " millis";
+			std::string img_desc = "Detection took " + std::to_string(int(duration.count())) + " millis";
 			cv::Point desc_pt(10, 80);
 			cv::putText(p_pic, img_desc, desc_pt, 1, 3, cv::Scalar(0, 0, 0), 7);   
 			cv::putText(p_pic, img_desc, desc_pt, 1, 3, cv::Scalar(0, 255, 0), 3);   
