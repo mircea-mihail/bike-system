@@ -69,7 +69,7 @@ struct give_way_chunk
 #define IMAGE_HEIGHT (960)
 #define IMAGE_WIDTH (1280)
 
-#define SAVE_IMG_RATIO 2
+#define SAVE_IMG_RATIO 1
 #define SAVED_IMG_HEIGHT (IMAGE_HEIGHT / SAVE_IMG_RATIO) 
 #define SAVED_IMG_WIDTH (IMAGE_WIDTH / SAVE_IMG_RATIO)
 

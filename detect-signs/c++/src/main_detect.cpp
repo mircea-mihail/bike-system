@@ -126,9 +126,17 @@ float detect_pic(cv::Mat &p_pic)
 	std::chrono::time_point end = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double, std::milli> duration = end - start;
 
+
 	if(score)
 	{
 		std::cout << "detect gw took " << duration.count() << " ms" << std::endl;
+
+		#ifdef PRINT_STATS
+			std::string img_desc = "Detection took " + std::to_string(duration.count()) + " millis";
+			cv::Point desc_pt(10, 80);
+			cv::putText(p_pic, img_desc, desc_pt, 1, 3, cv::Scalar(0, 0, 0), 7);   
+			cv::putText(p_pic, img_desc, desc_pt, 1, 3, cv::Scalar(0, 255, 0), 3);   
+		#endif
 	}
 
 	// show_pic(p_pic, "img");
@@ -196,11 +204,11 @@ void pi_loop()
 	camera.startVideo();
 	while(true)
 	{
-		std::chrono::time_point start = std::chrono::high_resolution_clock::now();
+		std::chrono::time_point take_pic_start = std::chrono::high_resolution_clock::now();
 		if(camera.getVideoFrame(pic, 1000))
 		{
-			std::chrono::time_point end = std::chrono::high_resolution_clock::now();
-			std::chrono::duration<double, std::milli> duration = end - start;
+			std::chrono::time_point take_pic_end = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<double, std::milli> take_pic_duration = take_pic_end - take_pic_start;
 
 			float detection_score = detect_pic(pic);
 
@@ -208,7 +216,7 @@ void pi_loop()
 
 			if(maybe_idx >= MIN_MAYBE_IDX)
 			{
-				std::cout << "take picture took " << duration.count() << " ms" << std::endl;
+				std::cout << "take picture took " << take_pic_duration.count() << " ms" << std::endl;
 
 				save_pic(pic, output_dir, pic_idx);
 				pic_idx ++;
@@ -270,11 +278,11 @@ void linux_loop()
 
 	while(true)
 	{
-		std::chrono::time_point start = std::chrono::high_resolution_clock::now();
+		std::chrono::time_point take_pic_start = std::chrono::high_resolution_clock::now();
 		if(take_picture(pic, camera) == 0)
 		{
-			std::chrono::time_point end = std::chrono::high_resolution_clock::now();
-			std::chrono::duration<double, std::milli> duration = end - start;
+			std::chrono::time_point take_pic_end = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<double, std::milli> take_pic_duration = take_pic_end - take_pic_start;
 
 			float detection_score = detect_pic(pic);
 
@@ -282,7 +290,7 @@ void linux_loop()
 
 			if(maybe_idx >= MIN_MAYBE_IDX)
 			{
-				std::cout << "take picture took " << duration.count() << " ms" << std::endl;
+				std::cout << "take picture took " << take_pic_duration.count() << " ms" << std::endl;
 				// show_pic(pic);
 				save_pic(pic, output_dir, pic_idx);
 
