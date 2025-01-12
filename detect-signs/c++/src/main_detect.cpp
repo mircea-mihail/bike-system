@@ -227,6 +227,7 @@ void detection_loop()
 		{
 			std::chrono::time_point take_pic_end = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> take_pic_duration = take_pic_end - take_pic_start;
+			cv::medianBlur(pic, pic, 3);
 
 			float detection_score = detect_pic(pic);
 
@@ -268,7 +269,7 @@ int main(int argc, char** argv)
 	// 	printf("usage: main_detect <Images Dir>\n"); 
 	// 	return -1; 
 	// } 
-	// detect_from_name(argv[1]);
 	// detect_dir_images(argv[1]);
+	// detect_from_name(argv[1]);
 	return 0; 
 }
