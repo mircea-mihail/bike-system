@@ -96,20 +96,24 @@ struct give_way_chunk
 
 // ------------------------------- RED COLOR DETECTION
 #define MAX_HUE 179
-#define VALUE_DELIMITER 110 
-#define ALLOWED_RED_HUE_OFFSET 8
+#define VALUE_DELIMITER 150 
 
-#define BRIGHT_MIN_RED_SATURATION 100
+#define HUE_POSITIVE_BRIGHT_OFFSET 8
+#define HUE_NEGATIVE_BRIGHT_OFFSET 10
+#define HUE_POSITIVE_DARK_OFFSET 8
+#define HUE_NEGATIVE_DARK_OFFSET 15
 
-#define DARK_MIN_RED_SATURATION 80
-#define DARK_MIN_RED_VALUE 50
+#define BRIGHT_MIN_RED_SATURATION 130
+
+#define DARK_MIN_RED_SATURATION 150
+#define DARK_MIN_RED_VALUE 40
 
 #define MAX_SATURATION 255
 #define MAX_VALUE 255
 
 // ------------------------------- WHITE COLOR DETECTION 
 // before min val 40
-#define MIN_WHITE_VALUE 100
+#define MIN_WHITE_VALUE 40
 #define MAX_WHITE_SATURATION 130
 
 ///////////////////////////////// rarely modified constants
