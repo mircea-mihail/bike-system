@@ -2,7 +2,7 @@
 
 bool is_red(uint8_t p_hue, uint8_t p_saturation, uint8_t p_value)
 {
-    if (p_hue < ALLOWED_RED_HUE_OFFSET || p_hue > MAX_HUE - ALLOWED_RED_HUE_OFFSET)
+    if (p_hue < HUE_POSITIVE_DARK_OFFSET || p_hue > MAX_HUE - HUE_NEGATIVE_BRIGHT_OFFSET)
     {
         // dark red:
         if (p_value < VALUE_DELIMITER)
@@ -29,7 +29,7 @@ bool is_red(cv::Vec3b p_hsv_px)
     uint8_t saturation = p_hsv_px[SATURATION];
     uint8_t value = p_hsv_px[VALUE];
 
-    if (hue < ALLOWED_RED_HUE_OFFSET || hue > MAX_HUE - ALLOWED_RED_HUE_OFFSET)
+    if (hue < HUE_POSITIVE_DARK_OFFSET || hue > MAX_HUE - HUE_NEGATIVE_BRIGHT_OFFSET)
     {
         // dark red:
         if (value < VALUE_DELIMITER)

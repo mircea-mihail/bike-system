@@ -87,6 +87,7 @@ void detect_dir_images(std::string p_input_dir)
     }
 	std::cout << "\nOn average it took " << avg_duration / images_cout << " milis\n";
 	std::cout << "Avg score:" << avg_score / scored_images_count << std::endl;
+	std::cout << "detected " << scored_images_count << " images" << std::endl;
 
 }
 
@@ -263,13 +264,13 @@ void detection_loop()
 
 int main(int argc, char** argv) 
 { 
-	detection_loop();
+	// detection_loop();
 
-	// if (argc != 2) { 
-	// 	printf("usage: main_detect <Images Dir>\n"); 
-	// 	return -1; 
-	// } 
-	// detect_dir_images(argv[1]);
+	if (argc != 2) { 
+		printf("usage: main_detect <Images Dir>\n"); 
+		return -1; 
+	} 
+	detect_dir_images(argv[1]);
 	// detect_from_name(argv[1]);
 	return 0; 
 }

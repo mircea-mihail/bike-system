@@ -195,15 +195,15 @@ void get_red_pixels(cv::Mat &p_hsv_img, cv::Mat &p_red_pixels)
 {
     // Define the lower and upper bounds for red hues in HSV
     cv::Scalar lower_red_1(0, DARK_MIN_RED_SATURATION, DARK_MIN_RED_VALUE);  
-    cv::Scalar upper_red_1(ALLOWED_RED_HUE_OFFSET, MAX_SATURATION, VALUE_DELIMITER); 
+    cv::Scalar upper_red_1(HUE_POSITIVE_DARK_OFFSET, MAX_SATURATION, VALUE_DELIMITER); 
 
     cv::Scalar lower_red_2(0, BRIGHT_MIN_RED_SATURATION, VALUE_DELIMITER); 
-    cv::Scalar upper_red_2(ALLOWED_RED_HUE_OFFSET, MAX_SATURATION, MAX_VALUE); 
+    cv::Scalar upper_red_2(HUE_POSITIVE_BRIGHT_OFFSET, MAX_SATURATION, MAX_VALUE); 
 
-    cv::Scalar lower_red_3(MAX_HUE - ALLOWED_RED_HUE_OFFSET, DARK_MIN_RED_SATURATION, DARK_MIN_RED_VALUE);  
+    cv::Scalar lower_red_3(MAX_HUE - HUE_NEGATIVE_DARK_OFFSET, DARK_MIN_RED_SATURATION, DARK_MIN_RED_VALUE);  
     cv::Scalar upper_red_3(MAX_HUE, MAX_SATURATION, VALUE_DELIMITER); 
 
-    cv::Scalar lower_red_4(MAX_HUE - ALLOWED_RED_HUE_OFFSET, BRIGHT_MIN_RED_SATURATION, VALUE_DELIMITER); 
+    cv::Scalar lower_red_4(MAX_HUE - HUE_NEGATIVE_BRIGHT_OFFSET, BRIGHT_MIN_RED_SATURATION, VALUE_DELIMITER); 
     cv::Scalar upper_red_4(MAX_HUE, MAX_SATURATION, MAX_VALUE); 
 
     // Create two masks for the two red hue ranges
