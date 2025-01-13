@@ -190,6 +190,10 @@ void detection_loop()
 	int32_t ctrl_pic_idx = 0;
 	int32_t maybe_idx = 0;
 
+	std::chrono::time_point loop_start_time = std::chrono::high_resolution_clock::now();
+	int32_t loop_time_freq = 100;
+	int32_t current_iteration = 0;
+
 	std::chrono::time_point control_pic_start = std::chrono::high_resolution_clock::now();
 
 	std::string output_dir = std::string(LOG_PIC_PATH).append("/detections/");
@@ -253,6 +257,17 @@ void detection_loop()
 				save_pic(pic, ctrl_output_dir, ctrl_pic_idx);
 				ctrl_pic_idx ++;
 			}
+
+			current_iteration += 1;
+			if(current_iteration >= loop_time_freq)
+			{
+				std::chrono::time_point loop_end_time = std::chrono::high_resolution_clock::now();
+				std::chrono::duration<double, std::milli> loop_time = loop_end_time - loop_start_time; 
+
+				std::cout << "on avg the loop takes " << loop_time.count() / current_iteration << "ms" << std::endl;
+				loop_start_time = std::chrono::high_resolution_clock::now();
+				current_iteration = 0;
+			}
 		}
 	}
 	#ifdef IN_RASPI
@@ -264,13 +279,13 @@ void detection_loop()
 
 int main(int argc, char** argv) 
 { 
-	// detection_loop();
+	detection_loop();
 
-	if (argc != 2) { 
-		printf("usage: main_detect <Images Dir>\n"); 
-		return -1; 
-	} 
-	detect_dir_images(argv[1]);
+	// if (argc != 2) { 
+	// 	printf("usage: main_detect <Images Dir>\n"); 
+	// 	return -1; 
+	// } 
+	// detect_dir_images(argv[1]);
 	// detect_from_name(argv[1]);
 	return 0; 
 }
