@@ -221,7 +221,7 @@ void get_red_pixels(cv::Mat &p_hsv_img, cv::Mat &p_red_pixels)
     p_red_pixels |= mask;
 }
 
-float detect_gw_cv(cv::Mat &p_img)
+float detect_gw_cv(cv::Mat &p_img, std::vector<cv::Mat> &p_templates)
 {
     cv::Mat hsv_image;
     cv::cvtColor(p_img, hsv_image, cv::COLOR_BGR2HSV);

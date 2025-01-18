@@ -127,3 +127,6 @@ struct give_way_chunk
 #define VALUE 2
 
 #endif
+
+// ------------------------------- templates 
+#define TEMPLATES_DIR "./templates/"

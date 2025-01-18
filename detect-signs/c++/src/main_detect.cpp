@@ -22,6 +22,15 @@ void show_pic(cv::Mat p_img)
 	cv::destroyAllWindows();
 }
 
+void load_templates(std::vector<cv::Mat> &p_templates)
+{
+	std::vector<std::string> template_names = {"crossing_mask.png"};
+	for (int i = 0; i < template_names.size(); i++)
+	{
+		p_templates.push_back(cv::imread(TEMPLATES_DIR + template_names[i], cv::IMREAD_GRAYSCALE)); 
+	}
+}
+
 void detect_dir_images(std::string p_input_dir)
 {
     const std::vector<std::string> validExtensions = {".jpg", ".jpeg", ".png", ".bmp", ".tiff"};
@@ -45,6 +54,8 @@ void detect_dir_images(std::string p_input_dir)
 	double avg_duration = 0;
 	uint32_t images_cout = 0;
 	uint32_t scored_images_count = 0;
+	std::vector<cv::Mat> templates;
+	load_templates(templates);
 
     for (const auto& entry : std::filesystem::directory_iterator(p_input_dir)) {
         // Get file path and extension
@@ -70,7 +81,7 @@ void detect_dir_images(std::string p_input_dir)
 			cv::resize(image, image, cv::Size(image_size));
 
 			std::chrono::time_point start = std::chrono::high_resolution_clock::now();
-			float score = detect_gw_cv(image);
+			float score = detect_gw_cv(image, templates);
 			std::chrono::time_point end = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> duration = end - start;
 
@@ -93,6 +104,8 @@ void detect_dir_images(std::string p_input_dir)
 
 void detect_from_name(std::string p_image_name)
 {
+	std::vector<cv::Mat> templates;
+	load_templates(templates);
 	cv::Mat image; 
 	image = cv::imread(p_image_name); 
 
@@ -105,7 +118,7 @@ void detect_from_name(std::string p_image_name)
 
 	std::chrono::time_point start = std::chrono::high_resolution_clock::now();
 
-	uint32_t gw_detected = detect_gw_cv(image);
+	uint32_t gw_detected = detect_gw_cv(image, templates);
 
 	std::cout << "found " << gw_detected << " give way signs" << std::endl;
 
@@ -117,14 +130,14 @@ void detect_from_name(std::string p_image_name)
 	show_pic(image);
 }
 
-float detect_pic(cv::Mat &p_pic)
+float detect_pic(cv::Mat &p_pic, std::vector<cv::Mat> &p_templates)
 {
 	cv::Point2i image_size = cv::Point2i(IMAGE_WIDTH, IMAGE_HEIGHT);
 	cv::resize(p_pic, p_pic, cv::Size(image_size));
 
 	std::chrono::time_point start = std::chrono::high_resolution_clock::now();
 
-	float score = detect_gw_cv(p_pic);
+	float score = detect_gw_cv(p_pic, p_templates);
 
 	std::chrono::time_point end = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double, std::milli> duration = end - start;
@@ -168,6 +181,7 @@ void save_pic(cv::Mat &p_pic, std::string p_output_dir, int32_t p_pic_idx)
 	cv::imwrite(p_output_dir + std::to_string(p_pic_idx) + ".jpg", pic_to_save);
 }
 
+
 void detection_loop()
 {
 	#ifdef IN_RASPI
@@ -186,6 +200,9 @@ void detection_loop()
 	#endif
 
 	cv::Mat pic;
+	std::vector<cv::Mat> templates;
+	load_templates(templates);
+
 	int32_t pic_idx = 0;
 	int32_t ctrl_pic_idx = 0;
 	int32_t maybe_idx = 0;
@@ -234,7 +251,7 @@ void detection_loop()
 			std::chrono::duration<double, std::milli> take_pic_duration = take_pic_end - take_pic_start;
 			cv::medianBlur(pic, pic, 3);
 
-			float detection_score = detect_pic(pic);
+			float detection_score = detect_pic(pic, templates);
 
 			maybe_idx = detection_score > 0 ? maybe_idx+1 : 0;
 
