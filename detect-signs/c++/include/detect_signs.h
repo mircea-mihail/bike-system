@@ -7,7 +7,6 @@
 
 #include "constants.h"
 #include "utility.h"
-#include "memory_pool_list.h"
 
 /// @brief checks how well the current chunk matches a generated give way sign between the chunk points
 /// @param p_hsv_img the hsv image, used for is_white function

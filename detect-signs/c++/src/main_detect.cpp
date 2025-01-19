@@ -8,19 +8,10 @@
 
 #include "utility.h"
 #include "detect_signs.h"
-#include "old_detect_signs.h"
 
 #ifdef IN_RASPI
 	#include <lccv.hpp>
 #endif
-
-void show_pic(cv::Mat p_img)
-{
-	cv::namedWindow("Display Image", cv::WINDOW_GUI_NORMAL); 
-	cv::imshow("Display Image", p_img); 
-	cv::waitKey(0); 
-	cv::destroyAllWindows();
-}
 
 void load_templates(std::vector<cv::Mat> &p_templates)
 {
@@ -81,7 +72,7 @@ void detect_dir_images(std::string p_input_dir)
 			cv::resize(image, image, cv::Size(image_size));
 
 			std::chrono::time_point start = std::chrono::high_resolution_clock::now();
-			float score = detect_gw_cv(image, templates);
+			float score = detect_gw_cv(image);
 			std::chrono::time_point end = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> duration = end - start;
 
@@ -118,7 +109,7 @@ void detect_from_name(std::string p_image_name)
 
 	std::chrono::time_point start = std::chrono::high_resolution_clock::now();
 
-	uint32_t gw_detected = detect_gw_cv(image, templates);
+	uint32_t gw_detected = detect_gw_cv(image);
 
 	std::cout << "found " << gw_detected << " give way signs" << std::endl;
 
@@ -137,7 +128,7 @@ float detect_pic(cv::Mat &p_pic, std::vector<cv::Mat> &p_templates)
 
 	std::chrono::time_point start = std::chrono::high_resolution_clock::now();
 
-	float score = detect_gw_cv(p_pic, p_templates);
+	float score = detect_gw_cv(p_pic);
 
 	std::chrono::time_point end = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double, std::milli> duration = end - start;
@@ -296,13 +287,13 @@ void detection_loop()
 
 int main(int argc, char** argv) 
 { 
-	detection_loop();
+	// detection_loop();
 
-	// if (argc != 2) { 
-	// 	printf("usage: main_detect <Images Dir>\n"); 
-	// 	return -1; 
-	// } 
-	// detect_dir_images(argv[1]);
+	if (argc != 2) { 
+		printf("usage: main_detect <Images Dir>\n"); 
+		return -1; 
+	} 
+	detect_dir_images(argv[1]);
 	// detect_from_name(argv[1]);
 	return 0; 
 }
