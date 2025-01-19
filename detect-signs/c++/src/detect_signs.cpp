@@ -1,6 +1,6 @@
 #include "detect_signs.h"
 
-float check_for_gw_cv(cv::Mat &p_hsv_img, give_way_chunk p_chunk, cv::Mat &p_label_mat, int32_t p_label)
+float check_for_gw_cv(cv::Mat &p_white_mask, give_way_chunk p_chunk, cv::Mat &p_label_mat, int32_t p_sign_label)
 {
     // filter out triangles with angle smaller than minimum
     if(has_small_angle(p_chunk))
@@ -41,16 +41,14 @@ float check_for_gw_cv(cv::Mat &p_hsv_img, give_way_chunk p_chunk, cv::Mat &p_lab
                 // check for thin border
                 if (point_in_triangle(point(j, i), thin_inner_triangle.top_left, thin_inner_triangle.top_right, thin_inner_triangle.bottom))
                 {
-                    cv::Vec3b px = p_hsv_img.at<cv::Vec3b>(i, j);
-
-                    if (is_white(px[HUE], px[SATURATION], px[VALUE]) && (current_label == 0))
+                    if (p_white_mask.at<int8_t>(i, j) != 0 && (current_label == 0))
                     {
                         thin_white_score += 1;
                     }
                 }
                 else
                 {
-                    if (current_label != 0)
+                    if (current_label == p_sign_label)
                     {
                         thin_red_score += 1;
                     }
@@ -59,16 +57,14 @@ float check_for_gw_cv(cv::Mat &p_hsv_img, give_way_chunk p_chunk, cv::Mat &p_lab
                 // and check for thick border
                 if (point_in_triangle(point(j, i), thick_inner_triangle.top_left, thick_inner_triangle.top_right, thick_inner_triangle.bottom))
                 {
-                    cv::Vec3b px = p_hsv_img.at<cv::Vec3b>(i, j);
-
-                    if (is_white(px[HUE], px[SATURATION], px[VALUE]) && (current_label == 0))
+                    if (p_white_mask.at<int8_t>(i, j) != 0 && (current_label == 0))
                     { 
                         thick_white_score += 1;
                     }
                 }
                 else
                 {
-                    if (current_label != 0)
+                    if (current_label == p_sign_label)
                     {
                         thick_red_score += 1;
                     }
@@ -77,9 +73,7 @@ float check_for_gw_cv(cv::Mat &p_hsv_img, give_way_chunk p_chunk, cv::Mat &p_lab
             // if not in triangle but red
             else 
             {
-                cv::Vec3b px = p_hsv_img.at<cv::Vec3b>(i, j);
-
-                if (current_label == p_label)
+                if (current_label == p_sign_label)
                 {
                     red_outside_gw += 1;
                 }
@@ -114,6 +108,10 @@ float check_for_gw_cv(cv::Mat &p_hsv_img, give_way_chunk p_chunk, cv::Mat &p_lab
     double thick_red_checked = pixels_checked - thick_white_checked;
     double final_thick_score = (std::min(thick_white_score / thick_white_checked, 1.0) + std::min(thick_red_score / thick_red_checked, 1.0)) / 2;
 
+    // std::cout << "best sign score: " << std::max(final_thin_score, final_thick_score) << std::endl;
+    // std::cout << "\tthick max whtie:\t\t" << thick_white_score/thick_white_checked << " red:\t"<< thick_red_score/thick_red_checked << std::endl;
+    // std::cout << "\tthin max whtie: \t\t" << thin_white_score/thin_white_checked << " red:\t"<< thin_red_score/thin_red_checked << std::endl;
+
     return std::max(final_thin_score, final_thick_score);
 }
 
@@ -126,7 +124,7 @@ void print_bounding_box(cv::Mat &p_img, int32_t p_x, int32_t p_y, int32_t p_w, i
     cv::rectangle(p_img, rect, color, thickness);
 }
 
-float find_sign(cv::Mat &p_img, cv::Mat &p_hsv_img, cv::Mat &p_labels, cv::Mat &p_stats, int32_t p_label)
+float find_gw_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_labels, cv::Mat &p_stats, int32_t p_label)
 {
     int32_t x = p_stats.at<int32_t>(cv::Point(0, p_label));
     int32_t y = p_stats.at<int32_t>(cv::Point(1, p_label));
@@ -164,20 +162,27 @@ float find_sign(cv::Mat &p_img, cv::Mat &p_hsv_img, cv::Mat &p_labels, cv::Mat &
         }
     }
 
-    point bottom_pt;
+    point leftest_bottom_pt(-1, -1);
+    point rightest_bottom_pt;
     for (int j = x; j < x + w; j++)
     {
         if (p_labels.at<int32_t>(y + h-1, j) == p_label)
         {
-            bottom_pt.x = j;
-            bottom_pt.y = y + h-1;
+            rightest_bottom_pt.x = j;
+            rightest_bottom_pt.y = y + h-1;
+            if(leftest_bottom_pt.x == -1)
+            {
+                leftest_bottom_pt.x = j;
+                leftest_bottom_pt.y = y + h-1;
+            }
             break;
         }
     }
+    point bottom_pt(int((rightest_bottom_pt.x + leftest_bottom_pt.x) / 2), rightest_bottom_pt.y);
 
     give_way_chunk gw_chunk = give_way_chunk(left_pt, right_pt, bottom_pt);
 
-    float chunk_score = check_for_gw_cv(p_hsv_img, gw_chunk, p_labels, p_label);
+    float chunk_score = check_for_gw_cv(p_white_mask, gw_chunk, p_labels, p_label);
     if(chunk_score > MIN_CHUNK_SCORE)
     {
         #ifdef PRINT_STATS
@@ -191,57 +196,94 @@ float find_sign(cv::Mat &p_img, cv::Mat &p_hsv_img, cv::Mat &p_labels, cv::Mat &
 }
 
 // 4 times faster than iterating through each pixel
-void get_red_pixels(cv::Mat &p_hsv_img, cv::Mat &p_red_pixels)
+void get_bright_red_mask(cv::Mat &p_hsv_img, cv::Mat &p_red_mask)
 {
-    // Define the lower and upper bounds for red hues in HSV
-    cv::Scalar lower_red_1(0, DARK_MIN_RED_SATURATION, DARK_MIN_RED_VALUE);  
-    cv::Scalar upper_red_1(HUE_POSITIVE_DARK_OFFSET, MAX_SATURATION, VALUE_DELIMITER); 
+    cv::Scalar lower_red_1(0, BRIGHT_MIN_RED_SATURATION, VALUE_DELIMITER - VALUE_DELIMITER_OFFSET); 
+    cv::Scalar upper_red_1(HUE_POSITIVE_BRIGHT_OFFSET, MAX_SATURATION, MAX_VALUE); 
 
-    cv::Scalar lower_red_2(0, BRIGHT_MIN_RED_SATURATION, VALUE_DELIMITER); 
-    cv::Scalar upper_red_2(HUE_POSITIVE_BRIGHT_OFFSET, MAX_SATURATION, MAX_VALUE); 
-
-    cv::Scalar lower_red_3(MAX_HUE - HUE_NEGATIVE_DARK_OFFSET, DARK_MIN_RED_SATURATION, DARK_MIN_RED_VALUE);  
-    cv::Scalar upper_red_3(MAX_HUE, MAX_SATURATION, VALUE_DELIMITER); 
-
-    cv::Scalar lower_red_4(MAX_HUE - HUE_NEGATIVE_BRIGHT_OFFSET, BRIGHT_MIN_RED_SATURATION, VALUE_DELIMITER); 
-    cv::Scalar upper_red_4(MAX_HUE, MAX_SATURATION, MAX_VALUE); 
+    cv::Scalar lower_red_2(MAX_HUE - HUE_NEGATIVE_BRIGHT_OFFSET, BRIGHT_MIN_RED_SATURATION, VALUE_DELIMITER - VALUE_DELIMITER_OFFSET); 
+    cv::Scalar upper_red_2(MAX_HUE, MAX_SATURATION, MAX_VALUE); 
 
     // Create two masks for the two red hue ranges
     cv::Mat mask;
 
     // Apply inRange to find red pixels in both ranges
-    cv::inRange(p_hsv_img, lower_red_1, upper_red_1, p_red_pixels); // Mask for the first red range
+    cv::inRange(p_hsv_img, lower_red_1, upper_red_1, p_red_mask); // Mask for the first red range
     cv::inRange(p_hsv_img, lower_red_2, upper_red_2, mask);
-    p_red_pixels |= mask;
-
-    cv::inRange(p_hsv_img, lower_red_3, upper_red_3, mask);
-    p_red_pixels |= mask;
-
-    cv::inRange(p_hsv_img, lower_red_4, upper_red_4, mask);
-    p_red_pixels |= mask;
+    p_red_mask |= mask;
 }
 
-float detect_gw_cv(cv::Mat &p_img, std::vector<cv::Mat> &p_templates)
+void get_dark_red_mask(cv::Mat &p_hsv_img, cv::Mat &p_red_mask)
+{
+    // Define the lower and upper bounds for red hues in HSV
+    cv::Scalar lower_red_1(0, DARK_MIN_RED_SATURATION, DARK_MIN_RED_VALUE);  
+    cv::Scalar upper_red_1(HUE_POSITIVE_DARK_OFFSET, MAX_SATURATION, VALUE_DELIMITER + VALUE_DELIMITER_OFFSET); 
+
+    cv::Scalar lower_red_2(MAX_HUE - HUE_NEGATIVE_DARK_OFFSET, DARK_MIN_RED_SATURATION, DARK_MIN_RED_VALUE);  
+    cv::Scalar upper_red_2(MAX_HUE, MAX_SATURATION, VALUE_DELIMITER + VALUE_DELIMITER_OFFSET); 
+
+    // Create two masks for the two red hue ranges
+    cv::Mat mask;
+
+    // Apply inRange to find red pixels in both ranges
+    cv::inRange(p_hsv_img, lower_red_1, upper_red_1, p_red_mask); // Mask for the first red range
+    cv::inRange(p_hsv_img, lower_red_2, upper_red_2, mask);
+    p_red_mask |= mask;
+}
+
+void get_white_mask(cv::Mat &p_hsv_img, cv::Mat &p_white_mask)
+{
+    // Define the lower and upper bounds for red hues in HSV
+    cv::Scalar lower_red_1(0, 0, MIN_WHITE_VALUE);  
+    cv::Scalar upper_red_1(MAX_HUE, MAX_WHITE_SATURATION, MAX_VALUE); 
+
+    // Apply inRange to find red pixels in both ranges
+    cv::inRange(p_hsv_img, lower_red_1, upper_red_1, p_white_mask); // Mask for the first red range
+}
+
+void get_masks(cv::Mat &p_img, cv::Mat &p_red_mask, cv::Mat &p_white_mask)
+{
+
+}
+
+float detect_gw_cv(cv::Mat &p_img)
 {
     cv::Mat hsv_image;
+    cv::Mat dark_red_mask;
+    cv::Mat bright_red_mask;
+    cv::Mat white_mask;
+
     cv::cvtColor(p_img, hsv_image, cv::COLOR_BGR2HSV);
-    cv::Mat red_pixels;
-    get_red_pixels(hsv_image, red_pixels);
+    get_dark_red_mask(hsv_image, dark_red_mask);
+    get_bright_red_mask(hsv_image, bright_red_mask);
+    get_white_mask(hsv_image, white_mask);
 
     uint8_t erode_size = 3;
-    cv::Mat kernel = cv::Mat::ones(erode_size, erode_size, CV_8U); 
-    cv::erode(red_pixels, red_pixels, kernel); 
+    cv::Mat erode_kernel = cv::Mat::ones(erode_size, erode_size, CV_8U); 
+    cv::erode(dark_red_mask, dark_red_mask, erode_kernel); 
+    cv::erode(bright_red_mask, bright_red_mask, erode_kernel); 
+
+    uint8_t dilate_size = 3;
+    cv::Mat dilate_kernel = cv::Mat::ones(dilate_size, dilate_size, CV_8U); 
+    cv::dilate(white_mask, white_mask, dilate_kernel);
+    cv::dilate(white_mask, white_mask, dilate_kernel);
+
+    // show_pic(p_img);
+    // show_pic(dark_red_mask);
+    // show_pic(bright_red_mask);
+    // show_pic(white_mask);
 
     cv::Mat labels;
     cv::Mat stats;
     cv::Mat centroids;
-    cv::connectedComponentsWithStats(red_pixels, labels, stats, centroids);
+    cv::connectedComponentsWithStats(dark_red_mask, labels, stats, centroids);
 
     float best_score = 0;
     int32_t detection_number = 0;
-    for(int i=1; i<stats.rows; i++)
+    // look for dark red chunks
+    for(int i=1; i < stats.rows; i++)
     {
-        float detection_res = find_sign(p_img, hsv_image, labels, stats, i);
+        float detection_res = find_gw_in_chunk(p_img, white_mask, labels, stats, i);
         if(detection_res > 0)
         {
             if(best_score < detection_res)
@@ -252,6 +294,23 @@ float detect_gw_cv(cv::Mat &p_img, std::vector<cv::Mat> &p_templates)
             detection_number ++;
         }
     }
+
+    cv::connectedComponentsWithStats(bright_red_mask, labels, stats, centroids);
+    // look for bright red chunks
+    for(int i=1; i < stats.rows; i++)
+    {
+        float detection_res = find_gw_in_chunk(p_img, white_mask, labels, stats, i);
+        if(detection_res > 0)
+        {
+            if(best_score < detection_res)
+            {
+                best_score = detection_res;
+            }
+
+            detection_number ++;
+        }
+    }
+
     #ifdef PRINT_STATS
         std::string img_desc = "Found " + std::to_string(detection_number) + " gw signs";
         cv::Point desc_pt(10, 40);
