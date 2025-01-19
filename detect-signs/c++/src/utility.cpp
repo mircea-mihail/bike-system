@@ -1,79 +1,5 @@
 #include "utility.h"
 
-bool is_red(uint8_t p_hue, uint8_t p_saturation, uint8_t p_value)
-{
-    if (p_hue < HUE_POSITIVE_DARK_OFFSET || p_hue > MAX_HUE - HUE_NEGATIVE_BRIGHT_OFFSET)
-    {
-        // dark red:
-        if (p_value < VALUE_DELIMITER)
-        {
-            if (p_value > DARK_MIN_RED_VALUE && p_saturation > DARK_MIN_RED_SATURATION)
-            {
-                return true;
-            }
-        }
-        else
-        {
-            if (p_saturation > BRIGHT_MIN_RED_SATURATION)
-            {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-bool is_red(cv::Vec3b p_hsv_px)
-{
-    uint8_t hue = p_hsv_px[HUE];
-    uint8_t saturation = p_hsv_px[SATURATION];
-    uint8_t value = p_hsv_px[VALUE];
-
-    if (hue < HUE_POSITIVE_DARK_OFFSET || hue > MAX_HUE - HUE_NEGATIVE_BRIGHT_OFFSET)
-    {
-        // dark red:
-        if (value < VALUE_DELIMITER)
-        {
-            if (value > DARK_MIN_RED_VALUE && saturation > DARK_MIN_RED_SATURATION)
-            {
-                return true;
-            }
-        }
-        else
-        {
-            if (saturation > BRIGHT_MIN_RED_SATURATION)
-            {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-bool is_white(uint8_t p_hue, uint8_t p_saturation, uint8_t p_value)
-{
-    if(p_value > MIN_WHITE_VALUE && p_saturation < MAX_WHITE_SATURATION)
-    {
-        return true;
-    }
-    
-    return false;
-}
-
-bool is_white(cv::Vec3b p_hsv_px)
-{
-    uint8_t hue = p_hsv_px[HUE];
-    uint8_t saturation = p_hsv_px[SATURATION];
-    uint8_t value = p_hsv_px[VALUE];
-
-    if(value > MIN_WHITE_VALUE && saturation < MAX_WHITE_SATURATION)
-    {
-        return true;
-    }
-    
-    return false;
-}
-
 double point_area(point p_point1, point p_point2, point p_point3)
 {
     return abs( p_point1.x * (p_point2.y - p_point3.y) + 
@@ -145,28 +71,6 @@ bool has_small_angle(give_way_chunk p_chunk)
     bool min_triangle_condition = (a_angle < MIN_TRIANGLE_ANGLE || b_angle < MIN_TRIANGLE_ANGLE || c_angle < MIN_TRIANGLE_ANGLE);
 
     return min_triangle_condition;
-}
-
-bool check_color_variance(uint8_t p_red_1, uint8_t p_green_1, uint8_t p_blue_1, uint8_t p_red_2, uint8_t p_green_2, uint8_t p_blue_2)
-{
-    int variance = abs(p_red_1 - p_red_2) + abs(p_green_1 - p_green_2) + abs(p_blue_1 - p_blue_2);
-    
-    return (variance < MAX_CLUMPING_VARIANCE);
-}
-
-bool check_color_variance(cv::Vec3b p_rgb_px_1, cv::Vec3b p_rgb_px_2)
-{
-    uint8_t red_1 = p_rgb_px_1[RED];
-    uint8_t green_1 = p_rgb_px_1[GREEN];
-    uint8_t blue_1 = p_rgb_px_1[BLUE];
-
-    uint8_t red_2 = p_rgb_px_2[RED];
-    uint8_t green_2 = p_rgb_px_2[GREEN];
-    uint8_t blue_2 = p_rgb_px_2[BLUE];
-       
-    int variance = abs(red_1 - red_2) + abs(green_1 - green_2) + abs(blue_1 - blue_2);
-    
-    return (variance < MAX_CLUMPING_VARIANCE);
 }
 
 void print_detection(cv::Mat &p_img, give_way_chunk gw_chunk, float p_score)
