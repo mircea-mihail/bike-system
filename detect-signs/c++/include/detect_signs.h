@@ -26,19 +26,24 @@ float check_for_gw_cv(cv::Mat &p_hsv_img, give_way_chunk p_chunk, cv::Mat &p_lab
 /// @param p_stats the stats built by the connectedComponentsWithStats function, used for chunk building
 /// @param p_label the current label in the p_labes mat
 /// @return returns the similitude between the current chunk and a give way sign
-float find_sign(cv::Mat &p_img, cv::Mat &p_hsv_img, cv::Mat &p_labels, cv::Mat &p_stats, int32_t p_label);
+float find_gw_in_chunk(cv::Mat &p_img, cv::Mat &p_hsv_img, cv::Mat &p_labels, cv::Mat &p_stats, int32_t p_label);
 
-/// @brief builds 4 scalar ranges used to create 4 masks in order to apply all of the hsv constraints for the red pixels
+/// @brief builds 2 scalar ranges used to create 2 masks in order to apply all of the hsv constraints for the bright red pixels
 /// 4 times faster than iterating through each pixel and calling is_red()
 /// @param p_hsv_img the original imge converted to hsv
 /// @param p_red_pixels the final mask to store red pixles in (grayscale, 255 if red, 0 otherwise)
-void get_red_pixels(cv::Mat &p_hsv_img, cv::Mat &p_red_pixels);
+void get_bright_red_mask(cv::Mat &p_hsv_img, cv::Mat &p_red_pixels);
+
+/// @brief builds 2 scalar ranges used to create 2 masks in order to apply all of the hsv constraints for the dark red pixels
+/// @param p_hsv_img the original imge converted to hsv
+/// @param p_red_pixels the final mask to store red pixles in (grayscale, 255 if red, 0 otherwise)
+void get_dark_red_mask(cv::Mat &p_hsv_img, cv::Mat &p_red_pixels);
 
 /// @brief gets a mask of the red pixels in the image, aplies erosion to it, 
 /// gets all the connex components in the mask using an opencv function and if they are big enough 
 /// tries to find a give way sign in the current connex components
 /// @param p_img the rgb image to try to find give way sign in 
 /// @return the best score found in the img
-float detect_gw_cv(cv::Mat &p_img, std::vector<cv::Mat> &p_templates);
+float detect_gw_cv(cv::Mat &p_img);
 
 #endif
