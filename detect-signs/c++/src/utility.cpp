@@ -186,3 +186,11 @@ void print_detection(cv::Mat &p_img, give_way_chunk gw_chunk, float p_score)
     cv::putText(p_img, stringed_score, text_pt, 1, font_size, cv::Scalar(0, 0, 0), 8);   
     cv::putText(p_img, stringed_score, text_pt, 1, font_size, cv::Scalar(0, 255, 0), 3);   
 }
+
+void show_pic(cv::Mat p_img)
+{
+	cv::namedWindow("Display Image", cv::WINDOW_GUI_NORMAL); 
+	cv::imshow("Display Image", p_img); 
+	cv::waitKey(0); 
+	cv::destroyAllWindows();
+}

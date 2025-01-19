@@ -105,4 +105,6 @@ bool check_color_variance(cv::Vec3b p_rgb_px_1, cv::Vec3b p_rgb_px_2);
 /// @param gw_chunk the coordonates of the points in the sign
 void print_detection(cv::Mat &p_img, give_way_chunk gw_chunk, float p_score);
 
+void show_pic(cv::Mat p_img);
+
 #endif
