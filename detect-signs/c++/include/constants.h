@@ -119,16 +119,8 @@ struct give_way_chunk
 #define MAX_WHITE_SATURATION 130
 
 ///////////////////////////////// rarely modified constants
-// ------------------------------- PIXLES 
-#define BLUE 0
-#define GREEN 1
-#define RED 2
+// ------------------------------- templates 
 
-#define HUE 0
-#define SATURATION 1
-#define VALUE 2
+#define TEMPLATES_DIR "./templates/"
 
 #endif
-
-// ------------------------------- templates 
-#define TEMPLATES_DIR "./templates/"
