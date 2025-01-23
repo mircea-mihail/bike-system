@@ -287,13 +287,13 @@ void detection_loop()
 
 int main(int argc, char** argv) 
 { 
-	// detection_loop();
+	detection_loop();
 
-	if (argc != 2) { 
-		printf("usage: main_detect <Images Dir>\n"); 
-		return -1; 
-	} 
-	detect_dir_images(argv[1]);
+	// if (argc != 2) { 
+	// 	printf("usage: main_detect <Images Dir>\n"); 
+	// 	return -1; 
+	// } 
+	// detect_dir_images(argv[1]);
 	// detect_from_name(argv[1]);
 	return 0; 
 }

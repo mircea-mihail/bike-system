@@ -4,6 +4,7 @@
 #include <opencv2/opencv.hpp> 
 #include <deque>
 #include <fstream>
+#include <thread>
 
 #include "constants.h"
 #include "utility.h"

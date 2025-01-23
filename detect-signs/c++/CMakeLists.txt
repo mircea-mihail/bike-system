@@ -1,20 +1,25 @@
 cmake_minimum_required(VERSION 3.0.0)
-project( main_detect )
+project(main_detect)
 
-set (CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 17)
 
-find_package( OpenCV REQUIRED )
-find_package( PkgConfig REQUIRED )
-#pkg_check_modules(LIBCAMERA REQUIRED libcamera)
+# Find necessary packages
+find_package(OpenCV REQUIRED)
+find_package(PkgConfig REQUIRED)
+find_package(Threads REQUIRED) # Add threading support
 
-include_directories( 
-	${OpenCV_INCLUDE_DIRS} 
-	${CMAKE_SOURCE_DIR}/include
-	${LIBCAMERA_INCLUDE_DIRS}
+# Include directories
+include_directories(
+    ${OpenCV_INCLUDE_DIRS} 
+    ${CMAKE_SOURCE_DIR}/include
+    ${LIBCAMERA_INCLUDE_DIRS}
 )
 
+# Source files
 file(GLOB_RECURSE SRC_FILES ${CMAKE_SOURCE_DIR}/src/*.cpp)
 
-add_executable( main_detect ${SRC_FILES})
-#target_link_libraries( main_detect -llccv ${OpenCV_LIBS} )
-target_link_libraries( main_detect  ${OpenCV_LIBS} )
+# Define the executable
+add_executable(main_detect ${SRC_FILES})
+
+# Link libraries
+target_link_libraries(main_detect ${OpenCV_LIBS} Threads::Threads)

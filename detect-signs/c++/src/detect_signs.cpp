@@ -246,13 +246,38 @@ void get_masks(cv::Mat &p_img, cv::Mat &p_red_mask, cv::Mat &p_white_mask)
 
 }
 
+void detect_gw_thread(cv::Mat *p_img, cv::Mat *p_red_mask, cv::Mat *p_white_mask, int32_t *p_detection_number, std::mutex *p_mutex)
+{
+    cv::Mat labels;
+    cv::Mat stats;
+    cv::Mat centroids;
+    cv::connectedComponentsWithStats(*p_red_mask, labels, stats, centroids);
+
+    // look for dark red chunks
+    for(int i=1; i < stats.rows; i++)
+    {
+        float detection_res = find_gw_in_chunk(*p_img, *p_white_mask, labels, stats, i);
+        if(detection_res > 0)
+        {
+            p_mutex->lock();
+            (*p_detection_number) ++;
+            std::cout << "detection number in thread:" << *p_detection_number << std::endl;
+            p_mutex->unlock();
+        }
+    }
+}
+
 float detect_gw_cv(cv::Mat &p_img)
 {
+
     cv::Mat hsv_image;
     cv::Mat dark_red_mask;
     cv::Mat bright_red_mask;
     cv::Mat white_mask;
 
+    int32_t detection_number = 0;
+    float best_score = 0;
+ 
     cv::cvtColor(p_img, hsv_image, cv::COLOR_BGR2HSV);
     get_dark_red_mask(hsv_image, dark_red_mask);
     get_bright_red_mask(hsv_image, bright_red_mask);
@@ -268,48 +293,26 @@ float detect_gw_cv(cv::Mat &p_img)
     cv::dilate(white_mask, white_mask, dilate_kernel);
     cv::dilate(white_mask, white_mask, dilate_kernel);
 
+    std::mutex mtx;
     // show_pic(p_img);
     // show_pic(dark_red_mask);
     // show_pic(bright_red_mask);
     // show_pic(white_mask);
 
-    cv::Mat labels;
-    cv::Mat stats;
-    cv::Mat centroids;
-    cv::connectedComponentsWithStats(dark_red_mask, labels, stats, centroids);
+    // on avg 15.8508 milis
+    // 16.36
+    // 17.45
+    // detect_gw_thread(&p_img, &bright_red_mask, &white_mask, &detection_number, &mtx);
+    // detect_gw_thread(&p_img, &dark_red_mask, &white_mask, &detection_number, &mtx);
 
-    float best_score = 0;
-    int32_t detection_number = 0;
-    // look for dark red chunks
-    for(int i=1; i < stats.rows; i++)
-    {
-        float detection_res = find_gw_in_chunk(p_img, white_mask, labels, stats, i);
-        if(detection_res > 0)
-        {
-            if(best_score < detection_res)
-            {
-                best_score = detection_res;
-            }
+    // 14.12 milis
+    // 14.09 milis
+    // 17.94
+    std::thread bright_red_gw_thread(detect_gw_thread, &p_img, &bright_red_mask, &white_mask, &detection_number, &mtx);
+    std::thread dark_red_gw_thread(detect_gw_thread, &p_img, &dark_red_mask, &white_mask, &detection_number, &mtx);
 
-            detection_number ++;
-        }
-    }
-
-    cv::connectedComponentsWithStats(bright_red_mask, labels, stats, centroids);
-    // look for bright red chunks
-    for(int i=1; i < stats.rows; i++)
-    {
-        float detection_res = find_gw_in_chunk(p_img, white_mask, labels, stats, i);
-        if(detection_res > 0)
-        {
-            if(best_score < detection_res)
-            {
-                best_score = detection_res;
-            }
-
-            detection_number ++;
-        }
-    }
+    bright_red_gw_thread.join();
+    dark_red_gw_thread.join();
 
     #ifdef PRINT_STATS
         std::string img_desc = "Found " + std::to_string(detection_number) + " gw signs";
