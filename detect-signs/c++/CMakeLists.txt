@@ -12,7 +12,8 @@ find_package(Threads REQUIRED) # Add threading support
 include_directories(
     ${OpenCV_INCLUDE_DIRS} 
     ${CMAKE_SOURCE_DIR}/include
-    ${LIBCAMERA_INCLUDE_DIRS}
+    #    ${LIBCAMERA_INCLUDE_DIRS}
+    /usr/include/libcamera
 )
 
 # Source files
@@ -22,4 +23,5 @@ file(GLOB_RECURSE SRC_FILES ${CMAKE_SOURCE_DIR}/src/*.cpp)
 add_executable(main_detect ${SRC_FILES})
 
 # Link libraries
-target_link_libraries(main_detect ${OpenCV_LIBS} Threads::Threads)
+target_link_libraries( main_detect -llccv ${OpenCV_LIBS} Threads::Threads)
+# target_link_libraries(main_detect ${OpenCV_LIBS} Threads::Threads)
