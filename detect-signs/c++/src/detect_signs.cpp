@@ -195,6 +195,166 @@ float find_gw_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_labels,
     return 0;
 }
 
+float find_stop_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_labels, cv::Mat &p_stats, int32_t p_label)
+{
+    int32_t x = p_stats.at<int32_t>(cv::Point(0, p_label));
+    int32_t y = p_stats.at<int32_t>(cv::Point(1, p_label));
+    int32_t w = p_stats.at<int32_t>(cv::Point(2, p_label));
+    int32_t h = p_stats.at<int32_t>(cv::Point(3, p_label));
+
+    if (h * w < MIN_BOUNDING_BOX_AREA)
+    {
+        return 0;
+    }
+
+    #ifdef PRINT_STATS
+        print_bounding_box(p_img, x, y, w, h);
+    #endif
+
+    point top_left(x, y);
+    point top_right(x, y);
+    float_t top_left_val = IMAGE_HEIGHT * IMAGE_WIDTH * 2;
+    float_t top_right_val = IMAGE_HEIGHT * IMAGE_WIDTH * -2;
+
+    point bottom_left(x, y);
+    point bottom_right(x, y);
+    float_t bottom_left_val = IMAGE_HEIGHT * IMAGE_WIDTH * -2;
+    float_t bottom_right_val = IMAGE_HEIGHT * IMAGE_WIDTH * -2;
+
+    point left_bottom(x, y);
+    point left_top(x, y);
+    float_t left_bottom_val = IMAGE_HEIGHT * IMAGE_WIDTH * 2;
+    float_t left_top_val = IMAGE_HEIGHT * IMAGE_WIDTH * 2;
+
+    point right_bottom(x, y);
+    point right_top(x, y);
+    float_t right_bottom_val = IMAGE_HEIGHT * IMAGE_WIDTH * -2;
+    float_t right_top_val = IMAGE_HEIGHT * IMAGE_WIDTH * -2;
+ 
+    float_t bias = 0.4;
+    for (int i = y; i < y + h; i++)
+    {
+        for (int j = x; j < x + w; j++)
+        {
+            if (p_labels.at<int32_t>(i, j) == p_label)
+            {
+                if(i + bias * j < top_left_val)
+                {
+                    top_left_val = i + bias * j;
+                    top_left.x = j;
+                    top_left.y = i;
+                }
+                if( bias * j - i > top_right_val)
+                {
+                    top_right_val = bias * j - i;
+                    top_right.x = j;
+                    top_right.y = i;
+                }
+
+                if(i - bias * j > bottom_left_val)
+                {
+                    bottom_left_val = i - bias * j;
+                    bottom_left.x = j;
+                    bottom_left.y = i;
+                }
+                if( bias * j + i > bottom_right_val)
+                {
+                    bottom_right_val = bias * j + i;
+                    bottom_right.x = j;
+                    bottom_right.y = i;
+                }
+
+                if(bias * i + j < left_top_val)
+                {
+                    left_top_val = j + bias * i;
+                    left_top.x = j;
+                    left_top.y = i;
+                }
+                if(j - bias * i < left_bottom_val)
+                {
+                    left_bottom_val = j - bias * i;
+                    left_bottom.y = i;
+                    left_bottom.x = j;
+                }
+
+                if( j + bias * i > right_bottom_val)
+                {
+                    right_bottom_val = j + bias * i;
+                    right_bottom.x = j;
+                    right_bottom.y = i;
+                }
+                if( j - bias * i > right_top_val)
+                {
+                    right_top_val = j - bias * i;
+                    right_top.x = j;
+                    right_top.y = i;
+                }
+            }
+        }
+    }
+
+    cv::Scalar color = cv::Scalar(0, 255, 0);
+    int thickness = 6;
+    cv::line(p_img, cv::Point2d(top_left.x, top_left.y), cv::Point2d(top_right.x, top_right.y), color, thickness);
+    cv::line(p_img, cv::Point2d(bottom_left.x, bottom_left.y), cv::Point2d(bottom_right.x, bottom_right.y), color, thickness);
+    cv::line(p_img, cv::Point2d(left_bottom.x, left_bottom.y), cv::Point2d(left_top.x, left_top.y), color, thickness);
+    cv::line(p_img, cv::Point2d(right_bottom.x, right_bottom.y), cv::Point2d(right_top.x, right_top.y), color, thickness);
+
+    point left_pt;
+    for (int i = y; i < y + h; i++)
+    {
+        if (p_labels.at<int32_t>(i, x) == p_label)
+        {
+            left_pt.x = x;
+            left_pt.y = i;
+            break;
+        }
+    }
+
+    point right_pt;
+    for (int i = y; i < y + h; i++)
+    {
+        if (p_labels.at<int32_t>(i, x + w-1) == p_label)
+        {
+            right_pt.x = x + w-1;
+            right_pt.y = i;
+            break;
+        }
+    }
+
+    point leftest_bottom_pt(-1, -1);
+    point rightest_bottom_pt;
+    for (int j = x; j < x + w; j++)
+    {
+        if (p_labels.at<int32_t>(y + h-1, j) == p_label)
+        {
+            rightest_bottom_pt.x = j;
+            rightest_bottom_pt.y = y + h-1;
+            if(leftest_bottom_pt.x == -1)
+            {
+                leftest_bottom_pt.x = j;
+                leftest_bottom_pt.y = y + h-1;
+            }
+            break;
+        }
+    }
+    point bottom_pt(int((rightest_bottom_pt.x + leftest_bottom_pt.x) / 2), rightest_bottom_pt.y);
+
+    give_way_chunk gw_chunk = give_way_chunk(left_pt, right_pt, bottom_pt);
+
+    // float chunk_score = check_for_gw_cv(p_white_mask, gw_chunk, p_labels, p_label);
+    // if(chunk_score > MIN_CHUNK_SCORE)
+    // {
+    //     #ifdef PRINT_STATS
+    //         print_detection(p_img, gw_chunk, chunk_score);
+    //     #endif
+
+    //     return chunk_score;
+    // }
+
+    return 0;
+}
+
 // 4 times faster than iterating through each pixel
 void get_bright_red_mask(cv::Mat &p_hsv_img, cv::Mat &p_red_mask)
 {
@@ -246,28 +406,26 @@ void get_masks(cv::Mat &p_img, cv::Mat &p_red_mask, cv::Mat &p_white_mask)
 
 }
 
-void detect_gw_thread(cv::Mat *p_img, cv::Mat *p_red_mask, cv::Mat *p_white_mask, int32_t *p_detection_number, std::mutex *p_mutex)
+void detect_gw_thread(cv::Mat *p_img, cv::Mat *p_red_mask,
+    cv::Mat *p_white_mask, std::atomic<int32_t> *p_detection_number)
 {
     cv::Mat labels;
     cv::Mat stats;
     cv::Mat centroids;
     cv::connectedComponentsWithStats(*p_red_mask, labels, stats, centroids);
 
-    // look for dark red chunks
     for(int i=1; i < stats.rows; i++)
     {
-        float detection_res = find_gw_in_chunk(*p_img, *p_white_mask, labels, stats, i);
-        if(detection_res > 0)
+        float gw_detection_res = find_gw_in_chunk(*p_img, *p_white_mask, labels, stats, i);
+        find_stop_in_chunk(*p_img, *p_white_mask, labels, stats, i);
+        if(gw_detection_res > 0)
         {
-            p_mutex->lock();
             (*p_detection_number) ++;
-            std::cout << "detection number in thread:" << *p_detection_number << std::endl;
-            p_mutex->unlock();
         }
     }
 }
 
-float detect_gw_cv(cv::Mat &p_img)
+float detect_gw_cv(cv::Mat &p_img, std::vector<cv::Mat> &p_templates)
 {
 
     cv::Mat hsv_image;
@@ -275,7 +433,7 @@ float detect_gw_cv(cv::Mat &p_img)
     cv::Mat bright_red_mask;
     cv::Mat white_mask;
 
-    int32_t detection_number = 0;
+    std::atomic<int32_t> detection_number = 0;
     float best_score = 0;
  
     cv::cvtColor(p_img, hsv_image, cv::COLOR_BGR2HSV);
@@ -293,7 +451,6 @@ float detect_gw_cv(cv::Mat &p_img)
     cv::dilate(white_mask, white_mask, dilate_kernel);
     cv::dilate(white_mask, white_mask, dilate_kernel);
 
-    std::mutex mtx;
     // show_pic(p_img);
     // show_pic(dark_red_mask);
     // show_pic(bright_red_mask);
@@ -308,12 +465,13 @@ float detect_gw_cv(cv::Mat &p_img)
     // 14.12 milis
     // 14.09 milis
     // 17.94
-    std::thread bright_red_gw_thread(detect_gw_thread, &p_img, &bright_red_mask, &white_mask, &detection_number, &mtx);
-    std::thread dark_red_gw_thread(detect_gw_thread, &p_img, &dark_red_mask, &white_mask, &detection_number, &mtx);
+    std::thread bright_red_gw_thread(detect_gw_thread, &p_img, &bright_red_mask, &white_mask, &detection_number);
+    std::thread dark_red_gw_thread(detect_gw_thread, &p_img, &dark_red_mask, &white_mask, &detection_number);
 
     bright_red_gw_thread.join();
     dark_red_gw_thread.join();
 
+    std::cout << "detection number:" << detection_number << std::endl;
     #ifdef PRINT_STATS
         std::string img_desc = "Found " + std::to_string(detection_number) + " gw signs";
         cv::Point desc_pt(10, 40);
@@ -321,5 +479,5 @@ float detect_gw_cv(cv::Mat &p_img)
         cv::putText(p_img, img_desc, desc_pt, 1, 3, cv::Scalar(0, 255, 0), 3);   
     #endif
 
-    return best_score;
+    return detection_number;
 }
