@@ -5,6 +5,7 @@
 #include <deque>
 #include <fstream>
 #include <thread>
+#include <atomic>
 
 #include "constants.h"
 #include "utility.h"
@@ -44,6 +45,6 @@ void get_dark_red_mask(cv::Mat &p_hsv_img, cv::Mat &p_red_pixels);
 /// tries to find a give way sign in the current connex components
 /// @param p_img the rgb image to try to find give way sign in 
 /// @return the best score found in the img
-float detect_gw_cv(cv::Mat &p_img);
+float detect_gw_cv(cv::Mat &p_img, std::vector<cv::Mat> &templates);
 
 #endif
