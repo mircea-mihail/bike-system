@@ -66,6 +66,9 @@ struct give_way_chunk
 // #define IN_RASPI
 
 #define LOG_PIC_PATH "/home/mircea/.bike-sys-data"
+// #define STOP_PATH "./templates/stop_100.png"
+// #define STOP_PATH "./templates/stop_edges.png"
+#define STOP_PATH "./templates/stop_test_tilted.png"
 
 // ------------------------------- IMAGE
 #define IMAGE_HEIGHT (960)
@@ -120,7 +123,5 @@ struct give_way_chunk
 
 ///////////////////////////////// rarely modified constants
 // ------------------------------- templates 
-
-#define TEMPLATES_DIR "./templates/"
 
 #endif
