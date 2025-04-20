@@ -15,11 +15,8 @@
 
 void load_templates(std::vector<cv::Mat> &p_templates)
 {
-	std::vector<std::string> template_names = {"crossing_mask.png"};
-	for (int i = 0; i < template_names.size(); i++)
-	{
-		p_templates.push_back(cv::imread(TEMPLATES_DIR + template_names[i], cv::IMREAD_GRAYSCALE)); 
-	}
+	cv::Mat buf = cv::imread(std::string(STOP_PATH), cv::IMREAD_COLOR);
+	p_templates.push_back(buf);
 }
 
 void detect_dir_images(std::string p_input_dir)
@@ -72,7 +69,7 @@ void detect_dir_images(std::string p_input_dir)
 			cv::resize(image, image, cv::Size(image_size));
 
 			std::chrono::time_point start = std::chrono::high_resolution_clock::now();
-			float score = detect_gw_cv(image);
+			float score = detect_gw_cv(image, templates);
 			std::chrono::time_point end = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> duration = end - start;
 
@@ -97,6 +94,7 @@ void detect_from_name(std::string p_image_name)
 {
 	std::vector<cv::Mat> templates;
 	load_templates(templates);
+
 	cv::Mat image; 
 	image = cv::imread(p_image_name); 
 
@@ -109,7 +107,7 @@ void detect_from_name(std::string p_image_name)
 
 	std::chrono::time_point start = std::chrono::high_resolution_clock::now();
 
-	uint32_t gw_detected = detect_gw_cv(image);
+	uint32_t gw_detected = detect_gw_cv(image, templates);
 
 	std::cout << "found " << gw_detected << " give way signs" << std::endl;
 
@@ -123,12 +121,15 @@ void detect_from_name(std::string p_image_name)
 
 float detect_pic(cv::Mat &p_pic, std::vector<cv::Mat> &p_templates)
 {
+	std::vector<cv::Mat> templates;
+	load_templates(templates);
+
 	cv::Point2i image_size = cv::Point2i(IMAGE_WIDTH, IMAGE_HEIGHT);
 	cv::resize(p_pic, p_pic, cv::Size(image_size));
 
 	std::chrono::time_point start = std::chrono::high_resolution_clock::now();
 
-	float score = detect_gw_cv(p_pic);
+	float score = detect_gw_cv(p_pic, templates);
 
 	std::chrono::time_point end = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double, std::milli> duration = end - start;
@@ -287,13 +288,42 @@ void detection_loop()
 
 int main(int argc, char** argv) 
 { 
-	detection_loop();
+	std::vector<cv::Mat> template_vector;
+	load_templates(template_vector);
+
+	// show_pic(template_vector[0]);
+	// cv::Mat stop = template_vector[0];
+	// cv::Mat gray_stop;
+	// cv::cvtColor(template_vector[0], gray_stop, cv::COLOR_BGR2GRAY);
+
+	// cv::Mat edges;
+	// cv::Canny(gray_stop, edges, 50, 150);
+
+	// std::vector<std::vector<cv::Point>> contours;
+	// cv::findContours(edges, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+
+	// std::vector<cv::Point> approx;
+	// double epsilon = 0.01 * cv::arcLength(contours[0], true);
+	// cv::approxPolyDP(contours[0], approx, epsilon, true);	
+
+	// std::cout << "number of edges:" << approx.size() << std::endl;
+
+	// cv::Scalar color = cv::Scalar(0, 255, 0);
+	// int thickness = 2;
+	// cv::line(stop, approx[0], approx[approx.size() - 1], color, thickness);
+	// for(int i = 0; i < approx.size() - 1; i++)
+	// {
+	// 	cv::line(stop, approx[i], approx[i + 1], color, thickness);
+	// }
+	// show_pic(stop);
+
+	// detection_loop();
 
 	// if (argc != 2) { 
 	// 	printf("usage: main_detect <Images Dir>\n"); 
 	// 	return -1; 
 	// } 
 	// detect_dir_images(argv[1]);
-	// detect_from_name(argv[1]);
+	detect_from_name(argv[1]);
 	return 0; 
 }
