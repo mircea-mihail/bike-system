@@ -186,7 +186,7 @@ float find_gw_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_labels,
     if(chunk_score > MIN_CHUNK_SCORE)
     {
         #ifdef PRINT_STATS
-            print_detection(p_img, gw_chunk, chunk_score);
+            print_give_way(p_img, gw_chunk, chunk_score);
         #endif
 
         return chunk_score;
@@ -231,7 +231,7 @@ float find_stop_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_label
     float_t right_bottom_val = IMAGE_HEIGHT * IMAGE_WIDTH * -2;
     float_t right_top_val = IMAGE_HEIGHT * IMAGE_WIDTH * -2;
  
-    float_t bias = 0.4;
+    float_t bias = 0.5;
     for (int i = y; i < y + h; i++)
     {
         for (int j = x; j < x + w; j++)
@@ -295,58 +295,15 @@ float find_stop_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_label
 
     cv::Scalar color = cv::Scalar(0, 255, 0);
     int thickness = 6;
-    cv::line(p_img, cv::Point2d(top_left.x, top_left.y), cv::Point2d(top_right.x, top_right.y), color, thickness);
-    cv::line(p_img, cv::Point2d(bottom_left.x, bottom_left.y), cv::Point2d(bottom_right.x, bottom_right.y), color, thickness);
-    cv::line(p_img, cv::Point2d(left_bottom.x, left_bottom.y), cv::Point2d(left_top.x, left_top.y), color, thickness);
-    cv::line(p_img, cv::Point2d(right_bottom.x, right_bottom.y), cv::Point2d(right_top.x, right_top.y), color, thickness);
+    stop_chunk st_chunk  = stop_chunk(top_left, top_right, right_top, right_bottom, bottom_right, bottom_left, left_bottom, left_top);
 
-    point left_pt;
-    for (int i = y; i < y + h; i++)
-    {
-        if (p_labels.at<int32_t>(i, x) == p_label)
-        {
-            left_pt.x = x;
-            left_pt.y = i;
-            break;
-        }
-    }
-
-    point right_pt;
-    for (int i = y; i < y + h; i++)
-    {
-        if (p_labels.at<int32_t>(i, x + w-1) == p_label)
-        {
-            right_pt.x = x + w-1;
-            right_pt.y = i;
-            break;
-        }
-    }
-
-    point leftest_bottom_pt(-1, -1);
-    point rightest_bottom_pt;
-    for (int j = x; j < x + w; j++)
-    {
-        if (p_labels.at<int32_t>(y + h-1, j) == p_label)
-        {
-            rightest_bottom_pt.x = j;
-            rightest_bottom_pt.y = y + h-1;
-            if(leftest_bottom_pt.x == -1)
-            {
-                leftest_bottom_pt.x = j;
-                leftest_bottom_pt.y = y + h-1;
-            }
-            break;
-        }
-    }
-    point bottom_pt(int((rightest_bottom_pt.x + leftest_bottom_pt.x) / 2), rightest_bottom_pt.y);
-
-    give_way_chunk gw_chunk = give_way_chunk(left_pt, right_pt, bottom_pt);
+    print_stop(p_img, st_chunk, 0.8);
 
     // float chunk_score = check_for_gw_cv(p_white_mask, gw_chunk, p_labels, p_label);
     // if(chunk_score > MIN_CHUNK_SCORE)
     // {
     //     #ifdef PRINT_STATS
-    //         print_detection(p_img, gw_chunk, chunk_score);
+    //         print_give_way(p_img, gw_chunk, chunk_score);
     //     #endif
 
     //     return chunk_score;
