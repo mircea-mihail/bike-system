@@ -57,7 +57,13 @@ bool has_small_angle(give_way_chunk p_chunk);
 /// @brief draws on the image the current give way sign detected
 /// @param p_img the image to write on 
 /// @param gw_chunk the coordonates of the points in the sign
-void print_detection(cv::Mat &p_img, give_way_chunk gw_chunk, float p_score);
+void print_give_way(cv::Mat &p_img, give_way_chunk gw_chunk, float p_score);
+
+/// @brief draws on the image the current stop sign detected
+/// @param p_img the image to write on 
+/// @param gw_chunk the coordonates of the points in the sign
+void print_stop(cv::Mat &p_img, stop_chunk st_chunk, float p_score);
+
 
 void show_pic(cv::Mat p_img);
 

@@ -73,7 +73,7 @@ bool has_small_angle(give_way_chunk p_chunk)
     return min_triangle_condition;
 }
 
-void print_detection(cv::Mat &p_img, give_way_chunk gw_chunk, float p_score)
+void print_give_way(cv::Mat &p_img, give_way_chunk gw_chunk, float p_score)
 {
     cv::Scalar color = cv::Scalar(0, 255, 0);
     int thickness = 2;
@@ -86,6 +86,37 @@ void print_detection(cv::Mat &p_img, give_way_chunk gw_chunk, float p_score)
     snprintf(stringed_score, sizeof(stringed_score), "%.1f", p_score * 100);
 
     cv::Point text_pt(int((gw_chunk.top_left.x + gw_chunk.top_right.x)/2), std::min(gw_chunk.top_left.y, gw_chunk.top_right.y));
+    int font_size = 3;
+    cv::putText(p_img, stringed_score, text_pt, 1, font_size, cv::Scalar(0, 0, 0), 8);   
+    cv::putText(p_img, stringed_score, text_pt, 1, font_size, cv::Scalar(0, 255, 0), 3);   
+}
+
+void print_stop(cv::Mat &p_img, stop_chunk p_st_chunk, float p_score)
+{
+    cv::Scalar color = cv::Scalar(0, 255, 0);
+    int thickness = 2;
+
+    cv::line(p_img, cv::Point2d(p_st_chunk.top_left.x, p_st_chunk.top_left.y), 
+        cv::Point2d(p_st_chunk.top_right.x, p_st_chunk.top_right.y), color, thickness);
+    cv::line(p_img, cv::Point2d(p_st_chunk.top_left.x, p_st_chunk.top_left.y), 
+        cv::Point2d(p_st_chunk.left_top.x, p_st_chunk.left_top.y), color, thickness);
+    cv::line(p_img, cv::Point2d(p_st_chunk.bottom_left.x, p_st_chunk.bottom_left.y),
+        cv::Point2d(p_st_chunk.bottom_right.x, p_st_chunk.bottom_right.y), color, thickness);
+    cv::line(p_img, cv::Point2d(p_st_chunk.bottom_left.x, p_st_chunk.bottom_left.y),
+        cv::Point2d(p_st_chunk.left_bottom.x, p_st_chunk.left_bottom.y), color, thickness);
+    cv::line(p_img, cv::Point2d(p_st_chunk.left_bottom.x, p_st_chunk.left_bottom.y),
+        cv::Point2d(p_st_chunk.left_top.x, p_st_chunk.left_top.y), color, thickness);
+    cv::line(p_img, cv::Point2d(p_st_chunk.right_bottom.x, p_st_chunk.right_bottom.y),
+        cv::Point2d(p_st_chunk.right_top.x, p_st_chunk.right_top.y), color, thickness);
+    cv::line(p_img, cv::Point2d(p_st_chunk.top_right.x, p_st_chunk.top_right.y),
+        cv::Point2d(p_st_chunk.right_top.x, p_st_chunk.right_top.y), color, thickness);
+    cv::line(p_img, cv::Point2d(p_st_chunk.right_bottom.x, p_st_chunk.right_bottom.y),
+        cv::Point2d(p_st_chunk.bottom_right.x, p_st_chunk.bottom_right.y), color, thickness);
+
+    char stringed_score[5];
+    snprintf(stringed_score, sizeof(stringed_score), "%.1f", p_score * 100);
+
+    cv::Point text_pt(int((p_st_chunk.top_left.x + p_st_chunk.top_right.x)/2), std::min(p_st_chunk.top_left.y, p_st_chunk.top_right.y));
     int font_size = 3;
     cv::putText(p_img, stringed_score, text_pt, 1, font_size, cv::Scalar(0, 0, 0), 8);   
     cv::putText(p_img, stringed_score, text_pt, 1, font_size, cv::Scalar(0, 255, 0), 3);   
