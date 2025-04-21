@@ -61,6 +61,29 @@ struct give_way_chunk
     }
 };
 
+struct stop_chunk
+{
+    point top_left;
+    point top_right;
+    point right_top;
+    point right_bottom;
+    point bottom_right;
+    point bottom_left;
+    point left_bottom;
+    point left_top;
+
+
+    stop_chunk(point p_top_left, point p_top_right, point p_right_top, point p_right_bottom,
+        point p_bottom_right, point p_bottom_left, point p_left_bottom, point p_left_top) 
+        : top_left(p_top_left), top_right(p_top_right), right_top(p_right_top), right_bottom(p_right_bottom), 
+        bottom_right(p_bottom_right), bottom_left(p_bottom_left), left_bottom(p_left_bottom), left_top(p_left_top) 
+    {}
+
+    stop_chunk() : top_left(point()), top_right(point()), right_top(point()), right_bottom(point()), 
+        bottom_right(point()), bottom_left(point()), left_bottom(point()), left_top(point()) 
+    {}
+};
+
 ///////////////////////////////// tweak-able constants
 #define PRINT_STATS
 // #define IN_RASPI
