@@ -64,7 +64,8 @@ void print_give_way(cv::Mat &p_img, give_way_chunk gw_chunk, float p_score);
 /// @param gw_chunk the coordonates of the points in the sign
 void print_stop(cv::Mat &p_img, stop_chunk st_chunk, float p_score);
 
-
 void show_pic(cv::Mat p_img);
+
+cv::Point2f get_line_intersection( point A, point B, point C, point D);
 
 #endif

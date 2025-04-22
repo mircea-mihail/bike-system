@@ -129,3 +129,23 @@ void show_pic(cv::Mat p_img)
 	cv::waitKey(0); 
 	cv::destroyAllWindows();
 }
+
+cv::Point2f get_line_intersection( point A, point B, point C, point D) {
+    float a1 = B.y - A.y;
+    float b1 = A.x - B.x;
+    float c1 = a1 * A.x + b1 * A.y;
+
+    float a2 = D.y - C.y;
+    float b2 = C.x - D.x;
+    float c2 = a2 * C.x + b2 * C.y;
+
+    float determinant = a1 * b2 - a2 * b1;
+
+    if (determinant == 0) {
+        return cv::Point2f(0, 0);
+    } else {
+        float x = (b2 * c1 - b1 * c2) / determinant;
+        float y = (a1 * c2 - a2 * c1) / determinant;
+        return cv::Point2f(x, y);
+    }
+}
