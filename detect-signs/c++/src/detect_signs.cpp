@@ -83,6 +83,7 @@ float check_for_gw_cv(cv::Mat &p_white_mask, give_way_chunk p_chunk, cv::Mat &p_
         }
     }
 
+
     // if there are a lot of red pixels outside of triangle, likely not a give way
     if(px_outside_gw != 0)
     {
@@ -115,6 +116,107 @@ float check_for_gw_cv(cv::Mat &p_white_mask, give_way_chunk p_chunk, cv::Mat &p_
     return std::max(final_thin_score, final_thick_score);
 }
 
+float check_for_stop(cv::Mat &p_white_mask, stop_chunk st_chunk, cv::Mat &p_label_mat, 
+    int32_t p_sign_label, cv::Mat &p_stop_template)
+{
+    // DO AN ANGLE CHECK ON EVERY EDGE
+    cv::Point2f top_left_corner = get_line_intersection(st_chunk.top_right, st_chunk.top_left, st_chunk.left_bottom, st_chunk.left_top);   
+    cv::Point2f top_right_corner = get_line_intersection(st_chunk.top_right, st_chunk.top_left, st_chunk.right_bottom, st_chunk.right_top);   
+    cv::Point2f bottom_left_corner = get_line_intersection(st_chunk.bottom_right, st_chunk.bottom_left, st_chunk.left_bottom, st_chunk.left_top);   
+    cv::Point2f bottom_right_corner = get_line_intersection(st_chunk.bottom_right, st_chunk.bottom_left, st_chunk.right_bottom, st_chunk.right_top);   
+
+    std::vector<cv::Point2f> src_points = {
+        top_left_corner,
+        top_right_corner,
+        bottom_right_corner,
+        bottom_left_corner
+	};
+
+	int32_t width = STOP_TEMPLATE_WIDTH;
+	int32_t height = STOP_TEMPLATE_HEIGHT;
+	
+	std::vector<cv::Point2f> dst_points = {
+		cv::Point2f(0, 0),           
+		cv::Point2f(width - 1, 0),    
+		cv::Point2f(width - 1, height - 1),
+		cv::Point2f(0, height - 1)    
+	};
+	cv::Mat H = cv::getPerspectiveTransform(src_points, dst_points);
+
+	cv::Mat warped_stop;
+    cv::Mat float_labels;
+    p_label_mat.convertTo(float_labels, CV_32F);
+	cv::warpPerspective(float_labels, warped_stop, H, cv::Size(width, height), cv::INTER_NEAREST );
+    warped_stop.convertTo(warped_stop, CV_32S);
+
+    
+    float_t red_score = 0, red_total = 0, white_score = 0, white_total = 0;
+    int32_t green_total = 0;
+
+    for(int i = 0; i < STOP_TEMPLATE_HEIGHT; i++)
+    {
+        for(int j = 0; j < STOP_TEMPLATE_WIDTH; j++)
+        {
+            // if(i > 50 && i < 60)
+            // {
+            //     std::cout << "red: " << int16_t(p_stop_template.at<cv::Vec3b>(i, j)[RED])<< std::endl;
+            //     std::cout << "green: " << int16_t(p_stop_template.at<cv::Vec3b>(i, j)[GREEN])<< std::endl;
+            //     std::cout << "blue: " << int16_t(p_stop_template.at<cv::Vec3b>(i, j)[BLUE])<< std::endl;
+            //     std::cout << std::endl;
+            // }
+            
+            if (! ((p_stop_template.at<cv::Vec3b>(i, j)[GREEN]) > COLOR_THRESHOLD
+                && (p_stop_template.at<cv::Vec3b>(i, j)[RED]) < COLOR_THRESHOLD
+                && (p_stop_template.at<cv::Vec3b>(i, j)[BLUE]) < COLOR_THRESHOLD)
+        )
+            {
+                if ((p_stop_template.at<cv::Vec3b>(i, j)[RED]) > COLOR_THRESHOLD
+                    && (p_stop_template.at<cv::Vec3b>(i, j)[GREEN]) < COLOR_THRESHOLD
+                    && (p_stop_template.at<cv::Vec3b>(i, j)[BLUE]) < COLOR_THRESHOLD
+                )
+                {
+                    // std::cout << warped_stop.at<int32_t>(i, j) << " " << p_sign_label << ", ";
+                    if(warped_stop.at<int32_t>(i, j) == p_sign_label)
+                    {
+                        red_score ++;
+                        red_total ++;
+                    }
+                    else
+                    {
+                        red_total ++;
+                    }
+                }
+                else
+                {
+                    if(p_white_mask.at<int8_t>(i, j) != 0 && warped_stop.at<int32_t>(i, j) != p_sign_label)
+                    {
+                        white_score ++;
+                        white_total ++;
+                    }
+                    else
+                    {
+                        white_total ++;
+                    }
+                }
+            }
+            else
+            {
+                green_total ++;
+            }
+        }
+    }
+    std::cout << "white score: " << white_score << "\nwhite total: " << white_total << std::endl;
+    std::cout << "red score: " << red_score << "\nred total: " << red_total << std::endl;
+    std::cout << "green total: " << green_total << std::endl;
+    std::cout << "final score:" << 0.60 * (red_score/red_total) + 0.4 * (white_score/white_total) << std::endl;
+    std::cout << std::endl;
+    if(red_total == 0 || white_total == 0)
+    {
+        return 0;
+    }
+    return 0.6 * (red_score/red_total) + 0.4 * (white_score/white_total);
+}
+ 
 void print_bounding_box(cv::Mat &p_img, int32_t p_x, int32_t p_y, int32_t p_w, int32_t p_h)
 {
     // print a bounding box above all checked shapes
@@ -195,7 +297,8 @@ float find_gw_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_labels,
     return 0;
 }
 
-float find_stop_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_labels, cv::Mat &p_stats, int32_t p_label)
+float find_stop_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_labels, 
+    cv::Mat &p_stats, int32_t p_label, std::vector<cv::Mat> &p_templates)
 {
     int32_t x = p_stats.at<int32_t>(cv::Point(0, p_label));
     int32_t y = p_stats.at<int32_t>(cv::Point(1, p_label));
@@ -297,17 +400,15 @@ float find_stop_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_label
     int thickness = 6;
     stop_chunk st_chunk  = stop_chunk(top_left, top_right, right_top, right_bottom, bottom_right, bottom_left, left_bottom, left_top);
 
-    print_stop(p_img, st_chunk, 0.8);
+    float chunk_score = check_for_stop(p_white_mask, st_chunk, p_labels, p_label, p_templates[STOP_POSITION]);
+    if(chunk_score > MIN_CHUNK_SCORE)
+    {
+        #ifdef PRINT_STATS
+            print_stop(p_img, st_chunk, chunk_score);
+        #endif
 
-    // float chunk_score = check_for_gw_cv(p_white_mask, gw_chunk, p_labels, p_label);
-    // if(chunk_score > MIN_CHUNK_SCORE)
-    // {
-    //     #ifdef PRINT_STATS
-    //         print_give_way(p_img, gw_chunk, chunk_score);
-    //     #endif
-
-    //     return chunk_score;
-    // }
+        return chunk_score;
+    }
 
     return 0;
 }
@@ -363,8 +464,8 @@ void get_masks(cv::Mat &p_img, cv::Mat &p_red_mask, cv::Mat &p_white_mask)
 
 }
 
-void detect_gw_thread(cv::Mat *p_img, cv::Mat *p_red_mask,
-    cv::Mat *p_white_mask, std::atomic<int32_t> *p_detection_number)
+void detect_gw_thread(cv::Mat *p_img, cv::Mat *p_red_mask, cv::Mat *p_white_mask,
+    std::atomic<int32_t> *p_detection_number, std::vector<cv::Mat> *p_templates)
 {
     cv::Mat labels;
     cv::Mat stats;
@@ -374,7 +475,7 @@ void detect_gw_thread(cv::Mat *p_img, cv::Mat *p_red_mask,
     for(int i=1; i < stats.rows; i++)
     {
         float gw_detection_res = find_gw_in_chunk(*p_img, *p_white_mask, labels, stats, i);
-        find_stop_in_chunk(*p_img, *p_white_mask, labels, stats, i);
+        find_stop_in_chunk(*p_img, *p_white_mask, labels, stats, i, *p_templates);
         if(gw_detection_res > 0)
         {
             (*p_detection_number) ++;
@@ -422,8 +523,8 @@ float detect_gw_cv(cv::Mat &p_img, std::vector<cv::Mat> &p_templates)
     // 14.12 milis
     // 14.09 milis
     // 17.94
-    std::thread bright_red_gw_thread(detect_gw_thread, &p_img, &bright_red_mask, &white_mask, &detection_number);
-    std::thread dark_red_gw_thread(detect_gw_thread, &p_img, &dark_red_mask, &white_mask, &detection_number);
+    std::thread bright_red_gw_thread(detect_gw_thread, &p_img, &bright_red_mask, &white_mask, &detection_number, &p_templates);
+    std::thread dark_red_gw_thread(detect_gw_thread, &p_img, &dark_red_mask, &white_mask, &detection_number, &p_templates);
 
     bright_red_gw_thread.join();
     dark_red_gw_thread.join();
