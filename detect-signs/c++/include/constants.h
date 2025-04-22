@@ -89,13 +89,17 @@ struct stop_chunk
 // #define IN_RASPI
 
 #define LOG_PIC_PATH "/home/mircea/.bike-sys-data"
-// #define STOP_PATH "./templates/stop_100.png"
+#define STOP_PATH "./templates/stop_100.png"
 // #define STOP_PATH "./templates/stop_edges.png"
-#define STOP_PATH "./templates/stop_test_tilted.png"
+// #define STOP_PATH "./templates/stop_test_tilted.png"
 
 // ------------------------------- IMAGE
 #define IMAGE_HEIGHT (960)
 #define IMAGE_WIDTH (1280)
+
+#define STOP_TEMPLATE_WIDTH 100
+#define STOP_TEMPLATE_HEIGHT 101
+#define STOP_POSITION 0
 
 #define SAVE_IMG_RATIO 1
 #define SAVED_IMG_HEIGHT (IMAGE_HEIGHT / SAVE_IMG_RATIO) 
@@ -143,6 +147,12 @@ struct stop_chunk
 // before min val 40
 #define MIN_WHITE_VALUE 40
 #define MAX_WHITE_SATURATION 130
+
+#define RED 2
+#define GREEN 1
+#define BLUE 0
+
+#define COLOR_THRESHOLD 128
 
 ///////////////////////////////// rarely modified constants
 // ------------------------------- templates 
