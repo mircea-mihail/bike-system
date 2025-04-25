@@ -119,7 +119,11 @@ float check_for_gw_cv(cv::Mat &p_white_mask, give_way_chunk p_chunk, cv::Mat &p_
 float check_for_stop(cv::Mat &p_white_mask, stop_chunk st_chunk, cv::Mat &p_label_mat, 
     int32_t p_sign_label, cv::Mat &p_stop_template)
 {
-    // DO AN ANGLE CHECK ON EVERY EDGE
+    if(has_small_angle(st_chunk))
+    {
+        return 0;
+    }
+
     cv::Point2f top_left_corner = get_line_intersection(st_chunk.top_right, st_chunk.top_left, st_chunk.left_bottom, st_chunk.left_top);   
     cv::Point2f top_right_corner = get_line_intersection(st_chunk.top_right, st_chunk.top_left, st_chunk.right_bottom, st_chunk.right_top);   
     cv::Point2f bottom_left_corner = get_line_intersection(st_chunk.bottom_right, st_chunk.bottom_left, st_chunk.left_bottom, st_chunk.left_top);   
