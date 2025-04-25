@@ -54,6 +54,8 @@ bool point_in_triangle(point p_point, point p_point_tr_1, point p_point_tr_2, po
 /// @return true if has at least an agle too small, false otherwise
 bool has_small_angle(give_way_chunk p_chunk);
 
+bool has_small_angle(stop_chunk p_chunk);
+
 /// @brief draws on the image the current give way sign detected
 /// @param p_img the image to write on 
 /// @param gw_chunk the coordonates of the points in the sign
@@ -67,5 +69,7 @@ void print_stop(cv::Mat &p_img, stop_chunk st_chunk, float p_score);
 void show_pic(cv::Mat p_img);
 
 cv::Point2f get_line_intersection( point A, point B, point C, point D);
+
+float get_angle(point A, point B, point C);
 
 #endif

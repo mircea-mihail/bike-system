@@ -53,6 +53,72 @@ bool point_in_triangle(point p_point, point p_point_tr_1, point p_point_tr_2, po
     return !(has_neg && has_pos);
 }
 
+float get_angle(point A, point B, point C) {
+    float BAx = A.x - B.x;
+    float BAy = A.y - B.y;
+    float BCx = C.x - B.x;
+    float BCy = C.y - B.y;
+
+    float dot = BAx * BCx + BAy * BCy;
+    float mag_BA = std::sqrt(BAx * BAx + BAy * BAy);
+    float mag_BC = std::sqrt(BCx * BCx + BCy * BCy);
+
+    if (mag_BA == 0 || mag_BC == 0)
+        return 0.0f;
+
+    float cos_angle = dot / (mag_BA * mag_BC);
+    cos_angle = std::clamp(cos_angle, -1.0f, 1.0f); 
+
+    float angle_rad = std::acos(cos_angle);
+    return angle_rad * 180.0f / M_PI;
+}
+
+bool has_small_angle(stop_chunk p_chunk)
+{
+    float angle = 0;
+    angle = get_angle(p_chunk.top_left, p_chunk.top_right, p_chunk.right_top);
+    if(angle > IDEAL_OCTOGON_ANGLE + OCTOGON_ANGLE_THRESHOLD || angle < IDEAL_OCTOGON_ANGLE - OCTOGON_ANGLE_THRESHOLD)
+    {
+        return false;
+    }
+    angle = get_angle(p_chunk.top_right, p_chunk.right_top, p_chunk.right_bottom);
+    if(angle > IDEAL_OCTOGON_ANGLE + OCTOGON_ANGLE_THRESHOLD || angle < IDEAL_OCTOGON_ANGLE - OCTOGON_ANGLE_THRESHOLD)
+    {
+        return false;
+    }
+    angle = get_angle(p_chunk.right_top, p_chunk.right_bottom, p_chunk.bottom_right);
+    if(angle > IDEAL_OCTOGON_ANGLE + OCTOGON_ANGLE_THRESHOLD || angle < IDEAL_OCTOGON_ANGLE - OCTOGON_ANGLE_THRESHOLD)
+    {
+        return false;
+    }
+    angle = get_angle(p_chunk.right_bottom, p_chunk.bottom_right, p_chunk.bottom_left);
+    if(angle > IDEAL_OCTOGON_ANGLE + OCTOGON_ANGLE_THRESHOLD || angle < IDEAL_OCTOGON_ANGLE - OCTOGON_ANGLE_THRESHOLD)
+    {
+        return false;
+    }
+    angle = get_angle(p_chunk.bottom_right, p_chunk.bottom_left, p_chunk.left_bottom);
+    if(angle > IDEAL_OCTOGON_ANGLE + OCTOGON_ANGLE_THRESHOLD || angle < IDEAL_OCTOGON_ANGLE - OCTOGON_ANGLE_THRESHOLD)
+    {
+        return false;
+    }
+    angle = get_angle(p_chunk.bottom_left, p_chunk.left_bottom, p_chunk.left_top);
+    if(angle > IDEAL_OCTOGON_ANGLE + OCTOGON_ANGLE_THRESHOLD || angle < IDEAL_OCTOGON_ANGLE - OCTOGON_ANGLE_THRESHOLD)
+    {
+        return false;
+    }
+    angle = get_angle(p_chunk.left_bottom, p_chunk.left_top, p_chunk.top_left);
+    if(angle > IDEAL_OCTOGON_ANGLE + OCTOGON_ANGLE_THRESHOLD || angle < IDEAL_OCTOGON_ANGLE - OCTOGON_ANGLE_THRESHOLD)
+    {
+        return false;
+    }
+    angle = get_angle(p_chunk.left_top, p_chunk.top_left, p_chunk.top_right);
+    if(angle > IDEAL_OCTOGON_ANGLE + OCTOGON_ANGLE_THRESHOLD || angle < IDEAL_OCTOGON_ANGLE - OCTOGON_ANGLE_THRESHOLD)
+    {
+        return false;
+    }
+    return true;
+}
+
 bool has_small_angle(give_way_chunk p_chunk)
 {
     float a_side = sqrt(pow(p_chunk.top_left.x - p_chunk.top_right.x, 2) + pow(p_chunk.top_left.y - p_chunk.top_right.y, 2));
