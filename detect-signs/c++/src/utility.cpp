@@ -79,44 +79,44 @@ bool has_small_angle(stop_chunk p_chunk)
     angle = get_angle(p_chunk.top_left, p_chunk.top_right, p_chunk.right_top);
     if(angle > IDEAL_OCTOGON_ANGLE + OCTOGON_ANGLE_THRESHOLD || angle < IDEAL_OCTOGON_ANGLE - OCTOGON_ANGLE_THRESHOLD)
     {
-        return false;
+        return true;
     }
     angle = get_angle(p_chunk.top_right, p_chunk.right_top, p_chunk.right_bottom);
     if(angle > IDEAL_OCTOGON_ANGLE + OCTOGON_ANGLE_THRESHOLD || angle < IDEAL_OCTOGON_ANGLE - OCTOGON_ANGLE_THRESHOLD)
     {
-        return false;
+        return true;
     }
     angle = get_angle(p_chunk.right_top, p_chunk.right_bottom, p_chunk.bottom_right);
     if(angle > IDEAL_OCTOGON_ANGLE + OCTOGON_ANGLE_THRESHOLD || angle < IDEAL_OCTOGON_ANGLE - OCTOGON_ANGLE_THRESHOLD)
     {
-        return false;
+        return true;
     }
     angle = get_angle(p_chunk.right_bottom, p_chunk.bottom_right, p_chunk.bottom_left);
     if(angle > IDEAL_OCTOGON_ANGLE + OCTOGON_ANGLE_THRESHOLD || angle < IDEAL_OCTOGON_ANGLE - OCTOGON_ANGLE_THRESHOLD)
     {
-        return false;
+        return true;
     }
     angle = get_angle(p_chunk.bottom_right, p_chunk.bottom_left, p_chunk.left_bottom);
     if(angle > IDEAL_OCTOGON_ANGLE + OCTOGON_ANGLE_THRESHOLD || angle < IDEAL_OCTOGON_ANGLE - OCTOGON_ANGLE_THRESHOLD)
     {
-        return false;
+        return true;
     }
     angle = get_angle(p_chunk.bottom_left, p_chunk.left_bottom, p_chunk.left_top);
     if(angle > IDEAL_OCTOGON_ANGLE + OCTOGON_ANGLE_THRESHOLD || angle < IDEAL_OCTOGON_ANGLE - OCTOGON_ANGLE_THRESHOLD)
     {
-        return false;
+        return true;
     }
     angle = get_angle(p_chunk.left_bottom, p_chunk.left_top, p_chunk.top_left);
     if(angle > IDEAL_OCTOGON_ANGLE + OCTOGON_ANGLE_THRESHOLD || angle < IDEAL_OCTOGON_ANGLE - OCTOGON_ANGLE_THRESHOLD)
     {
-        return false;
+        return true;
     }
     angle = get_angle(p_chunk.left_top, p_chunk.top_left, p_chunk.top_right);
     if(angle > IDEAL_OCTOGON_ANGLE + OCTOGON_ANGLE_THRESHOLD || angle < IDEAL_OCTOGON_ANGLE - OCTOGON_ANGLE_THRESHOLD)
     {
-        return false;
+        return true;
     }
-    return true;
+    return false;
 }
 
 bool has_small_angle(give_way_chunk p_chunk)
