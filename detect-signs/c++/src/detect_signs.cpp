@@ -152,73 +152,63 @@ float check_for_stop(cv::Mat &p_white_mask, stop_chunk st_chunk, cv::Mat &p_labe
     p_label_mat.convertTo(float_labels, CV_32F);
 	cv::warpPerspective(float_labels, warped_stop, H, cv::Size(width, height), cv::INTER_NEAREST );
     warped_stop.convertTo(warped_stop, CV_32S);
-
     
     float_t red_score = 0, red_total = 0, white_score = 0, white_total = 0;
-    int32_t green_total = 0;
+    float_t red_outside = 0, outside_total = 0;
 
     for(int i = 0; i < STOP_TEMPLATE_HEIGHT; i++)
     {
         for(int j = 0; j < STOP_TEMPLATE_WIDTH; j++)
         {
-            // if(i > 50 && i < 60)
-            // {
-            //     std::cout << "red: " << int16_t(p_stop_template.at<cv::Vec3b>(i, j)[RED])<< std::endl;
-            //     std::cout << "green: " << int16_t(p_stop_template.at<cv::Vec3b>(i, j)[GREEN])<< std::endl;
-            //     std::cout << "blue: " << int16_t(p_stop_template.at<cv::Vec3b>(i, j)[BLUE])<< std::endl;
-            //     std::cout << std::endl;
-            // }
-            
+            // if not green
             if (! ((p_stop_template.at<cv::Vec3b>(i, j)[GREEN]) > COLOR_THRESHOLD
                 && (p_stop_template.at<cv::Vec3b>(i, j)[RED]) < COLOR_THRESHOLD
                 && (p_stop_template.at<cv::Vec3b>(i, j)[BLUE]) < COLOR_THRESHOLD)
         )
             {
-                if ((p_stop_template.at<cv::Vec3b>(i, j)[RED]) > COLOR_THRESHOLD
-                    && (p_stop_template.at<cv::Vec3b>(i, j)[GREEN]) < COLOR_THRESHOLD
-                    && (p_stop_template.at<cv::Vec3b>(i, j)[BLUE]) < COLOR_THRESHOLD
-                )
+                uint8_t red_px = p_stop_template.at<cv::Vec3b>(i, j)[RED];
+                uint8_t green_px = p_stop_template.at<cv::Vec3b>(i, j)[GREEN];
+                uint8_t blue_px = p_stop_template.at<cv::Vec3b>(i, j)[BLUE];
+
+                // score according to template
+                red_total += cv::max((red_px - (green_px + blue_px) / 2) / PX_MAX_VAL, 0);
+                if(warped_stop.at<int32_t>(i, j) == p_sign_label)
                 {
-                    // std::cout << warped_stop.at<int32_t>(i, j) << " " << p_sign_label << ", ";
-                    if(warped_stop.at<int32_t>(i, j) == p_sign_label)
-                    {
-                        red_score ++;
-                        red_total ++;
-                    }
-                    else
-                    {
-                        red_total ++;
-                    }
+                    red_score += cv::max((red_px - (green_px + blue_px) / 2) / PX_MAX_VAL, 0);
                 }
-                else
+
+                if (red_px > COLOR_THRESHOLD && green_px > COLOR_THRESHOLD && blue_px > COLOR_THRESHOLD)
                 {
-                    if(p_white_mask.at<int8_t>(i, j) != 0 && warped_stop.at<int32_t>(i, j) != p_sign_label)
+                    white_total += cv::min({red_px, green_px, blue_px}) / PX_MAX_VAL;
+                    if (warped_stop.at<int32_t>(i, j) != p_sign_label && p_white_mask.at<int32_t>(i, j) != 0)
                     {
-                        white_score ++;
-                        white_total ++;
-                    }
-                    else
-                    {
-                        white_total ++;
+                        white_score += cv::min({red_px, green_px, blue_px}) / PX_MAX_VAL;
                     }
                 }
             }
             else
             {
-                green_total ++;
+                outside_total ++;
+                if(warped_stop.at<int32_t>(i, j) == p_sign_label)
+                {
+                    red_outside ++;
+                }
             }
         }
     }
-    std::cout << "white score: " << white_score << "\nwhite total: " << white_total << std::endl;
-    std::cout << "red score: " << red_score << "\nred total: " << red_total << std::endl;
-    std::cout << "green total: " << green_total << std::endl;
-    std::cout << "final score:" << 0.60 * (red_score/red_total) + 0.4 * (white_score/white_total) << std::endl;
-    std::cout << std::endl;
-    if(red_total == 0 || white_total == 0)
+
+    if(red_total == 0 || white_total == 0 || red_outside/outside_total > RED_OUTSIDE_STOP_THRESHOLD)
     {
         return 0;
     }
-    return 0.6 * (red_score/red_total) + 0.4 * (white_score/white_total);
+
+    std::cout << "white score: " << white_score << "\nwhite total: " << white_total << std::endl;
+    std::cout << "red score: " << red_score << "\nred total: " << red_total << std::endl;
+    std::cout << "outside ratio: " << red_outside/outside_total << std::endl;
+    std::cout << "final score:" << 0.5 * (red_score/red_total) + 0.5 * (white_score/white_total) << std::endl;
+    std::cout << std::endl;
+
+    return 0.5 * (red_score/red_total) + 0.5 * (white_score/white_total);
 }
  
 void print_bounding_box(cv::Mat &p_img, int32_t p_x, int32_t p_y, int32_t p_w, int32_t p_h)
