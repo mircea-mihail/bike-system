@@ -125,6 +125,7 @@ struct stop_chunk
 #define OCTOGON_ANGLE_THRESHOLD 20
 #define IDEAL_OCTOGON_ANGLE 135
 #define RED_OUTSIDE_GW_THRESHOLD 0.4
+#define RED_OUTSIDE_STOP_THRESHOLD 0.3
 #define RED_ABOVE_SIGN (1/4)
 
 // ------------------------------- RED COLOR DETECTION
@@ -144,6 +145,7 @@ struct stop_chunk
 
 #define MAX_SATURATION 255
 #define MAX_VALUE 255
+#define PX_MAX_VAL 255
 
 // ------------------------------- WHITE COLOR DETECTION 
 // before min val 40
