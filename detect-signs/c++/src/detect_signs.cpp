@@ -147,11 +147,16 @@ float check_for_stop(cv::Mat &p_white_mask, stop_chunk st_chunk, cv::Mat &p_labe
 	};
 	cv::Mat H = cv::getPerspectiveTransform(src_points, dst_points);
 
-	cv::Mat warped_stop;
+	cv::Mat warped_red_labels;
+    cv::Mat warped_white_mask;
     cv::Mat float_labels;
     p_label_mat.convertTo(float_labels, CV_32F);
-	cv::warpPerspective(float_labels, warped_stop, H, cv::Size(width, height), cv::INTER_NEAREST );
-    warped_stop.convertTo(warped_stop, CV_32S);
+	cv::warpPerspective(float_labels, warped_red_labels, H, cv::Size(width, height), cv::INTER_NEAREST );
+    
+	cv::warpPerspective(p_white_mask, warped_white_mask, H, cv::Size(width, height), cv::INTER_NEAREST );
+    show_pic(warped_red_labels);
+    show_pic(warped_white_mask);
+    warped_red_labels.convertTo(warped_red_labels, CV_32S);
     
     float_t red_score = 0, red_total = 0, white_score = 0, white_total = 0;
     float_t red_outside = 0, outside_total = 0;
@@ -172,7 +177,7 @@ float check_for_stop(cv::Mat &p_white_mask, stop_chunk st_chunk, cv::Mat &p_labe
 
                 // score according to template
                 red_total += cv::max((red_px - (green_px + blue_px) / 2) / PX_MAX_VAL, 0);
-                if(warped_stop.at<int32_t>(i, j) == p_sign_label)
+                if(warped_red_labels.at<int32_t>(i, j) == p_sign_label)
                 {
                     red_score += cv::max((red_px - (green_px + blue_px) / 2) / PX_MAX_VAL, 0);
                 }
@@ -180,7 +185,7 @@ float check_for_stop(cv::Mat &p_white_mask, stop_chunk st_chunk, cv::Mat &p_labe
                 if (red_px > COLOR_THRESHOLD && green_px > COLOR_THRESHOLD && blue_px > COLOR_THRESHOLD)
                 {
                     white_total += cv::min({red_px, green_px, blue_px}) / PX_MAX_VAL;
-                    if (warped_stop.at<int32_t>(i, j) != p_sign_label && p_white_mask.at<int32_t>(i, j) != 0)
+                    if (warped_red_labels.at<int32_t>(i, j) != p_sign_label && warped_white_mask.at<int32_t>(i, j) != 0)
                     {
                         white_score += cv::min({red_px, green_px, blue_px}) / PX_MAX_VAL;
                     }
@@ -189,7 +194,7 @@ float check_for_stop(cv::Mat &p_white_mask, stop_chunk st_chunk, cv::Mat &p_labe
             else
             {
                 outside_total ++;
-                if(warped_stop.at<int32_t>(i, j) == p_sign_label)
+                if(warped_red_labels.at<int32_t>(i, j) == p_sign_label)
                 {
                     red_outside ++;
                 }
