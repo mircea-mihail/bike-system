@@ -33,7 +33,7 @@ bool HardwareUtility::pressedMenuButton()
     // if the button has a constant state
     if(state == m_menuButton.m_prevState)
     {
-        // if the constant state has been kept for a while
+        // if the constant state has been kept for long enough to be counted
         if(time - m_menuButton.m_prevTime > BUTTON_CONSTANT_STATE_MS && m_menuButton.m_prevCountedState != state)
         {
             m_menuButton.m_prevCountedState = state;

@@ -230,11 +230,13 @@ void measurementTask(void *p_args)
 
     while(true)
     {
-        // used to send informaiton to display task
+        // todo daca spamez butonul de change menu, fortez un approximateVelocity care s-ar putea sa imi aproximeze ceva aiurea 
+        // send informaiton to display task
         if(millis() - lastMeasure > SEND_MEASUREMENTS_PERIOD || menu.getChangedState())
         {
             lastMeasure = millis();
 
+            // update the menu with the latest measured data
             if(sendingLatestSpeed)
             {
                 menu.update(tripData);
@@ -246,6 +248,7 @@ void measurementTask(void *p_args)
                     xSemaphoreGive(g_menuMutex);
                 }
             }
+            // estimate real time trip data as if a measurement has just been made
             else
             {
                 TripData estimatedData = bikeCalc.approximateVelocity();
