@@ -154,8 +154,6 @@ float check_for_stop(cv::Mat &p_white_mask, stop_chunk st_chunk, cv::Mat &p_labe
 	cv::warpPerspective(float_labels, warped_red_labels, H, cv::Size(width, height), cv::INTER_NEAREST );
     
 	cv::warpPerspective(p_white_mask, warped_white_mask, H, cv::Size(width, height), cv::INTER_NEAREST );
-    show_pic(warped_red_labels);
-    show_pic(warped_white_mask);
     warped_red_labels.convertTo(warped_red_labels, CV_32S);
     
     float_t red_score = 0, red_total = 0, white_score = 0, white_total = 0;
@@ -443,27 +441,28 @@ void get_dark_red_mask(cv::Mat &p_hsv_img, cv::Mat &p_red_mask)
     cv::Mat mask;
 
     // Apply inRange to find red pixels in both ranges
-    cv::inRange(p_hsv_img, lower_red_1, upper_red_1, p_red_mask); // Mask for the first red range
+    cv::inRange(p_hsv_img, lower_red_1, upper_red_1, p_red_mask); 
     cv::inRange(p_hsv_img, lower_red_2, upper_red_2, mask);
     p_red_mask |= mask;
 }
 
 void get_white_mask(cv::Mat &p_hsv_img, cv::Mat &p_white_mask)
 {
-    // Define the lower and upper bounds for red hues in HSV
     cv::Scalar lower_red_1(0, 0, MIN_WHITE_VALUE);  
     cv::Scalar upper_red_1(MAX_HUE, MAX_WHITE_SATURATION, MAX_VALUE); 
 
-    // Apply inRange to find red pixels in both ranges
-    cv::inRange(p_hsv_img, lower_red_1, upper_red_1, p_white_mask); // Mask for the first red range
+    cv::inRange(p_hsv_img, lower_red_1, upper_red_1, p_white_mask); 
 }
 
-void get_masks(cv::Mat &p_img, cv::Mat &p_red_mask, cv::Mat &p_white_mask)
+void get_black_mask(cv::Mat &p_hsv_img, cv::Mat &p_black_mask)
 {
+    cv::Scalar lower_red_1(0, 0, 0);  
+    cv::Scalar upper_red_1(MAX_HUE, MAX_BLACK_SATURATION, MAX_BLACK_VALUE); 
 
+    cv::inRange(p_hsv_img, lower_red_1, upper_red_1, p_black_mask); 
 }
 
-void detect_gw_thread(cv::Mat *p_img, cv::Mat *p_red_mask, cv::Mat *p_white_mask,
+void detect_gw_thread(cv::Mat *p_img, cv::Mat *p_red_mask, cv::Mat *p_white_mask, cv::Mat *p_black_mask,
     std::atomic<int32_t> *p_detection_number, std::vector<cv::Mat> *p_templates)
 {
     cv::Mat labels;
@@ -486,9 +485,8 @@ float detect_gw_cv(cv::Mat &p_img, std::vector<cv::Mat> &p_templates)
 {
 
     cv::Mat hsv_image;
-    cv::Mat dark_red_mask;
-    cv::Mat bright_red_mask;
-    cv::Mat white_mask;
+    cv::Mat dark_red_mask, bright_red_mask;
+    cv::Mat white_mask, black_mask;
 
     std::atomic<int32_t> detection_number = 0;
     float best_score = 0;
@@ -497,6 +495,10 @@ float detect_gw_cv(cv::Mat &p_img, std::vector<cv::Mat> &p_templates)
     get_dark_red_mask(hsv_image, dark_red_mask);
     get_bright_red_mask(hsv_image, bright_red_mask);
     get_white_mask(hsv_image, white_mask);
+    get_black_mask(hsv_image, black_mask);
+
+    show_pic(white_mask);
+    show_pic(black_mask);
 
     uint8_t erode_size = 3;
     cv::Mat erode_kernel = cv::Mat::ones(erode_size, erode_size, CV_8U); 
@@ -522,8 +524,8 @@ float detect_gw_cv(cv::Mat &p_img, std::vector<cv::Mat> &p_templates)
     // 14.12 milis
     // 14.09 milis
     // 17.94
-    std::thread bright_red_gw_thread(detect_gw_thread, &p_img, &bright_red_mask, &white_mask, &detection_number, &p_templates);
-    std::thread dark_red_gw_thread(detect_gw_thread, &p_img, &dark_red_mask, &white_mask, &detection_number, &p_templates);
+    std::thread bright_red_gw_thread(detect_gw_thread, &p_img, &bright_red_mask, &white_mask, &black_mask, &detection_number, &p_templates);
+    std::thread dark_red_gw_thread(detect_gw_thread, &p_img, &dark_red_mask, &white_mask, &black_mask, &detection_number, &p_templates);
 
     bright_red_gw_thread.join();
     dark_red_gw_thread.join();
