@@ -56,8 +56,6 @@ void detect_dir_images(std::string p_input_dir)
         // Check if the file has a valid image extension
         if (std::find(validExtensions.begin(), validExtensions.end(), extension) != validExtensions.end()) {
             std::cout << "Opening image: " << path.string() << std::endl;
-
-            // Read the image using OpenCV
             cv::Mat image = cv::imread(path.string());
 
             if (! image.data) {
@@ -291,32 +289,6 @@ int main(int argc, char** argv)
 	std::vector<cv::Mat> template_vector;
 	load_templates(template_vector);
 
-	// show_pic(template_vector[0]);
-	// cv::Mat stop = template_vector[0];
-	// cv::Mat gray_stop;
-	// cv::cvtColor(template_vector[0], gray_stop, cv::COLOR_BGR2GRAY);
-
-	// cv::Mat edges;
-	// cv::Canny(gray_stop, edges, 50, 150);
-
-	// std::vector<std::vector<cv::Point>> contours;
-	// cv::findContours(edges, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
-
-	// std::vector<cv::Point> approx;
-	// double epsilon = 0.01 * cv::arcLength(contours[0], true);
-	// cv::approxPolyDP(contours[0], approx, epsilon, true);	
-
-	// std::cout << "number of edges:" << approx.size() << std::endl;
-
-	// cv::Scalar color = cv::Scalar(0, 255, 0);
-	// int thickness = 2;
-	// cv::line(stop, approx[0], approx[approx.size() - 1], color, thickness);
-	// for(int i = 0; i < approx.size() - 1; i++)
-	// {
-	// 	cv::line(stop, approx[i], approx[i + 1], color, thickness);
-	// }
-	// show_pic(stop);
-
 	// detection_loop();
 
 	// if (argc != 2) { 
@@ -324,6 +296,7 @@ int main(int argc, char** argv)
 	// 	return -1; 
 	// } 
 	// detect_dir_images(argv[1]);
+
 	detect_from_name(argv[1]);
 	return 0; 
 }

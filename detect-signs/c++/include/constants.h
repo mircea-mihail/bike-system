@@ -108,7 +108,7 @@ struct stop_chunk
 // ------------------------------- CHUNK
 #define MIN_CHUNK_SIZE 10
 #define MIN_BOUNDING_BOX_AREA 200
-#define MIN_CHUNK_SCORE 0.70
+#define MIN_CHUNK_SCORE 0.55
 #define MAX_CLUMPING_VARIANCE 5 
 
 // ------------------------------- TIMING
@@ -121,6 +121,8 @@ struct stop_chunk
 // #define THICK_GW_BORDER_PER_CENT 0.376
 #define THICK_GW_BORDER_PER_CENT 0.4
 #define THIN_GW_BORDER_PER_CENT 0.68
+// for thin german give way:
+// #define THIN_GW_BORDER_PER_CENT 0.88
 #define MIN_TRIANGLE_ANGLE 40
 #define OCTOGON_ANGLE_THRESHOLD 20
 #define IDEAL_OCTOGON_ANGLE 135
@@ -151,6 +153,9 @@ struct stop_chunk
 // before min val 40
 #define MIN_WHITE_VALUE 40
 #define MAX_WHITE_SATURATION 130
+
+#define MAX_BLACK_VALUE 80
+#define MAX_BLACK_SATURATION 130
 
 #define RED 2
 #define GREEN 1

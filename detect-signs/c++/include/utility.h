@@ -72,4 +72,6 @@ cv::Point2f get_line_intersection( point A, point B, point C, point D);
 
 float get_angle(point A, point B, point C);
 
+void print_bounding_box(cv::Mat &p_img, int32_t p_x, int32_t p_y, int32_t p_w, int32_t p_h);
+
 #endif

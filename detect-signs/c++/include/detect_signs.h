@@ -9,6 +9,8 @@
 
 #include "constants.h"
 #include "utility.h"
+#include "template_match_signs.h"
+#include "find_signs_in_chunk.h"
 
 /// @brief checks how well the current chunk matches a generated give way sign between the chunk points
 /// @param p_hsv_img the hsv image, used for is_white function
@@ -27,7 +29,7 @@ float check_for_gw_cv(cv::Mat &p_hsv_img, give_way_chunk p_chunk, cv::Mat &p_lab
 /// @param p_stats the stats built by the connectedComponentsWithStats function, used for chunk building
 /// @param p_label the current label in the p_labes mat
 /// @return returns the similitude between the current chunk and a give way sign
-float find_gw_in_chunk(cv::Mat &p_img, cv::Mat &p_hsv_img, cv::Mat &p_labels, cv::Mat &p_stats, int32_t p_label);
+// float find_gw_in_chunk(cv::Mat &p_img, cv::Mat &p_hsv_img, cv::Mat &p_labels, cv::Mat &p_stats, int32_t p_label);
 
 /// @brief builds 2 scalar ranges used to create 2 masks in order to apply all of the hsv constraints for the bright red pixels
 /// 4 times faster than iterating through each pixel and calling is_red()
