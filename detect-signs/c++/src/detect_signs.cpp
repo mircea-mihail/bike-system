@@ -131,3 +131,5 @@ float detect_gw_cv(cv::Mat &p_img, std::vector<cv::Mat> &p_templates)
 
     return detection_number;
 }
+
+//todo intersection over union

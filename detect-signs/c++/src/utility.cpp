@@ -119,6 +119,33 @@ bool has_small_angle(stop_chunk p_chunk)
     return false;
 }
 
+bool has_small_angle(no_bikes_chunk p_chunk)
+{
+    float angle = 0;
+    angle = get_angle(p_chunk.top, p_chunk.right, p_chunk.bottom);
+    if(angle > IDEAL_SQUARE_ANGLE + SQUARE_ANGLE_THRESHOLD || angle < IDEAL_SQUARE_ANGLE - SQUARE_ANGLE_THRESHOLD)
+    {
+        return true;
+    }
+    angle = get_angle(p_chunk.right, p_chunk.bottom, p_chunk.left);
+    if(angle > IDEAL_SQUARE_ANGLE + SQUARE_ANGLE_THRESHOLD || angle < IDEAL_SQUARE_ANGLE - SQUARE_ANGLE_THRESHOLD)
+    {
+        return true;
+    }
+    angle = get_angle(p_chunk.bottom, p_chunk.left, p_chunk.top);
+    if(angle > IDEAL_SQUARE_ANGLE + SQUARE_ANGLE_THRESHOLD || angle < IDEAL_SQUARE_ANGLE - SQUARE_ANGLE_THRESHOLD)
+    {
+        return true;
+    }
+    angle = get_angle(p_chunk.left, p_chunk.top, p_chunk.right);
+    if(angle > IDEAL_SQUARE_ANGLE + SQUARE_ANGLE_THRESHOLD || angle < IDEAL_SQUARE_ANGLE - SQUARE_ANGLE_THRESHOLD)
+    {
+        return true;
+    }
+    
+    return false;
+}
+
 bool has_small_angle(give_way_chunk p_chunk)
 {
     float a_side = sqrt(pow(p_chunk.top_left.x - p_chunk.top_right.x, 2) + pow(p_chunk.top_left.y - p_chunk.top_right.y, 2));
@@ -200,13 +227,6 @@ void print_no_bikes(cv::Mat &p_img, no_bikes_chunk nb_chunk, float p_score)
 
     float axisX = (nb_chunk.right.x - nb_chunk.left.x) / 2.0;
     float axisY = (nb_chunk.bottom.y - nb_chunk.top.y) / 2.0;
-
-    cv::circle(p_img, cv::Point2d(nb_chunk.bottom.x, nb_chunk.bottom.y), 5, cv::Scalar(0, 0, 255), cv::FILLED);
-    cv::circle(p_img, cv::Point2d(nb_chunk.left.x, nb_chunk.left.y), 5, cv::Scalar(0, 255, 0), cv::FILLED);
-    cv::circle(p_img, cv::Point2d(nb_chunk.right.x, nb_chunk.right.y), 5, cv::Scalar(255, 0, 0), cv::FILLED);
-    cv::circle(p_img, cv::Point2d(nb_chunk.top.x, nb_chunk.top.y), 5, cv::Scalar(0, 0, 0), cv::FILLED);
-
-    std::cout << nb_chunk.bottom.x << " " << nb_chunk.bottom.y << std::endl;
 
     cv::ellipse(p_img, center, cv::Size(axisX, axisY), 0, 0, 360, cv::Scalar(0, 255, 0), 2);
 

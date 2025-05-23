@@ -213,3 +213,124 @@ float check_for_stop(cv::Mat &p_white_mask, stop_chunk st_chunk, cv::Mat &p_labe
 
     return 0.5 * (red_score/red_total) + 0.5 * (white_score/white_total);
 }
+
+float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_chunk nb_chunk, 
+    cv::Mat &p_label_mat, int32_t p_sign_label, cv::Mat &p_nb_template)
+{
+    /////////////////////////////////////////////////////////////////////////////////////////////////////todo
+    if(has_small_angle(nb_chunk))
+    {
+        return 0;
+    }
+
+    cv::Point2f top_left_corner = cv::Point2f(nb_chunk.left.x, nb_chunk.top.y);
+    cv::Point2f top_right_corner = cv::Point2f(nb_chunk.right.x, nb_chunk.top.y);
+    cv::Point2f bottom_left_corner = cv::Point2f(nb_chunk.left.x, nb_chunk.bottom.y);
+    cv::Point2f bottom_right_corner = cv::Point2f(nb_chunk.right.x, nb_chunk.bottom.y);
+
+    std::vector<cv::Point2f> src_points = {
+        top_left_corner,
+        top_right_corner,
+        bottom_right_corner,
+        bottom_left_corner
+	};
+
+	int32_t width = NO_BIKES_TEMPLATE_WIDTH;
+	int32_t height = NO_BIKES_TEMPLATE_HEIGHT;
+	
+	std::vector<cv::Point2f> dst_points = {
+		cv::Point2f(0, 0),           
+		cv::Point2f(width - 1, 0),    
+		cv::Point2f(width - 1, height - 1),
+		cv::Point2f(0, height - 1)    
+	};
+	cv::Mat H = cv::getPerspectiveTransform(src_points, dst_points);
+
+	cv::Mat warped_red_labels;
+    cv::Mat warped_white_mask;
+    cv::Mat warped_black_mask;
+
+    cv::Mat float_labels;
+    p_label_mat.convertTo(float_labels, CV_32F);
+
+	cv::warpPerspective(float_labels, warped_red_labels, H, cv::Size(width, height), cv::INTER_NEAREST );
+	cv::warpPerspective(p_black_mask, warped_black_mask, H, cv::Size(width, height), cv::INTER_NEAREST );
+	cv::warpPerspective(p_white_mask, warped_white_mask, H, cv::Size(width, height), cv::INTER_NEAREST );
+
+    // show_pic(warped_red_labels);
+    // show_pic(warped_black_mask);
+    // show_pic(warped_white_mask);
+
+    // return 1;
+
+    warped_red_labels.convertTo(warped_red_labels, CV_32S);
+    
+    float_t red_score = 0, red_total = 0;
+    float_t white_score = 0, white_total = 0;
+    float_t black_score = 0, black_total = 0;
+    float_t red_outside = 0, outside_total = 0;
+
+    for(int i = 0; i < STOP_TEMPLATE_HEIGHT; i++)
+    {
+        for(int j = 0; j < STOP_TEMPLATE_WIDTH; j++)
+        {
+            // if not green
+            if (! ((p_nb_template.at<cv::Vec3b>(i, j)[GREEN]) > COLOR_THRESHOLD
+                && (p_nb_template.at<cv::Vec3b>(i, j)[RED]) < COLOR_THRESHOLD
+                && (p_nb_template.at<cv::Vec3b>(i, j)[BLUE]) < COLOR_THRESHOLD)
+        )
+            {
+                uint8_t red_px = p_nb_template.at<cv::Vec3b>(i, j)[RED];
+                uint8_t green_px = p_nb_template.at<cv::Vec3b>(i, j)[GREEN];
+                uint8_t blue_px = p_nb_template.at<cv::Vec3b>(i, j)[BLUE];
+
+                // score according to template
+                red_total += cv::max((red_px - (green_px + blue_px) / 2) / PX_MAX_VAL, 0);
+                if(warped_red_labels.at<int32_t>(i, j) == p_sign_label)
+                {
+                    red_score += cv::max((red_px - (green_px + blue_px) / 2) / PX_MAX_VAL, 0);
+                }
+
+                if (red_px > COLOR_THRESHOLD && green_px > COLOR_THRESHOLD && blue_px > COLOR_THRESHOLD)
+                {
+                    white_total += cv::min({red_px, green_px, blue_px}) / PX_MAX_VAL;
+                    if (warped_red_labels.at<int32_t>(i, j) != p_sign_label && warped_white_mask.at<int32_t>(i, j) != 0)
+                    {
+                        white_score += cv::min({red_px, green_px, blue_px}) / PX_MAX_VAL;
+                    }
+                }
+                else 
+                {
+                    black_total += (PX_MAX_VAL - cv::max({red_px, green_px, blue_px})) / PX_MAX_VAL;
+                    if (warped_red_labels.at<int32_t>(i, j) != p_sign_label && warped_black_mask.at<int32_t>(i, j) != 0)
+                    {
+                        black_score += (PX_MAX_VAL - cv::max({red_px, green_px, blue_px})) / PX_MAX_VAL;
+                    }
+
+                }
+            }
+            else
+            {
+                outside_total ++;
+                if(warped_red_labels.at<int32_t>(i, j) == p_sign_label)
+                {
+                    red_outside ++;
+                }
+            }
+        }
+    }
+
+    if(red_total == 0 || white_total == 0 || black_total == 0 || red_outside/outside_total > RED_OUTSIDE_STOP_THRESHOLD)
+    {
+        return 0;
+    }
+
+    std::cout << "white score: " << white_score / white_total << std::endl;
+    std::cout << "red score: " << red_score / red_total << std::endl;
+    std::cout << "black score: " << black_score / black_total << std::endl;
+    std::cout << "outside ratio: " << red_outside/outside_total << std::endl;
+    std::cout << "final score:" << 0.34 * (red_score/red_total) + 0.34 * (white_score/white_total) + 0.34 * (black_score / black_total) << std::endl;
+    std::cout << std::endl;
+
+    return 0.34 * (red_score/red_total) + 0.34 * (white_score/white_total) + 0.34 * (black_score / black_total);
+}

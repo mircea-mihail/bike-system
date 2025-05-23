@@ -187,6 +187,7 @@ float find_stop_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_label
     return 0;
 }
 
+// todo p_templates -> make it just no bikes template?
 float find_no_bikes_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_black_mask,
     cv::Mat &p_labels, cv::Mat &p_stats, int32_t p_label, std::vector<cv::Mat> &p_templates)
 {
@@ -249,18 +250,15 @@ float find_no_bikes_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_b
     }
     no_bikes_chunk nb_chunk = no_bikes_chunk(top_pt, bottom_pt, left_pt, right_pt);
 
-    print_no_bikes(p_img, nb_chunk, 0.8);
-    show_pic(p_img);
+    float chunk_score = check_for_no_bikes(p_white_mask, p_black_mask, nb_chunk, p_labels, p_label, p_templates[NO_BIKES_POSITION]);
+    if(chunk_score > MIN_CHUNK_SCORE)
+    {
+        #ifdef PRINT_STATS
+            print_no_bikes(p_img, nb_chunk, chunk_score);
+        #endif
 
-    // float chunk_score = check_for_gw_cv(p_white_mask, gw_chunk, p_labels, p_label);
-    // if(chunk_score > MIN_CHUNK_SCORE)
-    // {
-    //     #ifdef PRINT_STATS
-    //         print_give_way(p_img, gw_chunk, chunk_score);
-    //     #endif
-
-    //     return chunk_score;
-    // }
+        return chunk_score;
+    }
 
     return 0;
 }

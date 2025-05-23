@@ -17,6 +17,8 @@ void load_templates(std::vector<cv::Mat> &p_templates)
 {
 	cv::Mat buf = cv::imread(std::string(STOP_PATH), cv::IMREAD_COLOR);
 	p_templates.push_back(buf);
+	buf = cv::imread(std::string(NO_BIKES_PATH), cv::IMREAD_COLOR);
+	p_templates.push_back(buf);
 }
 
 void detect_dir_images(std::string p_input_dir)
