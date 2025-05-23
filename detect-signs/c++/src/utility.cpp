@@ -188,6 +188,37 @@ void print_stop(cv::Mat &p_img, stop_chunk p_st_chunk, float p_score)
     cv::putText(p_img, stringed_score, text_pt, 1, font_size, cv::Scalar(0, 255, 0), 3);   
 }
 
+void print_no_bikes(cv::Mat &p_img, no_bikes_chunk nb_chunk, float p_score)
+{
+    cv::Scalar color = cv::Scalar(0, 255, 0);
+    int thickness = 2;
+
+    float centerX = (nb_chunk.left.x + nb_chunk.right.x) / 2.0;
+    float centerY = (nb_chunk.top.y + nb_chunk.bottom.y) / 2.0;
+
+    cv::Point2f center(centerX, centerY);
+
+    float axisX = (nb_chunk.right.x - nb_chunk.left.x) / 2.0;
+    float axisY = (nb_chunk.bottom.y - nb_chunk.top.y) / 2.0;
+
+    cv::circle(p_img, cv::Point2d(nb_chunk.bottom.x, nb_chunk.bottom.y), 5, cv::Scalar(0, 0, 255), cv::FILLED);
+    cv::circle(p_img, cv::Point2d(nb_chunk.left.x, nb_chunk.left.y), 5, cv::Scalar(0, 255, 0), cv::FILLED);
+    cv::circle(p_img, cv::Point2d(nb_chunk.right.x, nb_chunk.right.y), 5, cv::Scalar(255, 0, 0), cv::FILLED);
+    cv::circle(p_img, cv::Point2d(nb_chunk.top.x, nb_chunk.top.y), 5, cv::Scalar(0, 0, 0), cv::FILLED);
+
+    std::cout << nb_chunk.bottom.x << " " << nb_chunk.bottom.y << std::endl;
+
+    cv::ellipse(p_img, center, cv::Size(axisX, axisY), 0, 0, 360, cv::Scalar(0, 255, 0), 2);
+
+    char stringed_score[5];
+    snprintf(stringed_score, sizeof(stringed_score), "%.1f", p_score * 100);
+
+    cv::Point text_pt(nb_chunk.top.x, nb_chunk.top.y);
+    int font_size = 3;
+    cv::putText(p_img, stringed_score, text_pt, 1, font_size, cv::Scalar(0, 0, 0), 8);   
+    cv::putText(p_img, stringed_score, text_pt, 1, font_size, cv::Scalar(0, 255, 0), 3);   
+}
+
 void show_pic(cv::Mat p_img)
 {
 	cv::namedWindow("Display Image", cv::WINDOW_GUI_NORMAL); 

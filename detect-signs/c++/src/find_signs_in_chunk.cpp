@@ -226,35 +226,41 @@ float find_no_bikes_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_b
         }
     }
 
-    point leftest_bottom_pt(-1, -1);
-    point rightest_bottom_pt;
+    point bottom_pt;
     for (int j = x; j < x + w; j++)
     {
         if (p_labels.at<int32_t>(y + h-1, j) == p_label)
         {
-            rightest_bottom_pt.x = j;
-            rightest_bottom_pt.y = y + h-1;
-            if(leftest_bottom_pt.x == -1)
-            {
-                leftest_bottom_pt.x = j;
-                leftest_bottom_pt.y = y + h-1;
-            }
+            bottom_pt.x = j;
+            bottom_pt.y = y + h-1;
             break;
         }
     }
-    point bottom_pt(int((rightest_bottom_pt.x + leftest_bottom_pt.x) / 2), rightest_bottom_pt.y);
 
-    give_way_chunk gw_chunk = give_way_chunk(left_pt, right_pt, bottom_pt);
-
-    float chunk_score = check_for_gw_cv(p_white_mask, gw_chunk, p_labels, p_label);
-    if(chunk_score > MIN_CHUNK_SCORE)
+    point top_pt;
+    for (int j = x; j < x + w; j++)
     {
-        #ifdef PRINT_STATS
-            print_give_way(p_img, gw_chunk, chunk_score);
-        #endif
-
-        return chunk_score;
+        if (p_labels.at<int32_t>(y, j) == p_label)
+        {
+            top_pt.x = j;
+            top_pt.y = y;
+            break;
+        }
     }
+    no_bikes_chunk nb_chunk = no_bikes_chunk(top_pt, bottom_pt, left_pt, right_pt);
+
+    print_no_bikes(p_img, nb_chunk, 0.8);
+    show_pic(p_img);
+
+    // float chunk_score = check_for_gw_cv(p_white_mask, gw_chunk, p_labels, p_label);
+    // if(chunk_score > MIN_CHUNK_SCORE)
+    // {
+    //     #ifdef PRINT_STATS
+    //         print_give_way(p_img, gw_chunk, chunk_score);
+    //     #endif
+
+    //     return chunk_score;
+    // }
 
     return 0;
 }

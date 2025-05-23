@@ -64,6 +64,7 @@ void detect_gw_thread(cv::Mat *p_img, cv::Mat *p_red_mask, cv::Mat *p_white_mask
     {
         float gw_detection_res = find_gw_in_chunk(*p_img, *p_white_mask, labels, stats, i);
         find_stop_in_chunk(*p_img, *p_white_mask, labels, stats, i, *p_templates);
+        find_no_bikes_in_chunk(*p_img, *p_white_mask, *p_black_mask, labels, stats, i, *p_templates);
         if(gw_detection_res > 0)
         {
             (*p_detection_number) ++;
