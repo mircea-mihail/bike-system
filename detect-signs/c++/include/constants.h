@@ -84,14 +84,38 @@ struct stop_chunk
     {}
 };
 
+struct no_bikes_chunk
+{
+    point top;
+    point bottom;
+    point left;
+    point right;
+
+    no_bikes_chunk(point p_top, point p_bottom, point p_left, point p_right)
+    {
+        top = p_top;
+        bottom = p_bottom;
+        left = p_left;
+        right = p_right;
+    }
+
+    no_bikes_chunk()
+    {
+        top = point();
+        bottom = point();
+        left = point();
+        right = point();
+    }
+};
+
+
 ///////////////////////////////// tweak-able constants
 #define PRINT_STATS
 // #define IN_RASPI
 
 #define LOG_PIC_PATH "/home/mircea/.bike-sys-data"
 #define STOP_PATH "./templates/stop_100.png"
-// #define STOP_PATH "./templates/stop_edges.png"
-// #define STOP_PATH "./templates/stop_test_tilted.png"
+#define NO_BIKES_PATH "./templates/no_bikes_100.png"
 
 // ------------------------------- IMAGE
 #define IMAGE_HEIGHT (960)
@@ -99,7 +123,12 @@ struct stop_chunk
 
 #define STOP_TEMPLATE_WIDTH 100
 #define STOP_TEMPLATE_HEIGHT 101
+#define NO_BIKES_TEMPLATE_WIDTH 100
+#define NO_BIKES_TEMPLATE_HEIGHT 100
+
+
 #define STOP_POSITION 0
+#define NO_BIKES_POSITION 1
 
 #define SAVE_IMG_RATIO 1
 #define SAVED_IMG_HEIGHT (IMAGE_HEIGHT / SAVE_IMG_RATIO) 
@@ -108,7 +137,7 @@ struct stop_chunk
 // ------------------------------- CHUNK
 #define MIN_CHUNK_SIZE 10
 #define MIN_BOUNDING_BOX_AREA 200
-#define MIN_CHUNK_SCORE 0.55
+#define MIN_CHUNK_SCORE 0.70
 #define MAX_CLUMPING_VARIANCE 5 
 
 // ------------------------------- TIMING
@@ -126,6 +155,10 @@ struct stop_chunk
 #define MIN_TRIANGLE_ANGLE 40
 #define OCTOGON_ANGLE_THRESHOLD 20
 #define IDEAL_OCTOGON_ANGLE 135
+
+#define IDEAL_SQUARE_ANGLE 90
+#define SQUARE_ANGLE_THRESHOLD 20
+
 #define RED_OUTSIDE_GW_THRESHOLD 0.4
 #define RED_OUTSIDE_STOP_THRESHOLD 0.3
 #define RED_ABOVE_SIGN (1/4)
@@ -154,7 +187,7 @@ struct stop_chunk
 #define MIN_WHITE_VALUE 40
 #define MAX_WHITE_SATURATION 130
 
-#define MAX_BLACK_VALUE 80
+#define MAX_BLACK_VALUE 120
 #define MAX_BLACK_SATURATION 130
 
 #define RED 2

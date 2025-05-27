@@ -230,8 +230,10 @@ void print_no_bikes(cv::Mat &p_img, no_bikes_chunk nb_chunk, float p_score)
 
     cv::ellipse(p_img, center, cv::Size(axisX, axisY), 0, 0, 360, cv::Scalar(0, 255, 0), 2);
 
-    char stringed_score[5];
-    snprintf(stringed_score, sizeof(stringed_score), "%.1f", p_score * 100);
+    char stringed_score[20] = "no-bikes ";
+    char buf[10];
+    snprintf(buf, sizeof(stringed_score), "%.1f", p_score * 100);
+    strcat(stringed_score, buf);
 
     cv::Point text_pt(nb_chunk.top.x, nb_chunk.top.y);
     int font_size = 3;

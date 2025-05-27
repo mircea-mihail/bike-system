@@ -41,7 +41,7 @@ float check_for_gw_cv(cv::Mat &p_white_mask, give_way_chunk p_chunk, cv::Mat &p_
                 // check for thin border
                 if (point_in_triangle(point(j, i), thin_inner_triangle.top_left, thin_inner_triangle.top_right, thin_inner_triangle.bottom))
                 {
-                    if (p_white_mask.at<int8_t>(i, j) != 0 && (current_label == 0))
+                    if (p_white_mask.at<uchar>(i, j) > 0 && (current_label == 0))
                     {
                         thin_white_score += 1;
                     }
@@ -57,7 +57,7 @@ float check_for_gw_cv(cv::Mat &p_white_mask, give_way_chunk p_chunk, cv::Mat &p_
                 // and check for thick border
                 if (point_in_triangle(point(j, i), thick_inner_triangle.top_left, thick_inner_triangle.top_right, thick_inner_triangle.bottom))
                 {
-                    if (p_white_mask.at<int8_t>(i, j) != 0 && (current_label == 0))
+                    if (p_white_mask.at<uchar>(i, j) > 0 && (current_label == 0))
                     { 
                         thick_white_score += 1;
                     }
@@ -85,7 +85,7 @@ float check_for_gw_cv(cv::Mat &p_white_mask, give_way_chunk p_chunk, cv::Mat &p_
 
 
     // if there are a lot of red pixels outside of triangle, likely not a give way
-    if(px_outside_gw != 0)
+    if(px_outside_gw > 0)
     {
         if ( red_outside_gw / (double)px_outside_gw > RED_OUTSIDE_GW_THRESHOLD)
         {
@@ -158,6 +158,7 @@ float check_for_stop(cv::Mat &p_white_mask, stop_chunk st_chunk, cv::Mat &p_labe
     
     float_t red_score = 0, red_total = 0, white_score = 0, white_total = 0;
     float_t red_outside = 0, outside_total = 0;
+    double px_max_val = 255;
 
     for(int i = 0; i < STOP_TEMPLATE_HEIGHT; i++)
     {
@@ -169,23 +170,23 @@ float check_for_stop(cv::Mat &p_white_mask, stop_chunk st_chunk, cv::Mat &p_labe
                 && (p_stop_template.at<cv::Vec3b>(i, j)[BLUE]) < COLOR_THRESHOLD)
         )
             {
-                uint8_t red_px = p_stop_template.at<cv::Vec3b>(i, j)[RED];
-                uint8_t green_px = p_stop_template.at<cv::Vec3b>(i, j)[GREEN];
-                uint8_t blue_px = p_stop_template.at<cv::Vec3b>(i, j)[BLUE];
+                uchar red_px = p_stop_template.at<cv::Vec3b>(i, j)[RED];
+                uchar green_px = p_stop_template.at<cv::Vec3b>(i, j)[GREEN];
+                uchar blue_px = p_stop_template.at<cv::Vec3b>(i, j)[BLUE];
 
                 // score according to template
-                red_total += cv::max((red_px - (green_px + blue_px) / 2) / PX_MAX_VAL, 0);
+                red_total += cv::max((red_px - (green_px + blue_px) / 2) / px_max_val, 0.0);
                 if(warped_red_labels.at<int32_t>(i, j) == p_sign_label)
                 {
-                    red_score += cv::max((red_px - (green_px + blue_px) / 2) / PX_MAX_VAL, 0);
+                    red_score += cv::max((red_px - (green_px + blue_px) / 2) / px_max_val, 0.0);
                 }
 
                 if (red_px > COLOR_THRESHOLD && green_px > COLOR_THRESHOLD && blue_px > COLOR_THRESHOLD)
                 {
-                    white_total += cv::min({red_px, green_px, blue_px}) / PX_MAX_VAL;
-                    if (warped_red_labels.at<int32_t>(i, j) != p_sign_label && warped_white_mask.at<int32_t>(i, j) != 0)
+                    white_total += cv::min({red_px, green_px, blue_px}) / px_max_val;
+                    if (warped_red_labels.at<int32_t>(i, j) != p_sign_label && warped_white_mask.at<uchar>(i, j) > 0)
                     {
-                        white_score += cv::min({red_px, green_px, blue_px}) / PX_MAX_VAL;
+                        white_score += cv::min({red_px, green_px, blue_px}) / px_max_val;
                     }
                 }
             }
@@ -215,7 +216,7 @@ float check_for_stop(cv::Mat &p_white_mask, stop_chunk st_chunk, cv::Mat &p_labe
 }
 
 float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_chunk nb_chunk, 
-    cv::Mat &p_label_mat, int32_t p_sign_label, cv::Mat &p_nb_template)
+    cv::Mat &p_label_mat, int32_t p_sign_label, cv::Mat &p_nb_template, cv::Mat &p_img)
 {
     /////////////////////////////////////////////////////////////////////////////////////////////////////todo
     if(has_small_angle(nb_chunk))
@@ -251,17 +252,21 @@ float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_
     cv::Mat warped_black_mask;
 
     cv::Mat float_labels;
+    cv::Mat ref_img;
     p_label_mat.convertTo(float_labels, CV_32F);
 
 	cv::warpPerspective(float_labels, warped_red_labels, H, cv::Size(width, height), cv::INTER_NEAREST );
 	cv::warpPerspective(p_black_mask, warped_black_mask, H, cv::Size(width, height), cv::INTER_NEAREST );
 	cv::warpPerspective(p_white_mask, warped_white_mask, H, cv::Size(width, height), cv::INTER_NEAREST );
+	cv::warpPerspective(p_img, ref_img, H, cv::Size(width, height), cv::INTER_NEAREST );
 
-    // show_pic(warped_red_labels);
-    // show_pic(warped_black_mask);
-    // show_pic(warped_white_mask);
+    cv::Mat vibe_check = warped_white_mask.clone();
 
     // return 1;
+
+    show_pic(ref_img);
+    // show_pic(p_nb_template);
+    // show_pic(warped_red_labels);
 
     warped_red_labels.convertTo(warped_red_labels, CV_32S);
     
@@ -269,44 +274,50 @@ float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_
     float_t white_score = 0, white_total = 0;
     float_t black_score = 0, black_total = 0;
     float_t red_outside = 0, outside_total = 0;
+    double px_max_val = 255.0;
 
-    for(int i = 0; i < STOP_TEMPLATE_HEIGHT; i++)
+    for(int i = 0; i < NO_BIKES_TEMPLATE_HEIGHT; i++)
     {
-        for(int j = 0; j < STOP_TEMPLATE_WIDTH; j++)
+        for(int j = 0; j < NO_BIKES_TEMPLATE_WIDTH; j++)
         {
+            vibe_check.at<uchar>(i, j) = 0;
             // if not green
             if (! ((p_nb_template.at<cv::Vec3b>(i, j)[GREEN]) > COLOR_THRESHOLD
                 && (p_nb_template.at<cv::Vec3b>(i, j)[RED]) < COLOR_THRESHOLD
-                && (p_nb_template.at<cv::Vec3b>(i, j)[BLUE]) < COLOR_THRESHOLD)
-        )
+                && (p_nb_template.at<cv::Vec3b>(i, j)[BLUE]) < COLOR_THRESHOLD))
             {
-                uint8_t red_px = p_nb_template.at<cv::Vec3b>(i, j)[RED];
-                uint8_t green_px = p_nb_template.at<cv::Vec3b>(i, j)[GREEN];
-                uint8_t blue_px = p_nb_template.at<cv::Vec3b>(i, j)[BLUE];
+                int32_t red_px = p_nb_template.at<cv::Vec3b>(i, j)[RED];
+                int32_t green_px = p_nb_template.at<cv::Vec3b>(i, j)[GREEN];
+                int32_t blue_px = p_nb_template.at<cv::Vec3b>(i, j)[BLUE];
 
                 // score according to template
-                red_total += cv::max((red_px - (green_px + blue_px) / 2) / PX_MAX_VAL, 0);
+
+                red_total += std::max((red_px - (green_px + blue_px) / 2) / px_max_val, 0.0);
                 if(warped_red_labels.at<int32_t>(i, j) == p_sign_label)
                 {
-                    red_score += cv::max((red_px - (green_px + blue_px) / 2) / PX_MAX_VAL, 0);
+                    red_score += std::max((red_px - (green_px + blue_px) / 2) / px_max_val, 0.0);
+                    vibe_check.at<uchar>(i, j) = std::min(std::max((red_px - (green_px + blue_px) / 2) / px_max_val, 0.0) * px_max_val, px_max_val);
                 }
 
                 if (red_px > COLOR_THRESHOLD && green_px > COLOR_THRESHOLD && blue_px > COLOR_THRESHOLD)
                 {
-                    white_total += cv::min({red_px, green_px, blue_px}) / PX_MAX_VAL;
-                    if (warped_red_labels.at<int32_t>(i, j) != p_sign_label && warped_white_mask.at<int32_t>(i, j) != 0)
+                    white_total += cv::min({red_px, green_px, blue_px}) / px_max_val;
+
+                    if (warped_red_labels.at<int32_t>(i, j) != p_sign_label && warped_white_mask.at<uchar>(i, j) > 0)
                     {
-                        white_score += cv::min({red_px, green_px, blue_px}) / PX_MAX_VAL;
+                        white_score += cv::min({red_px, green_px, blue_px}) / px_max_val;
+                        vibe_check.at<uchar>(i, j) = std::min(cv::min({red_px, green_px, blue_px}), int(px_max_val));
                     }
                 }
-                else 
-                {
-                    black_total += (PX_MAX_VAL - cv::max({red_px, green_px, blue_px})) / PX_MAX_VAL;
-                    if (warped_red_labels.at<int32_t>(i, j) != p_sign_label && warped_black_mask.at<int32_t>(i, j) != 0)
-                    {
-                        black_score += (PX_MAX_VAL - cv::max({red_px, green_px, blue_px})) / PX_MAX_VAL;
-                    }
 
+                if (red_px < COLOR_THRESHOLD && green_px < COLOR_THRESHOLD && blue_px < COLOR_THRESHOLD)
+                {
+                    black_total += (px_max_val - std::max({red_px, green_px, blue_px})) / px_max_val;
+                    if (warped_red_labels.at<int32_t>(i, j) != p_sign_label && warped_black_mask.at<uchar>(i, j) > 0)
+                    {
+                        black_score += (px_max_val - std::max({red_px, green_px, blue_px})) / px_max_val;
+                        vibe_check.at<uchar>(i, j) = std::min((px_max_val - std::max({red_px, green_px, blue_px})) / px_max_val *  px_max_val, px_max_val);
+                    }
                 }
             }
             else
@@ -314,11 +325,15 @@ float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_
                 outside_total ++;
                 if(warped_red_labels.at<int32_t>(i, j) == p_sign_label)
                 {
+                    vibe_check.at<uchar>(i, j) = 155;
                     red_outside ++;
                 }
             }
         }
     }
+    show_pic(warped_black_mask);
+    show_pic(warped_white_mask);
+    show_pic(vibe_check);
 
     if(red_total == 0 || white_total == 0 || black_total == 0 || red_outside/outside_total > RED_OUTSIDE_STOP_THRESHOLD)
     {
@@ -328,9 +343,13 @@ float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_
     std::cout << "white score: " << white_score / white_total << std::endl;
     std::cout << "red score: " << red_score / red_total << std::endl;
     std::cout << "black score: " << black_score / black_total << std::endl;
+    std::cout << "black total: " << black_total << " black score " << black_score << std::endl;
     std::cout << "outside ratio: " << red_outside/outside_total << std::endl;
     std::cout << "final score:" << 0.34 * (red_score/red_total) + 0.34 * (white_score/white_total) + 0.34 * (black_score / black_total) << std::endl;
     std::cout << std::endl;
 
     return 0.34 * (red_score/red_total) + 0.34 * (white_score/white_total) + 0.34 * (black_score / black_total);
 }
+
+
+// todo try soebel -> square it to make errors (<0) smaller and match with the soebel of the template
