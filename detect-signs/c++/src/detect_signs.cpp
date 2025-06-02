@@ -116,10 +116,10 @@ float detect_gw_cv(cv::Mat &p_img, std::vector<cv::Mat> &p_templates)
     // 14.09 milis
     // 17.94
     std::thread bright_red_gw_thread(detect_gw_thread, &p_img, &bright_red_mask, &white_mask, &black_mask, &detection_number, &p_templates);
-    std::thread dark_red_gw_thread(detect_gw_thread, &p_img, &dark_red_mask, &white_mask, &black_mask, &detection_number, &p_templates);
+    // std::thread dark_red_gw_thread(detect_gw_thread, &p_img, &dark_red_mask, &white_mask, &black_mask, &detection_number, &p_templates);
 
     bright_red_gw_thread.join();
-    dark_red_gw_thread.join();
+    // dark_red_gw_thread.join();
 
     std::cout << "detection number:" << detection_number << std::endl;
     #ifdef PRINT_STATS

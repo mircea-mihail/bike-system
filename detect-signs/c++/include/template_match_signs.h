@@ -8,6 +8,7 @@
 #include <fstream>
 #include <thread>
 #include <atomic>
+#include <cmath>
 
 #include "constants.h"
 #include "utility.h"

@@ -215,10 +215,75 @@ float check_for_stop(cv::Mat &p_white_mask, stop_chunk st_chunk, cv::Mat &p_labe
     return 0.5 * (red_score/red_total) + 0.5 * (white_score/white_total);
 }
 
+double get_rotation_angle_to_horizontal(cv::Mat p_warped_black_mask)
+{
+    // isolate the circle where the bike is supposed to be using a mask
+    cv::Mat mask = cv::Mat::zeros(p_warped_black_mask.size(), CV_8UC1);
+
+    int radius = 36;
+    cv::Point center(mask.cols / 2, mask.rows / 2);
+    cv::circle(mask, center, radius, cv::Scalar(255), cv::FILLED);
+    show_pic(mask);
+
+    cv::Mat clean_black_mask;
+    cv::bitwise_and(p_warped_black_mask, mask, clean_black_mask);
+
+    cv::Mat labels, stats, centroids;
+    int num_labels = cv::connectedComponentsWithStats(clean_black_mask, labels, stats, centroids);
+
+    // get the biggest area chunk as it has the cyclist symbol
+    int max_area = 0;
+    int max_label = 1;
+    for (int i = 1; i < num_labels; ++i) {
+        int area = stats.at<int>(i, cv::CC_STAT_AREA);
+        if (area > max_area) {
+            max_area = area;
+            max_label = i;
+        }
+    }
+
+    int32_t x = stats.at<int32_t>(cv::Point(0, max_label));
+    int32_t y = stats.at<int32_t>(cv::Point(1, max_label));
+    int32_t w = stats.at<int32_t>(cv::Point(2, max_label));
+    int32_t h = stats.at<int32_t>(cv::Point(3, max_label));
+
+    // get wheel coordonates
+    cv::Point2i left_wheel_pt, right_wheel_pt;
+    for(int i = y; i < y + h; i++)
+    {
+        if(clean_black_mask.at<uint8_t>(i, x) != 0)
+        {
+            left_wheel_pt = cv::Point2i(x, i);
+        }
+
+        if(clean_black_mask.at<uint8_t>(i, x + w - 1) != 0)
+        {
+            right_wheel_pt = cv::Point2i(x + w - 1, i);
+        }
+        
+    }
+
+    show_pic(clean_black_mask);
+    cv::circle(clean_black_mask, left_wheel_pt, 1, cv::Scalar(128), cv::FILLED);
+    cv::circle(clean_black_mask, right_wheel_pt, 1, cv::Scalar(128), cv::FILLED);
+    show_pic(clean_black_mask);
+
+    // get slope between the leftest and rightest points:
+    int dy = right_wheel_pt.y - left_wheel_pt.y;
+    int dx = right_wheel_pt.x - left_wheel_pt.x; 
+
+    double angle_rad = std::atan2(dy, dx);
+    double angle_deg = angle_rad * 180.0 / M_PI;
+
+    // convert from slope angle to degrees to turn the image by
+    double slope_min=-30, slope_max=30, theta_min=-45, theta_max=45;
+    return (angle_deg - slope_min) / (slope_max - slope_min) * (theta_max - theta_min) + theta_min;
+}
+
+// todo delete p_img
 float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_chunk nb_chunk, 
     cv::Mat &p_label_mat, int32_t p_sign_label, cv::Mat &p_nb_template, cv::Mat &p_img)
 {
-    /////////////////////////////////////////////////////////////////////////////////////////////////////todo
     if(has_small_angle(nb_chunk))
     {
         return 0;
@@ -260,13 +325,29 @@ float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_
 	cv::warpPerspective(p_white_mask, warped_white_mask, H, cv::Size(width, height), cv::INTER_NEAREST );
 	cv::warpPerspective(p_img, ref_img, H, cv::Size(width, height), cv::INTER_NEAREST );
 
+    //todo remove vibe check
     cv::Mat vibe_check = warped_white_mask.clone();
-
-    // return 1;
 
     show_pic(ref_img);
     // show_pic(p_nb_template);
     // show_pic(warped_red_labels);
+    show_pic(warped_black_mask);
+    // show_pic(warped_white_mask);
+
+    float deskew_angle = get_rotation_angle_to_horizontal(warped_black_mask);
+
+    // rotate mask in order to have it horizontal
+    cv::Point2f center(warped_black_mask.cols / 2.0F, warped_black_mask.rows / 2.0F);
+    double scale = 1.0;
+    cv::Mat rotationMatrix = cv::getRotationMatrix2D(center, deskew_angle, scale);
+    // Compute the bounding box of the rotated image to prevent clipping
+    // cv::Rect2f bbox = cv::RotatedRect(center, warped_black_mask.size(), deskew_angle).boundingRect2f();
+
+    // rotationMatrix.at<double>(0, 2) += bbox.width / 2.0 - center.x;
+    // rotationMatrix.at<double>(1, 2) += bbox.height / 2.0 - center.y;
+
+    cv::warpAffine(warped_black_mask, warped_black_mask, rotationMatrix, warped_black_mask.size());
+
 
     warped_red_labels.convertTo(warped_red_labels, CV_32S);
     
@@ -291,7 +372,6 @@ float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_
                 int32_t blue_px = p_nb_template.at<cv::Vec3b>(i, j)[BLUE];
 
                 // score according to template
-
                 red_total += std::max((red_px - (green_px + blue_px) / 2) / px_max_val, 0.0);
                 if(warped_red_labels.at<int32_t>(i, j) == p_sign_label)
                 {
@@ -316,7 +396,7 @@ float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_
                     if (warped_red_labels.at<int32_t>(i, j) != p_sign_label && warped_black_mask.at<uchar>(i, j) > 0)
                     {
                         black_score += (px_max_val - std::max({red_px, green_px, blue_px})) / px_max_val;
-                        vibe_check.at<uchar>(i, j) = std::min((px_max_val - std::max({red_px, green_px, blue_px})) / px_max_val *  px_max_val, px_max_val);
+                        vibe_check.at<uchar>(i, j) = std::min((px_max_val - std::max({red_px, green_px, blue_px})), px_max_val);
                     }
                 }
             }
@@ -331,8 +411,6 @@ float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_
             }
         }
     }
-    show_pic(warped_black_mask);
-    show_pic(warped_white_mask);
     show_pic(vibe_check);
 
     if(red_total == 0 || white_total == 0 || black_total == 0 || red_outside/outside_total > RED_OUTSIDE_STOP_THRESHOLD)
@@ -343,12 +421,14 @@ float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_
     std::cout << "white score: " << white_score / white_total << std::endl;
     std::cout << "red score: " << red_score / red_total << std::endl;
     std::cout << "black score: " << black_score / black_total << std::endl;
-    std::cout << "black total: " << black_total << " black score " << black_score << std::endl;
+    std::cout << std::endl;
+    // std::cout << "black total: " << black_total << " black score " << black_score << std::endl;
     std::cout << "outside ratio: " << red_outside/outside_total << std::endl;
-    std::cout << "final score:" << 0.34 * (red_score/red_total) + 0.34 * (white_score/white_total) + 0.34 * (black_score / black_total) << std::endl;
+    std::cout << "final score:" << 0.3 * (red_score/red_total) + 0.3 * (white_score/white_total) + 0.4 * (black_score / black_total) << std::endl;
+    std::cout << std::endl;
     std::cout << std::endl;
 
-    return 0.34 * (red_score/red_total) + 0.34 * (white_score/white_total) + 0.34 * (black_score / black_total);
+    return 0.3 * (red_score/red_total) + 0.3 * (white_score/white_total) + 0.4 * (black_score / black_total);
 }
 
 

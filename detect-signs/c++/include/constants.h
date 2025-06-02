@@ -187,7 +187,7 @@ struct no_bikes_chunk
 #define MIN_WHITE_VALUE 40
 #define MAX_WHITE_SATURATION 130
 
-#define MAX_BLACK_VALUE 120
+#define MAX_BLACK_VALUE 150
 #define MAX_BLACK_SATURATION 130
 
 #define RED 2
