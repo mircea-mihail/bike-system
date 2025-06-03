@@ -3,6 +3,7 @@ import numpy as np
 # -------------------------- FILE AND PATH
 BIKE_DATA_PATH = "/media/mircea/CEF1-30A0/data/"
 TRIP_SAVE_LOCATION = "/home/mircea/.bike-sys/"
+BACKUP_SAVE_LOCATION = "/home/mircea/.bike-sys/backup"
  
 MAIN_DATA_FILE_NAME = "_speed_acc.txt"
 CSV_HEAD_DATA_FILE = "detection time micros\n" 
@@ -24,5 +25,8 @@ DISTANCES_TO_PRINT = 10
 
 # -------------------------- FILE FILTERING
 # at least 10 meters in a trip
-MIN_KM_IN_TRIP = 0.01
+MIN_KM_IN_TRIP = 0.2
 MIN_LINES_IN_FILE = MIN_KM_IN_TRIP * MM_TO_KM / BIKE_WHEEL_DIAMETER_MM
+
+MAX_POSSIBLE_SPEED_KMPH = 65
+MAX_POSSIBLE_ACCELERATION_MPSS = 5
