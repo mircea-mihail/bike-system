@@ -108,7 +108,7 @@ def extractDataFromSD(sd_path):
     allFiles = os.listdir(sd_path)
     dataFiles = [file for file in allFiles if MAIN_DATA_FILE_NAME in file]
 
-    dataFiles.sort(key = sortMethod)
+    dataFiles.sort(key = fileSortMethod)
     print(dataFiles)
 
     tripIdx = findNumberOfSavedTrips() - 1 # i do  ++ every time i find the csv header
