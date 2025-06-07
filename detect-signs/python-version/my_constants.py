@@ -40,6 +40,8 @@ MIN_WHITE_BRIGHTNESS = 40
 MAX_WHITE_SATURATION = 130
 
 ################################# rarely modified constants
+IMAGE_DIR = "./output_images"
+
 # ------------------------------- PIXLES 
 RED_PX = 0
 GREEN_PX = 1

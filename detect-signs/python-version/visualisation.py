@@ -1,4 +1,5 @@
 import numpy as np
+import os
 import cv2 as cv
 from my_constants import *
 from matplotlib import pyplot as plt 
@@ -20,8 +21,9 @@ def view_hsv_pixel(p_hue, p_saturation, p_value):
 
     rgb_px = cv.cvtColor(hsv_px, cv.COLOR_HSV2RGB)
 
-    plt.imshow(rgb_px)
-    plt.show()
+    plt.imsave(os.path.join(IMAGE_DIR, "0-hsv-value.png"), rgb_px)
+    plt.close('all')
+
 
 def view_red_in_pictures(p_gwImages, p_imagesToShow):
     # for img_idx in range(len(gw_images)):
@@ -52,9 +54,8 @@ def view_red_in_pictures(p_gwImages, p_imagesToShow):
         plt.axis('off')
         plt.imshow(img)
 
-        plt.show()
-
-
+        plt.savefig(os.path.join(IMAGE_DIR, "1-"+ str(img_idx) + "-popping-red.png"))
+        plt.close('all')
 
 def view_white_in_pictures(p_gwImages, p_imagesToShow):
     # for img_idx in range(len(gw_images)):
@@ -79,7 +80,11 @@ def view_white_in_pictures(p_gwImages, p_imagesToShow):
         plt.subplot(1, 2, 2)
         plt.axis('off')
         plt.imshow(img)
-        plt.show()
+
+        plt.savefig(os.path.join(IMAGE_DIR, "2-"+ str(img_idx) + "-popping-white.png"))
+        plt.close('all')
+
+
 
 # draw the gw sign to have a better idea about how the template looks
 
