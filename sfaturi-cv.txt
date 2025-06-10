@@ -1,4 +1,0 @@
-filtru hsv
-functie hough circles -> gasesti repede cercuri inscrise in triunghi
-
-
