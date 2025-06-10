@@ -23,5 +23,8 @@ file(GLOB_RECURSE SRC_FILES ${CMAKE_SOURCE_DIR}/src/*.cpp)
 add_executable(main_detect ${SRC_FILES})
 
 # Link libraries
-target_link_libraries( main_detect -llccv ${OpenCV_LIBS} Threads::Threads)
-# target_link_libraries(main_detect ${OpenCV_LIBS} Threads::Threads)
+# in raspi:
+# target_link_libraries( main_detect -llccv ${OpenCV_LIBS} Threads::Threads)
+
+# on linux:
+target_link_libraries(main_detect ${OpenCV_LIBS} Threads::Threads)
