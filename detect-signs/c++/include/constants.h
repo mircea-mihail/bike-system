@@ -108,6 +108,26 @@ struct no_bikes_chunk
     }
 };
 
+struct crossing_chunk
+{
+    point left;
+    point right;
+    point top;
+
+    crossing_chunk(point p_top, point p_left, point p_right)
+    {
+        top = p_top;
+        left = p_left;
+        right = p_right;
+    }
+
+    crossing_chunk()
+    {
+        top = point();
+        left = point();
+        right = point();
+    }
+};
 
 ///////////////////////////////// tweak-able constants
 #define PRINT_STATS
@@ -116,6 +136,7 @@ struct no_bikes_chunk
 #define LOG_PIC_PATH "/home/mircea/.bike-sys-data"
 #define STOP_PATH "./templates/stop_100.png"
 #define NO_BIKES_PATH "./templates/no_bikes_100.png"
+#define CROSSING_PATH "./templates/crossing_100.png"
 
 // ------------------------------- IMAGE
 #define IMAGE_HEIGHT (960)
@@ -129,6 +150,7 @@ struct no_bikes_chunk
 
 #define STOP_POSITION 0
 #define NO_BIKES_POSITION 1
+#define CROSSING_POSITION 2
 
 #define SAVE_IMG_RATIO 1
 #define SAVED_IMG_HEIGHT (IMAGE_HEIGHT / SAVE_IMG_RATIO) 
