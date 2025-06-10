@@ -223,7 +223,8 @@ double get_rotation_angle_to_horizontal(cv::Mat p_warped_black_mask)
     int radius = 36;
     cv::Point center(mask.cols / 2, mask.rows / 2);
     cv::circle(mask, center, radius, cv::Scalar(255), cv::FILLED);
-    show_pic(mask);
+    // nice prints
+    // show_pic(mask);
 
     cv::Mat clean_black_mask;
     cv::bitwise_and(p_warped_black_mask, mask, clean_black_mask);
@@ -263,10 +264,11 @@ double get_rotation_angle_to_horizontal(cv::Mat p_warped_black_mask)
         
     }
 
-    show_pic(clean_black_mask);
+    // nice prints
+    // show_pic(clean_black_mask);
     cv::circle(clean_black_mask, left_wheel_pt, 1, cv::Scalar(128), cv::FILLED);
     cv::circle(clean_black_mask, right_wheel_pt, 1, cv::Scalar(128), cv::FILLED);
-    show_pic(clean_black_mask);
+    // show_pic(clean_black_mask);
 
     // get slope between the leftest and rightest points:
     int dy = right_wheel_pt.y - left_wheel_pt.y;
@@ -301,8 +303,8 @@ float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_
         bottom_left_corner
 	};
 
-	int32_t width = NO_BIKES_TEMPLATE_WIDTH;
-	int32_t height = NO_BIKES_TEMPLATE_HEIGHT;
+	int32_t width = p_nb_template.cols;
+	int32_t height = p_nb_template.rows;
 	
 	std::vector<cv::Point2f> dst_points = {
 		cv::Point2f(0, 0),           
@@ -328,11 +330,14 @@ float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_
     //todo remove vibe check
     cv::Mat vibe_check = warped_white_mask.clone();
 
-    show_pic(ref_img);
+    // nice prints 
+    // show_pic(ref_img);
+    // show_pic(warped_black_mask);
+
     // show_pic(p_nb_template);
     // show_pic(warped_red_labels);
-    show_pic(warped_black_mask);
     // show_pic(warped_white_mask);
+
 
     float deskew_angle = get_rotation_angle_to_horizontal(warped_black_mask);
 
@@ -341,10 +346,6 @@ float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_
     double scale = 1.0;
     cv::Mat rotationMatrix = cv::getRotationMatrix2D(center, deskew_angle, scale);
     // Compute the bounding box of the rotated image to prevent clipping
-    // cv::Rect2f bbox = cv::RotatedRect(center, warped_black_mask.size(), deskew_angle).boundingRect2f();
-
-    // rotationMatrix.at<double>(0, 2) += bbox.width / 2.0 - center.x;
-    // rotationMatrix.at<double>(1, 2) += bbox.height / 2.0 - center.y;
 
     cv::warpAffine(warped_black_mask, warped_black_mask, rotationMatrix, warped_black_mask.size());
 
@@ -357,9 +358,9 @@ float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_
     float_t red_outside = 0, outside_total = 0;
     double px_max_val = 255.0;
 
-    for(int i = 0; i < NO_BIKES_TEMPLATE_HEIGHT; i++)
+    for(int i = 0; i < height; i++)
     {
-        for(int j = 0; j < NO_BIKES_TEMPLATE_WIDTH; j++)
+        for(int j = 0; j < width; j++)
         {
             vibe_check.at<uchar>(i, j) = 0;
             // if not green
@@ -411,7 +412,158 @@ float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_
             }
         }
     }
-    show_pic(vibe_check);
+    // nice prints
+    // show_pic(vibe_check);
+
+    if(red_total == 0 || white_total == 0 || black_total == 0 || red_outside/outside_total > RED_OUTSIDE_STOP_THRESHOLD)
+    {
+        return 0;
+    }
+
+    // std::cout << "white score: " << white_score / white_total << std::endl;
+    // std::cout << "red score: " << red_score / red_total << std::endl;
+    // std::cout << "black score: " << black_score / black_total << std::endl;
+    // std::cout << std::endl;
+    // // std::cout << "black total: " << black_total << " black score " << black_score << std::endl;
+    // std::cout << "outside ratio: " << red_outside/outside_total << std::endl;
+    // std::cout << "final score:" << 0.3 * (red_score/red_total) + 0.3 * (white_score/white_total) + 0.4 * (black_score / black_total) << std::endl;
+    // std::cout << std::endl;
+    // std::cout << std::endl;
+
+    return 0.3 * (red_score/red_total) + 0.3 * (white_score/white_total) + 0.4 * (black_score / black_total);
+}
+
+float check_for_crossing(cv::Mat &p_white_mask, cv::Mat &p_black_mask, crossing_chunk p_cr_chunk, 
+    cv::Mat &p_label_mat, int32_t p_sign_label, cv::Mat &p_cr_template, cv::Mat &p_img)
+{
+    if(has_small_angle(p_cr_chunk))
+    {
+        return 0;
+    }
+
+    cv::Point2f bottom_left_corner = cv::Point2f(p_cr_chunk.left.x, p_cr_chunk.left.y);
+    cv::Point2f bottom_right_corner = cv::Point2f(p_cr_chunk.right.x, p_cr_chunk.right.y);
+
+    // compute top left and top right corners 
+    cv::Point2f bottom_dir = bottom_right_corner - bottom_left_corner;
+
+    float upward_length = std::sqrt(bottom_dir.x * bottom_dir.x + bottom_dir.y * bottom_dir.y);
+    cv::Point2f perp(-bottom_dir.y / upward_length, bottom_dir.x / upward_length); // rotated counterclockwise
+
+    float bounding_width = cv::norm(bottom_right_corner - bottom_left_corner);
+
+    cv::Point2f top(p_cr_chunk.top.x, p_cr_chunk.top.y);
+    cv::Point2f offset = (bottom_dir / bounding_width) * (bounding_width/ 2); // half the width along bottom edge direction
+    cv::Point2f top_left_corner = top - offset;
+    cv::Point2f top_right_corner = top + offset;
+
+    std::vector<cv::Point2f> src_points = {
+        top_left_corner,
+        top_right_corner,
+        bottom_right_corner,
+        bottom_left_corner
+	};
+
+	int32_t width = p_cr_template.cols;
+	int32_t height = p_cr_template.rows;
+	
+	std::vector<cv::Point2f> dst_points = {
+		cv::Point2f(0, 0),           
+		cv::Point2f(width - 1, 0),    
+		cv::Point2f(width - 1, height - 1),
+		cv::Point2f(0, height - 1)    
+	};
+	cv::Mat H = cv::getPerspectiveTransform(src_points, dst_points);
+
+	cv::Mat warped_red_labels;
+    cv::Mat warped_white_mask;
+    cv::Mat warped_black_mask;
+
+    cv::Mat float_labels;
+    cv::Mat ref_img;
+    p_label_mat.convertTo(float_labels, CV_32F);
+
+	cv::warpPerspective(float_labels, warped_red_labels, H, cv::Size(width, height), cv::INTER_NEAREST );
+	cv::warpPerspective(p_black_mask, warped_black_mask, H, cv::Size(width, height), cv::INTER_NEAREST );
+	cv::warpPerspective(p_white_mask, warped_white_mask, H, cv::Size(width, height), cv::INTER_NEAREST );
+	cv::warpPerspective(p_img, ref_img, H, cv::Size(width, height), cv::INTER_NEAREST );
+
+
+    //todo remove vibe check
+    cv::Mat vibe_check = warped_white_mask.clone();
+
+    // nice prints 
+    // show_pic(p_cr_template);
+    // show_pic(warped_black_mask);
+
+    // show_pic(p_cr_template);
+    // show_pic(warped_red_labels);
+    // show_pic(warped_white_mask);
+
+    warped_red_labels.convertTo(warped_red_labels, CV_32S);
+    
+    float_t red_score = 0, red_total = 0;
+    float_t white_score = 0, white_total = 0;
+    float_t black_score = 0, black_total = 0;
+    float_t red_outside = 0, outside_total = 0;
+    double px_max_val = 255.0;
+
+    for(int i = 0; i < height; i++)
+    {
+        for(int j = 0; j < width; j++)
+        {
+            vibe_check.at<uchar>(i, j) = 0;
+            // if not green
+            if (! ((p_cr_template.at<cv::Vec3b>(i, j)[GREEN]) > COLOR_THRESHOLD
+                && (p_cr_template.at<cv::Vec3b>(i, j)[RED]) < COLOR_THRESHOLD
+                && (p_cr_template.at<cv::Vec3b>(i, j)[BLUE]) < COLOR_THRESHOLD))
+            {
+                int32_t red_px = p_cr_template.at<cv::Vec3b>(i, j)[RED];
+                int32_t green_px = p_cr_template.at<cv::Vec3b>(i, j)[GREEN];
+                int32_t blue_px = p_cr_template.at<cv::Vec3b>(i, j)[BLUE];
+
+                // score according to template
+                red_total += std::max((red_px - (green_px + blue_px) / 2) / px_max_val, 0.0);
+                if(warped_red_labels.at<int32_t>(i, j) == p_sign_label)
+                {
+                    red_score += std::max((red_px - (green_px + blue_px) / 2) / px_max_val, 0.0);
+                    vibe_check.at<uchar>(i, j) = std::min(std::max((red_px - (green_px + blue_px) / 2) / px_max_val, 0.0) * px_max_val, px_max_val);
+                }
+
+                if (red_px > COLOR_THRESHOLD && green_px > COLOR_THRESHOLD && blue_px > COLOR_THRESHOLD)
+                {
+                    white_total += cv::min({red_px, green_px, blue_px}) / px_max_val;
+
+                    if (warped_red_labels.at<int32_t>(i, j) != p_sign_label && warped_white_mask.at<uchar>(i, j) > 0)
+                    {
+                        white_score += cv::min({red_px, green_px, blue_px}) / px_max_val;
+                        vibe_check.at<uchar>(i, j) = std::min(cv::min({red_px, green_px, blue_px}), int(px_max_val));
+                    }
+                }
+
+                if (red_px < COLOR_THRESHOLD && green_px < COLOR_THRESHOLD && blue_px < COLOR_THRESHOLD)
+                {
+                    black_total += (px_max_val - std::max({red_px, green_px, blue_px})) / px_max_val;
+                    if (warped_red_labels.at<int32_t>(i, j) != p_sign_label && warped_black_mask.at<uchar>(i, j) > 0)
+                    {
+                        black_score += (px_max_val - std::max({red_px, green_px, blue_px})) / px_max_val;
+                        vibe_check.at<uchar>(i, j) = std::min((px_max_val - std::max({red_px, green_px, blue_px})), px_max_val);
+                    }
+                }
+            }
+            else
+            {
+                outside_total ++;
+                if(warped_red_labels.at<int32_t>(i, j) == p_sign_label)
+                {
+                    vibe_check.at<uchar>(i, j) = 155;
+                    red_outside ++;
+                }
+            }
+        }
+    }
+    // nice prints
+    // show_pic(vibe_check);
 
     if(red_total == 0 || white_total == 0 || black_total == 0 || red_outside/outside_total > RED_OUTSIDE_STOP_THRESHOLD)
     {
@@ -421,7 +573,6 @@ float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_
     std::cout << "white score: " << white_score / white_total << std::endl;
     std::cout << "red score: " << red_score / red_total << std::endl;
     std::cout << "black score: " << black_score / black_total << std::endl;
-    std::cout << std::endl;
     // std::cout << "black total: " << black_total << " black score " << black_score << std::endl;
     std::cout << "outside ratio: " << red_outside/outside_total << std::endl;
     std::cout << "final score:" << 0.3 * (red_score/red_total) + 0.3 * (white_score/white_total) + 0.4 * (black_score / black_total) << std::endl;
@@ -430,6 +581,5 @@ float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_
 
     return 0.3 * (red_score/red_total) + 0.3 * (white_score/white_total) + 0.4 * (black_score / black_total);
 }
-
 
 // todo try soebel -> square it to make errors (<0) smaller and match with the soebel of the template

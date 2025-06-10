@@ -65,6 +65,8 @@ void detect_gw_thread(cv::Mat *p_img, cv::Mat *p_red_mask, cv::Mat *p_white_mask
         float gw_detection_res = find_gw_in_chunk(*p_img, *p_white_mask, labels, stats, i);
         find_stop_in_chunk(*p_img, *p_white_mask, labels, stats, i, *p_templates);
         find_no_bikes_in_chunk(*p_img, *p_white_mask, *p_black_mask, labels, stats, i, *p_templates);
+        find_crossing_in_chunk(*p_img, *p_white_mask, *p_black_mask, labels, stats, i, *p_templates);
+
         if(gw_detection_res > 0)
         {
             (*p_detection_number) ++;
@@ -116,6 +118,7 @@ float detect_gw_cv(cv::Mat &p_img, std::vector<cv::Mat> &p_templates)
     // 14.09 milis
     // 17.94
     std::thread bright_red_gw_thread(detect_gw_thread, &p_img, &bright_red_mask, &white_mask, &black_mask, &detection_number, &p_templates);
+    // !! todo DON'T FORGET ABOUT UNCOMMEENTING THIS
     // std::thread dark_red_gw_thread(detect_gw_thread, &p_img, &dark_red_mask, &white_mask, &black_mask, &detection_number, &p_templates);
 
     bright_red_gw_thread.join();

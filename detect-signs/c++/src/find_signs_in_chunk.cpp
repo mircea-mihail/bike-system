@@ -262,3 +262,77 @@ float find_no_bikes_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_b
 
     return 0;
 }
+
+// todo p_templates -> make it just no bikes template?
+float find_crossing_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_black_mask,
+    cv::Mat &p_labels, cv::Mat &p_stats, int32_t p_label, std::vector<cv::Mat> &p_templates)
+{
+    int32_t x = p_stats.at<int32_t>(cv::Point(0, p_label));
+    int32_t y = p_stats.at<int32_t>(cv::Point(1, p_label));
+    int32_t w = p_stats.at<int32_t>(cv::Point(2, p_label));
+    int32_t h = p_stats.at<int32_t>(cv::Point(3, p_label));
+
+    if (h * w < MIN_BOUNDING_BOX_AREA)
+    {
+        return 0;
+    }
+
+    #ifdef PRINT_STATS
+        print_bounding_box(p_img, x, y, w, h);
+    #endif
+
+    point left_pt;
+    for (int i = y; i < y + h; i++)
+    {
+        if (p_labels.at<int32_t>(i, x) == p_label)
+        {
+            left_pt.x = x;
+            left_pt.y = i;
+            break;
+        }
+    }
+
+    point right_pt;
+    for (int i = y; i < y + h; i++)
+    {
+        if (p_labels.at<int32_t>(i, x + w-1) == p_label)
+        {
+            right_pt.x = x + w-1;
+            right_pt.y = i;
+            break;
+        }
+    }
+
+    point leftest_bottom_pt(-1, -1);
+    point rightest_bottom_pt;
+    for (int j = x; j < x + w; j++)
+    {
+        if (p_labels.at<int32_t>(y, j) == p_label)
+        {
+            rightest_bottom_pt.x = j;
+            rightest_bottom_pt.y = y;
+            if(leftest_bottom_pt.x == -1)
+            {
+                leftest_bottom_pt.x = j;
+                leftest_bottom_pt.y = y + h-1;
+            }
+            break;
+        }
+    }
+    point top_pt(int((rightest_bottom_pt.x + leftest_bottom_pt.x) / 2), rightest_bottom_pt.y);
+
+
+    crossing_chunk cr_chunk = crossing_chunk(top_pt, left_pt, right_pt);
+
+    float chunk_score = check_for_crossing(p_white_mask, p_black_mask, cr_chunk, p_labels, p_label, p_templates[CROSSING_POSITION], p_img);
+    if(chunk_score > MIN_CHUNK_SCORE)
+    {
+        #ifdef PRINT_STATS
+            print_crossing(p_img, cr_chunk, chunk_score);
+        #endif
+
+        return chunk_score;
+    }
+
+    return 0;
+}
