@@ -18,6 +18,8 @@
 //////////////////////// Immage rela((ted
 #define NUMBER_OX_OFFSET 20
 
+// todo add audio warning
+
 void initPins()
 {
     // ePaper display pins
@@ -67,6 +69,7 @@ void setup()
 
     TaskHandle_t measurementTaskHandle = NULL;
     xTaskCreate(measurementTask, "measurement", MEASUREMENT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, &measurementTaskHandle);
+    //todo add a task that checks if a microsd has been added (in which case start the sd task if not already started) and if the bike cam has beed connected (so start the bike cam process) 
 }
 
 // don't need the loop (everything takes place in custom tasks)

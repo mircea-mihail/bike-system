@@ -88,6 +88,7 @@ void displayManagement(void *p_args)
 void writeToFileTask(void *p_args)
 {
     FSInteraction::init();
+    // todo move can write to FS here !
 
     // csv files 
     const char writeDirPath[MAX_SIZE_OF_DIR_PATH] = "/data";
@@ -101,6 +102,8 @@ void writeToFileTask(void *p_args)
 
     int currentFileIdx = FSInteraction::getLatestVersion(writeDirPath, velocityAccFileName);
 
+    // todo change file names
+    // data/123_speeed_acc.txt
     char fileVersion[MAX_SIZE_OF_FILE_NAME];
     snprintf(fileVersion, MAX_SIZE_OF_FILE_NAME, "%d", currentFileIdx);
     strcpy(velocityAccFilePath, writeDirPath);
@@ -109,6 +112,7 @@ void writeToFileTask(void *p_args)
     strcat(velocityAccFilePath, "_");
     strcat(velocityAccFilePath, velocityAccFileName);
 
+    // make new file if the current one is too big
     if(FSInteraction::getFileSize(velocityAccFilePath) > MAX_FILE_SIZE_BYTES)
     {
         currentFileIdx ++;
@@ -121,6 +125,7 @@ void writeToFileTask(void *p_args)
         strcat(velocityAccFilePath, velocityAccFileName);
     }
 
+    // show contents of files on terminal
     if(PRINT_CONTENTS_OF_ALL_FILES)
     {
         Serial.print("printing from error file:\n");
@@ -136,10 +141,13 @@ void writeToFileTask(void *p_args)
         }
     }  
 
+    // print the header to current file
     if (FSInteraction::canWriteToFs()) 
     {  
         if (xSemaphoreTake(g_spiMutex, portMAX_DELAY))
         { 
+            //todo do i need previous velocity in logging?
+            //todo add street sign idx
             char csvErrStartMsg[MAX_SIZE_OF_ERR_MSG] = "time, velocity, previous velocity\n";
             char csvSpeedAccStartMsg[MAX_SIZE_OF_ERR_MSG] = "detection time micros\n";
 
@@ -161,12 +169,14 @@ void writeToFileTask(void *p_args)
 
     while(true)
     {
+        // todo check if too many failed attempts to write to file happened, in which case kill the process (sd disconnected?)
         xQueueReceive(g_tripDataQueue, &dataToWrite, SEND_DATA_DELAY_TICKS);
 
         if(dataToWrite != previousData)
         {
             if (xSemaphoreTake(g_spiMutex, portMAX_DELAY))
             {
+                //todo get rid of error dir...
                 // record possible error                
                 if(dataToWrite.m_currentVelocity >= SUSPICIOUS_SPEED_KMPH)
                 {
