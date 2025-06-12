@@ -206,11 +206,10 @@ struct crossing_chunk
 
 // ------------------------------- WHITE COLOR DETECTION 
 // before min val 40
-#define MIN_WHITE_VALUE 40
+#define MIN_WHITE_VALUE 60
 #define MAX_WHITE_SATURATION 130
 
-#define MAX_BLACK_VALUE 150
-#define MAX_BLACK_SATURATION 130
+#define MAX_BLACK_VALUE 100
 
 #define RED 2
 #define GREEN 1
