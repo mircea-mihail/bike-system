@@ -206,7 +206,7 @@ float find_no_bikes_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_b
     #endif
 
     point left_pt;
-    for (int i = y; i < y + h; i++)
+    for (int i = y+h - 1; i >= y; i--)
     {
         if (p_labels.at<int32_t>(i, x) == p_label)
         {
@@ -217,7 +217,7 @@ float find_no_bikes_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_b
     }
 
     point right_pt;
-    for (int i = y; i < y + h; i++)
+    for (int i = y + h - 1; i >= y; i--)
     {
         if (p_labels.at<int32_t>(i, x + w-1) == p_label)
         {
