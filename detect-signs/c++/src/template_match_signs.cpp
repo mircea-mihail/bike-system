@@ -290,6 +290,8 @@ float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_
     {
         return 0;
     }
+    // show_pic(p_img);
+    // show_pic(p_white_mask);
 
     cv::Point2f top_left_corner = cv::Point2f(nb_chunk.left.x, nb_chunk.top.y);
     cv::Point2f top_right_corner = cv::Point2f(nb_chunk.right.x, nb_chunk.top.y);
@@ -354,9 +356,17 @@ float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_
     
     float_t red_score = 0, red_total = 0;
     float_t white_score = 0, white_total = 0;
-    float_t black_score = 0, black_total = 0;
+    float_t thick_black_score = 0, thin_black_score = 0, black_total = 0;
     float_t red_outside = 0, outside_total = 0;
     double px_max_val = 255.0;
+
+    // also check for a thicker black bike and choose the better score
+    cv::Mat thick_black_mask;
+    warped_black_mask.copyTo(thick_black_mask);
+
+    uint8_t dilate_size = 3;
+    cv::Mat dilate_kernel = cv::Mat::ones(dilate_size, dilate_size, CV_8U); 
+    cv::dilate(thick_black_mask, thick_black_mask, dilate_kernel);
 
     for(int i = 0; i < height; i++)
     {
@@ -396,7 +406,12 @@ float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_
                     black_total += (px_max_val - std::max({red_px, green_px, blue_px})) / px_max_val;
                     if (warped_red_labels.at<int32_t>(i, j) != p_sign_label && warped_black_mask.at<uchar>(i, j) > 0)
                     {
-                        black_score += (px_max_val - std::max({red_px, green_px, blue_px})) / px_max_val;
+                        thin_black_score += (px_max_val - std::max({red_px, green_px, blue_px})) / px_max_val;
+                        vibe_check.at<uchar>(i, j) = std::min((px_max_val - std::max({red_px, green_px, blue_px})), px_max_val);
+                    }
+                    if (warped_red_labels.at<int32_t>(i, j) != p_sign_label && thick_black_mask.at<uchar>(i, j) > 0)
+                    {
+                        thick_black_score += (px_max_val - std::max({red_px, green_px, blue_px})) / px_max_val;
                         vibe_check.at<uchar>(i, j) = std::min((px_max_val - std::max({red_px, green_px, blue_px})), px_max_val);
                     }
                 }
@@ -413,22 +428,31 @@ float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_
         }
     }
     // nice prints
-    // show_pic(vibe_check);
+    show_pic(vibe_check);
 
     if(red_total == 0 || white_total == 0 || black_total == 0 || red_outside/outside_total > RED_OUTSIDE_STOP_THRESHOLD)
     {
         return 0;
     }
 
-    // std::cout << "white score: " << white_score / white_total << std::endl;
-    // std::cout << "red score: " << red_score / red_total << std::endl;
-    // std::cout << "black score: " << black_score / black_total << std::endl;
+    float_t black_score = std::max(thick_black_score, thin_black_score);
+    std::cout << "white score: " << white_score / white_total << std::endl;
+    std::cout << "red score: " << red_score / red_total << std::endl;
+    std::cout << "black score: " << black_score / black_total << std::endl;
     // std::cout << std::endl;
-    // // std::cout << "black total: " << black_total << " black score " << black_score << std::endl;
-    // std::cout << "outside ratio: " << red_outside/outside_total << std::endl;
-    // std::cout << "final score:" << 0.3 * (red_score/red_total) + 0.3 * (white_score/white_total) + 0.4 * (black_score / black_total) << std::endl;
-    // std::cout << std::endl;
-    // std::cout << std::endl;
+    std::cout << "black total: " << black_total << " black score " << black_score << std::endl;
+    std::cout << "outside ratio: " << red_outside/outside_total << std::endl;
+    std::cout << "final score:" << 0.3 * (red_score/red_total) + 0.3 * (white_score/white_total) + 0.4 * (black_score / black_total) << std::endl;
+    std::cout << std::endl;
+    std::cout << std::endl;
+
+    float_t final_red = red_score/red_total;
+    float_t final_white = white_score/white_total;
+    float_t final_black = black_score/black_total;
+    if (final_red < MIN_CHUNK_SCORE || final_white < MIN_CHUNK_SCORE || final_black < MIN_CHUNK_SCORE)
+    {
+        return std::min(std::min(final_red, final_black), final_white);
+    } 
 
     return 0.3 * (red_score/red_total) + 0.3 * (white_score/white_total) + 0.4 * (black_score / black_total);
 }
@@ -564,20 +588,22 @@ float check_for_crossing(cv::Mat &p_white_mask, cv::Mat &p_black_mask, crossing_
     }
     // nice prints
     // show_pic(vibe_check);
+    // show_pic(ref_img);
+    // 84, 85
 
     if(red_total == 0 || white_total == 0 || black_total == 0 || red_outside/outside_total > RED_OUTSIDE_STOP_THRESHOLD)
     {
         return 0;
     }
 
-    std::cout << "white score: " << white_score / white_total << std::endl;
-    std::cout << "red score: " << red_score / red_total << std::endl;
-    std::cout << "black score: " << black_score / black_total << std::endl;
-    // std::cout << "black total: " << black_total << " black score " << black_score << std::endl;
-    std::cout << "outside ratio: " << red_outside/outside_total << std::endl;
-    std::cout << "final score:" << 0.3 * (red_score/red_total) + 0.3 * (white_score/white_total) + 0.4 * (black_score / black_total) << std::endl;
-    std::cout << std::endl;
-    std::cout << std::endl;
+    // std::cout << "white score: " << white_score / white_total << std::endl;
+    // std::cout << "red score: " << red_score / red_total << std::endl;
+    // std::cout << "black score: " << black_score / black_total << std::endl;
+    // // std::cout << "black total: " << black_total << " black score " << black_score << std::endl;
+    // std::cout << "outside ratio: " << red_outside/outside_total << std::endl;
+    // std::cout << "final score:" << 0.3 * (red_score/red_total) + 0.3 * (white_score/white_total) + 0.4 * (black_score / black_total) << std::endl;
+    // std::cout << std::endl;
+    // std::cout << std::endl;
 
     return 0.3 * (red_score/red_total) + 0.3 * (white_score/white_total) + 0.4 * (black_score / black_total);
 }
