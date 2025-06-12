@@ -242,6 +242,10 @@ double get_rotation_angle_to_horizontal(cv::Mat p_warped_black_mask)
             max_label = i;
         }
     }
+    if(max_area == 0) 
+    {
+        return FAILED_TO_ROTATE_VAL;
+    }
 
     int32_t x = stats.at<int32_t>(cv::Point(0, max_label));
     int32_t y = stats.at<int32_t>(cv::Point(1, max_label));
@@ -249,7 +253,7 @@ double get_rotation_angle_to_horizontal(cv::Mat p_warped_black_mask)
     int32_t h = stats.at<int32_t>(cv::Point(3, max_label));
 
     // get wheel coordonates
-    cv::Point2i left_wheel_pt, right_wheel_pt;
+    cv::Point2i left_wheel_pt = cv::Point2i(-1, -1), right_wheel_pt = cv::Point2i(-1, -1);
     for(int i = y; i < y + h; i++)
     {
         if(clean_black_mask.at<uint8_t>(i, x) != 0)
@@ -261,8 +265,13 @@ double get_rotation_angle_to_horizontal(cv::Mat p_warped_black_mask)
         {
             right_wheel_pt = cv::Point2i(x + w - 1, i);
         }
-        
     }
+
+    if(left_wheel_pt == cv::Point2i(-1, -1) || right_wheel_pt == cv::Point2i(-1, -1))
+    {
+        return FAILED_TO_ROTATE_VAL;
+    }
+
 
     // nice prints
     // show_pic(clean_black_mask);
@@ -286,6 +295,7 @@ double get_rotation_angle_to_horizontal(cv::Mat p_warped_black_mask)
 float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_chunk nb_chunk, 
     cv::Mat &p_label_mat, int32_t p_sign_label, cv::Mat &p_nb_template, cv::Mat &p_img)
 {
+    // show_pic(p_black_mask);
     if(has_small_angle(nb_chunk))
     {
         return 0;
@@ -342,6 +352,10 @@ float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_
 
 
     float deskew_angle = get_rotation_angle_to_horizontal(warped_black_mask);
+    if(deskew_angle == FAILED_TO_ROTATE_VAL)
+    {
+        return 0;
+    }
 
     // rotate mask in order to have it horizontal
     cv::Point2f center(warped_black_mask.cols / 2.0F, warped_black_mask.rows / 2.0F);
@@ -428,7 +442,7 @@ float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_
         }
     }
     // nice prints
-    show_pic(vibe_check);
+    // show_pic(vibe_check);
 
     if(red_total == 0 || white_total == 0 || black_total == 0 || red_outside/outside_total > RED_OUTSIDE_STOP_THRESHOLD)
     {

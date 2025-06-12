@@ -167,6 +167,7 @@ struct crossing_chunk
 
 // ------------------------------- DETECTION RELATED
 #define MIN_MAYBE_IDX 3
+#define FAILED_TO_ROTATE_VAL 361
 
 // ------------------------------- GIVE WAY RED BORDER   
 // #define THICK_GW_BORDER_PER_CENT 0.376
