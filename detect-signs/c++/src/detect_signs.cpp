@@ -47,7 +47,7 @@ void get_white_mask(cv::Mat &p_hsv_img, cv::Mat &p_white_mask)
 void get_black_mask(cv::Mat &p_hsv_img, cv::Mat &p_black_mask)
 {
     cv::Scalar lower_red_1(0, 0, 0);  
-    cv::Scalar upper_red_1(MAX_HUE, MAX_BLACK_SATURATION, MAX_BLACK_VALUE); 
+    cv::Scalar upper_red_1(MAX_HUE, MAX_SATURATION, MAX_BLACK_VALUE); 
 
     cv::inRange(p_hsv_img, lower_red_1, upper_red_1, p_black_mask); 
 }
@@ -100,28 +100,28 @@ float detect_gw_cv(cv::Mat &p_img, std::vector<cv::Mat> &p_templates)
 
     uint8_t dilate_size = 3;
     cv::Mat dilate_kernel = cv::Mat::ones(dilate_size, dilate_size, CV_8U); 
-    cv::dilate(white_mask, white_mask, dilate_kernel);
-    cv::dilate(white_mask, white_mask, dilate_kernel);
+    cv::dilate(dark_red_mask, dark_red_mask, dilate_kernel);
+    cv::dilate(bright_red_mask, bright_red_mask, dilate_kernel);
 
     // show_pic(p_img);
     // show_pic(dark_red_mask);
     // show_pic(bright_red_mask);
     // show_pic(white_mask);
+    // show_pic(black_mask);
 
     // on avg 15.8508 milis
     // 16.36
     // 17.45
-    // detect_gw_thread(&p_img, &bright_red_mask, &white_mask, &detection_number, &mtx);
-    // detect_gw_thread(&p_img, &dark_red_mask, &white_mask, &detection_number, &mtx);
+    detect_gw_thread(&p_img, &bright_red_mask, &white_mask, &black_mask, &detection_number, &p_templates);
+    detect_gw_thread(&p_img, &dark_red_mask, &white_mask, &black_mask, &detection_number, &p_templates);
 
     // 14.12 milis
     // 14.09 milis
     // 17.94
-    std::thread bright_red_gw_thread(detect_gw_thread, &p_img, &bright_red_mask, &white_mask, &black_mask, &detection_number, &p_templates);
-    // !! todo DON'T FORGET ABOUT UNCOMMEENTING THIS
+    // parralel?
+    // std::thread bright_red_gw_thread(detect_gw_thread, &p_img, &bright_red_mask, &white_mask, &black_mask, &detection_number, &p_templates);
     // std::thread dark_red_gw_thread(detect_gw_thread, &p_img, &dark_red_mask, &white_mask, &black_mask, &detection_number, &p_templates);
-
-    bright_red_gw_thread.join();
+    // bright_red_gw_thread.join();
     // dark_red_gw_thread.join();
 
     std::cout << "detection number:" << detection_number << std::endl;
