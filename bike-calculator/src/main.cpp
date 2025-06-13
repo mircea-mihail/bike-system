@@ -46,11 +46,13 @@ Menu g_menu;
 xSemaphoreHandle g_menuMutex;
 xSemaphoreHandle g_spiMutex;
 QueueHandle_t g_tripDataQueue;
+HardwareSerial g_camSerial(1); 
 
 void setup()
 {    
     initPins();
     Serial.begin(115200);
+    g_camSerial.begin(9600, SERIAL_8N1, RX_SERIAL, TX_SERIAL); // RX=16, TX=17
 
     g_tripDataQueue = xQueueCreate(QUEUE_SIZE, sizeof(TripData));
     if(g_tripDataQueue == NULL)
@@ -69,6 +71,10 @@ void setup()
 
     TaskHandle_t measurementTaskHandle = NULL;
     xTaskCreate(measurementTask, "measurement", MEASUREMENT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, &measurementTaskHandle);
+
+    TaskHandle_t serialTaskHandle = NULL;
+    xTaskCreate(serialCamTask, "measurement", DEFAULT_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, &serialTaskHandle);
+ 
     //todo add a task that checks if a microsd has been added (in which case start the sd task if not already started) and if the bike cam has beed connected (so start the bike cam process) 
 }
 

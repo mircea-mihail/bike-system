@@ -301,3 +301,20 @@ void measurementTask(void *p_args)
         taskYIELD();
     }
 }
+
+void serialCamTask(void *p_args)
+{
+    Serial.println("started serial cam task");
+    int32_t signCode = -2;
+    while(true)
+    {
+        if(g_camSerial.available())
+        {
+            Serial.println("about to get an int:");
+            signCode = g_camSerial.parseInt();
+            Serial.print("Got: ");
+            Serial.println(signCode);
+            taskYIELD();
+        }
+   }
+}

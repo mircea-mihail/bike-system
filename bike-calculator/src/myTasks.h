@@ -48,6 +48,7 @@ extern Menu g_menu;
 extern xSemaphoreHandle g_menuMutex;
 extern xSemaphoreHandle g_spiMutex;
 extern QueueHandle_t g_tripDataQueue;
+extern HardwareSerial g_camSerial; 
 
 /// @brief the display management task
 ///     * set up the display object from the epaper library and the 200 x 200 byte matrix
@@ -76,5 +77,7 @@ void writeToFileTask(void *p_args);
 ///     * try to detect sensor as often as possible and update tripdata that is sent to the sd on detection
 /// @param p_args no arguments
 void measurementTask(void *p_args);
+
+void serialCamTask(void *p_args);
 
 #endif
