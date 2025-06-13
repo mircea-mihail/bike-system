@@ -157,8 +157,8 @@ int FSInteraction::getLatestVersion(const char * p_dirname, const char *p_fileNa
     // 1_fileName.txt
     while(file)
     {
-        Serial.println("found a file: ");
-        Serial.print(file.name());
+        Serial.print("found a file: ");
+        Serial.println(file.name());
 
         if(!file.isDirectory())
         {
