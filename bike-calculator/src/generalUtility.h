@@ -62,6 +62,10 @@
 #define CLK GPIO_NUM_18             // SPI SCK pin, used designed pin for this on esp
 #define DATA_COMMAND GPIO_NUM_12    // Data/Command selection (high for data, low for command) -> am pus pinul de MISO
 
+// serial pins -> connector layout: (ON/OFF switch, USB port, rail), TX, GND, RX, (Other rail)
+#define TX_SERIAL GPIO_NUM_17
+#define RX_SERIAL GPIO_NUM_16
+
 // pins for e-paper display
 #define RST GPIO_NUM_27             // External reset, low active
 #define BUSY GPIO_NUM_35            // Busy status output, high active
