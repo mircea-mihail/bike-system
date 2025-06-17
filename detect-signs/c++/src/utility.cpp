@@ -240,7 +240,7 @@ void print_stop(cv::Mat &p_img, stop_chunk p_st_chunk, float p_score)
     cv::putText(p_img, stringed_score, text_pt, 1, font_size, cv::Scalar(0, 255, 0), 3);   
 }
 
-void print_no_bikes(cv::Mat &p_img, circle_chunk nb_chunk, float p_score)
+void print_circle(cv::Mat &p_img, circle_chunk nb_chunk, float p_score, std::string p_sign_name)
 {
     cv::Scalar color = cv::Scalar(0, 255, 0);
     int thickness = DRAW_LINE_THICKNESS;
@@ -255,15 +255,15 @@ void print_no_bikes(cv::Mat &p_img, circle_chunk nb_chunk, float p_score)
 
     cv::ellipse(p_img, center, cv::Size(axisX, axisY), 0, 0, 360, cv::Scalar(0, 255, 0), thickness);
 
-    char stringed_score[30] = "no-bikes ";
     char buf[10];
     snprintf(buf, sizeof(buf), "%.1f", p_score * 100);
-    strcat(stringed_score, buf);
+    p_sign_name += " ";
+    p_sign_name += buf;
 
     cv::Point text_pt(nb_chunk.left.x, nb_chunk.top.y);
     int font_size = 3;
-    cv::putText(p_img, stringed_score, text_pt, 1, font_size, cv::Scalar(0, 0, 0), 8);   
-    cv::putText(p_img, stringed_score, text_pt, 1, font_size, cv::Scalar(0, 255, 0), 3);   
+    cv::putText(p_img, p_sign_name, text_pt, 1, font_size, cv::Scalar(0, 0, 0), 8);   
+    cv::putText(p_img, p_sign_name, text_pt, 1, font_size, cv::Scalar(0, 255, 0), 3);   
 }
 
 void print_crossing(cv::Mat &p_img, crossing_chunk cr_chunk, float p_score)

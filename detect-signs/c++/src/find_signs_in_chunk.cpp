@@ -264,7 +264,7 @@ float find_wrong_way_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_
         if (p_labels.at<int32_t>(y, j) == p_label)
         {
             if(first_idx == -1)
-            {
+            { 
                 first_idx = j;
             }
             last_idx = j;
@@ -275,13 +275,13 @@ float find_wrong_way_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_
     top_pt.x = (first_idx + last_idx) / 2;
     top_pt.y = y;
 
-    circle_chunk nb_chunk = circle_chunk(top_pt, bottom_pt, left_pt, right_pt);
+    circle_chunk ww_chunk = circle_chunk(top_pt, bottom_pt, left_pt, right_pt);
 
-    // float chunk_score = check_for_no_bikes(p_white_mask, nb_chunk, p_labels, p_label, p_templates[NO_BIKES_POSITION], p_img);
+    // float chunk_score = check_for_wrong_way(p_white_mask, nb_chunk, p_labels, p_label, p_templates[NO_BIKES_POSITION], p_img);
     // if(chunk_score > MIN_CHUNK_SCORE)
     // {
     //     #ifdef PRINT_STATS
-    //         print_no_bikes(p_img, nb_chunk, chunk_score);
+    //         print_circle(p_img, nb_chunk, chunk_score, "wrong way");
     //     #endif
 
     //     return chunk_score;
@@ -384,7 +384,7 @@ float find_no_bikes_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_b
     if(chunk_score > MIN_CHUNK_SCORE)
     {
         #ifdef PRINT_STATS
-            print_no_bikes(p_img, nb_chunk, chunk_score);
+            print_circle(p_img, nb_chunk, chunk_score, "no bikes");
         #endif
 
         return chunk_score;

@@ -78,7 +78,7 @@ float get_angle(point A, point B, point C);
 
 void print_bounding_box(cv::Mat &p_img, int32_t p_x, int32_t p_y, int32_t p_w, int32_t p_h);
 
-void print_no_bikes(cv::Mat &p_img, circle_chunk nb_chunk, float p_score);
+void print_circle(cv::Mat &p_img, circle_chunk nb_chunk, float p_score, std::string p_sign_name);
 
 void print_crossing(cv::Mat &p_img, crossing_chunk cr_chunk, float p_score);
 
