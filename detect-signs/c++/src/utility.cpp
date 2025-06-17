@@ -189,16 +189,19 @@ bool has_small_angle(crossing_chunk p_chunk)
 void print_give_way(cv::Mat &p_img, give_way_chunk gw_chunk, float p_score)
 {
     cv::Scalar color = cv::Scalar(0, 255, 0);
-    int thickness = 2;
+    int thickness = DRAW_LINE_THICKNESS;
 
     cv::line(p_img, gw_chunk.bottom.get_cv_point(), gw_chunk.top_left.get_cv_point(), color, thickness);
     cv::line(p_img, gw_chunk.top_left.get_cv_point(), gw_chunk.top_right.get_cv_point(), color, thickness);
     cv::line(p_img, gw_chunk.top_right.get_cv_point(), gw_chunk.bottom.get_cv_point(), color, thickness);
 
-    char stringed_score[5];
-    snprintf(stringed_score, sizeof(stringed_score), "%.1f", p_score * 100);
+    char stringed_score[30] = "give-way ";
+    char buf[10];
+    snprintf(buf, sizeof(buf), "%.1f", p_score * 100);
+    strcat(stringed_score, buf);
 
-    cv::Point text_pt(int((gw_chunk.top_left.x + gw_chunk.top_right.x)/2), std::min(gw_chunk.top_left.y, gw_chunk.top_right.y));
+
+    cv::Point text_pt(gw_chunk.top_left.x, std::min(gw_chunk.top_left.y, gw_chunk.top_right.y));
     int font_size = 3;
     cv::putText(p_img, stringed_score, text_pt, 1, font_size, cv::Scalar(0, 0, 0), 8);   
     cv::putText(p_img, stringed_score, text_pt, 1, font_size, cv::Scalar(0, 255, 0), 3);   
@@ -207,7 +210,7 @@ void print_give_way(cv::Mat &p_img, give_way_chunk gw_chunk, float p_score)
 void print_stop(cv::Mat &p_img, stop_chunk p_st_chunk, float p_score)
 {
     cv::Scalar color = cv::Scalar(0, 255, 0);
-    int thickness = 2;
+    int thickness = DRAW_LINE_THICKNESS;
 
     cv::line(p_img, cv::Point2d(p_st_chunk.top_left.x, p_st_chunk.top_left.y), 
         cv::Point2d(p_st_chunk.top_right.x, p_st_chunk.top_right.y), color, thickness);
@@ -226,10 +229,12 @@ void print_stop(cv::Mat &p_img, stop_chunk p_st_chunk, float p_score)
     cv::line(p_img, cv::Point2d(p_st_chunk.right_bottom.x, p_st_chunk.right_bottom.y),
         cv::Point2d(p_st_chunk.bottom_right.x, p_st_chunk.bottom_right.y), color, thickness);
 
-    char stringed_score[5];
-    snprintf(stringed_score, sizeof(stringed_score), "%.1f", p_score * 100);
+    char stringed_score[30] = "stop ";
+    char buf[10];
+    snprintf(buf, sizeof(buf), "%.1f", p_score * 100);
+    strcat(stringed_score, buf);
 
-    cv::Point text_pt(int((p_st_chunk.top_left.x + p_st_chunk.top_right.x)/2), std::min(p_st_chunk.top_left.y, p_st_chunk.top_right.y));
+    cv::Point text_pt(p_st_chunk.top_left.x, std::min(p_st_chunk.top_left.y, p_st_chunk.top_right.y));
     int font_size = 3;
     cv::putText(p_img, stringed_score, text_pt, 1, font_size, cv::Scalar(0, 0, 0), 8);   
     cv::putText(p_img, stringed_score, text_pt, 1, font_size, cv::Scalar(0, 255, 0), 3);   
@@ -238,7 +243,7 @@ void print_stop(cv::Mat &p_img, stop_chunk p_st_chunk, float p_score)
 void print_no_bikes(cv::Mat &p_img, no_bikes_chunk nb_chunk, float p_score)
 {
     cv::Scalar color = cv::Scalar(0, 255, 0);
-    int thickness = 2;
+    int thickness = DRAW_LINE_THICKNESS;
 
     float centerX = (nb_chunk.left.x + nb_chunk.right.x) / 2.0;
     float centerY = (nb_chunk.top.y + nb_chunk.bottom.y) / 2.0;
@@ -248,14 +253,14 @@ void print_no_bikes(cv::Mat &p_img, no_bikes_chunk nb_chunk, float p_score)
     float axisX = (nb_chunk.right.x - nb_chunk.left.x) / 2.0;
     float axisY = (nb_chunk.bottom.y - nb_chunk.top.y) / 2.0;
 
-    cv::ellipse(p_img, center, cv::Size(axisX, axisY), 0, 0, 360, cv::Scalar(0, 255, 0), 2);
+    cv::ellipse(p_img, center, cv::Size(axisX, axisY), 0, 0, 360, cv::Scalar(0, 255, 0), thickness);
 
-    char stringed_score[20] = "no-bikes ";
+    char stringed_score[30] = "no-bikes ";
     char buf[10];
-    snprintf(buf, sizeof(stringed_score), "%.1f", p_score * 100);
+    snprintf(buf, sizeof(buf), "%.1f", p_score * 100);
     strcat(stringed_score, buf);
 
-    cv::Point text_pt(nb_chunk.top.x, nb_chunk.top.y);
+    cv::Point text_pt(nb_chunk.left.x, nb_chunk.top.y);
     int font_size = 3;
     cv::putText(p_img, stringed_score, text_pt, 1, font_size, cv::Scalar(0, 0, 0), 8);   
     cv::putText(p_img, stringed_score, text_pt, 1, font_size, cv::Scalar(0, 255, 0), 3);   
@@ -264,16 +269,18 @@ void print_no_bikes(cv::Mat &p_img, no_bikes_chunk nb_chunk, float p_score)
 void print_crossing(cv::Mat &p_img, crossing_chunk cr_chunk, float p_score)
 {
     cv::Scalar color = cv::Scalar(0, 255, 0);
-    int thickness = 2;
+    int thickness = DRAW_LINE_THICKNESS;
 
     cv::line(p_img, cr_chunk.top.get_cv_point(), cr_chunk.left.get_cv_point(), color, thickness);
     cv::line(p_img, cr_chunk.left.get_cv_point(), cr_chunk.right.get_cv_point(), color, thickness);
     cv::line(p_img, cr_chunk.right.get_cv_point(), cr_chunk.top.get_cv_point(), color, thickness);
 
-    char stringed_score[5];
-    snprintf(stringed_score, sizeof(stringed_score), "%.1f", p_score * 100);
+    char stringed_score[30] = "crossing ";
+    char buf[10];
+    snprintf(buf, sizeof(buf), "%.1f", p_score * 100);
+    strcat(stringed_score, buf);
 
-    cv::Point text_pt(int((cr_chunk.left.x + cr_chunk.right.x)/2), cr_chunk.top.y);
+    cv::Point text_pt(cr_chunk.left.x, cr_chunk.top.y);
     int font_size = 3;
     cv::putText(p_img, stringed_score, text_pt, 1, font_size, cv::Scalar(0, 0, 0), 8);   
     cv::putText(p_img, stringed_score, text_pt, 1, font_size, cv::Scalar(0, 255, 0), 3);   
@@ -312,6 +319,6 @@ void print_bounding_box(cv::Mat &p_img, int32_t p_x, int32_t p_y, int32_t p_w, i
     // print a bounding box above all checked shapes
     cv::Scalar color(255,0,0);
     cv::Rect rect(p_x, p_y, p_w, p_h);
-    uint8_t thickness = 2;
+    uint8_t thickness = DRAW_LINE_THICKNESS;
     cv::rectangle(p_img, rect, color, thickness);
 }
