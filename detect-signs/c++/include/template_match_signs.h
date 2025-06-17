@@ -21,6 +21,9 @@ float check_for_stop(cv::Mat &p_white_mask, stop_chunk st_chunk, cv::Mat &p_labe
 float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, circle_chunk nb_chunk, 
     cv::Mat &p_label_mat, int32_t p_sign_label, cv::Mat &p_stop_template, cv::Mat &p_img);
 
+float check_for_wrong_way(cv::Mat &p_white_mask, circle_chunk ww_chunk, cv::Mat &p_label_mat, 
+    int32_t p_sign_label, cv::Mat &p_stop_template, cv::Mat &p_img);
+
 float check_for_crossing(cv::Mat &p_white_mask, cv::Mat &p_black_mask, crossing_chunk cr_chunk, 
     cv::Mat &p_label_mat, int32_t p_sign_label, cv::Mat &p_cr_template, cv::Mat &p_img);
 
