@@ -56,7 +56,7 @@ bool has_small_angle(give_way_chunk p_chunk);
 
 bool has_small_angle(stop_chunk p_chunk);
 
-bool has_small_angle(no_bikes_chunk p_chunk);
+bool has_small_angle(circle_chunk p_chunk);
 
 bool has_small_angle(crossing_chunk p_chunk);
 
@@ -78,7 +78,7 @@ float get_angle(point A, point B, point C);
 
 void print_bounding_box(cv::Mat &p_img, int32_t p_x, int32_t p_y, int32_t p_w, int32_t p_h);
 
-void print_no_bikes(cv::Mat &p_img, no_bikes_chunk nb_chunk, float p_score);
+void print_no_bikes(cv::Mat &p_img, circle_chunk nb_chunk, float p_score);
 
 void print_crossing(cv::Mat &p_img, crossing_chunk cr_chunk, float p_score);
 

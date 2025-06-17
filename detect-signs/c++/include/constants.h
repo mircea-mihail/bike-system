@@ -84,14 +84,14 @@ struct stop_chunk
     {}
 };
 
-struct no_bikes_chunk
+struct circle_chunk
 {
     point top;
     point bottom;
     point left;
     point right;
 
-    no_bikes_chunk(point p_top, point p_bottom, point p_left, point p_right)
+    circle_chunk(point p_top, point p_bottom, point p_left, point p_right)
     {
         top = p_top;
         bottom = p_bottom;
@@ -99,7 +99,7 @@ struct no_bikes_chunk
         right = p_right;
     }
 
-    no_bikes_chunk()
+    circle_chunk()
     {
         top = point();
         bottom = point();
@@ -137,6 +137,7 @@ struct crossing_chunk
 #define STOP_PATH "./templates/stop_100.png"
 #define NO_BIKES_PATH "./templates/no_bikes_100.png"
 #define CROSSING_PATH "./templates/crossing_100.png"
+#define WRONG_WAY_PATH "./templates/wrong_way_100.png"
 
 // ------------------------------- IMAGE
 #define IMAGE_HEIGHT (960)
@@ -151,6 +152,7 @@ struct crossing_chunk
 #define STOP_POSITION 0
 #define NO_BIKES_POSITION 1
 #define CROSSING_POSITION 2
+#define WRONG_WAY_POSITION 3
 
 #define SAVE_IMG_RATIO 1
 #define SAVED_IMG_HEIGHT (IMAGE_HEIGHT / SAVE_IMG_RATIO) 

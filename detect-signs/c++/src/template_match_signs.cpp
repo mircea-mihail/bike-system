@@ -292,7 +292,7 @@ double get_rotation_angle_to_horizontal(cv::Mat p_warped_black_mask)
 }
 
 // todo delete p_img
-float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, no_bikes_chunk nb_chunk, 
+float check_for_no_bikes(cv::Mat &p_white_mask, cv::Mat &p_black_mask, circle_chunk nb_chunk, 
     cv::Mat &p_label_mat, int32_t p_sign_label, cv::Mat &p_nb_template, cv::Mat &p_img)
 {
     // show_pic(p_black_mask);

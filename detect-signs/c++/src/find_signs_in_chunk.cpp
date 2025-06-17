@@ -275,7 +275,7 @@ float find_wrong_way_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_
     top_pt.x = (first_idx + last_idx) / 2;
     top_pt.y = y;
 
-    no_bikes_chunk nb_chunk = no_bikes_chunk(top_pt, bottom_pt, left_pt, right_pt);
+    circle_chunk nb_chunk = circle_chunk(top_pt, bottom_pt, left_pt, right_pt);
 
     // float chunk_score = check_for_no_bikes(p_white_mask, nb_chunk, p_labels, p_label, p_templates[NO_BIKES_POSITION], p_img);
     // if(chunk_score > MIN_CHUNK_SCORE)
@@ -378,7 +378,7 @@ float find_no_bikes_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_b
     }
     top_pt.x = (first_idx + last_idx) / 2;
     top_pt.y = y;
-    no_bikes_chunk nb_chunk = no_bikes_chunk(top_pt, bottom_pt, left_pt, right_pt);
+    circle_chunk nb_chunk(top_pt, bottom_pt, left_pt, right_pt);
 
     float chunk_score = check_for_no_bikes(p_white_mask, p_black_mask, nb_chunk, p_labels, p_label, p_templates[NO_BIKES_POSITION], p_img);
     if(chunk_score > MIN_CHUNK_SCORE)

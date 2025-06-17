@@ -119,7 +119,7 @@ bool has_small_angle(stop_chunk p_chunk)
     return false;
 }
 
-bool has_small_angle(no_bikes_chunk p_chunk)
+bool has_small_angle(circle_chunk p_chunk)
 {
     float angle = 0;
     angle = get_angle(p_chunk.top, p_chunk.right, p_chunk.bottom);
@@ -240,7 +240,7 @@ void print_stop(cv::Mat &p_img, stop_chunk p_st_chunk, float p_score)
     cv::putText(p_img, stringed_score, text_pt, 1, font_size, cv::Scalar(0, 255, 0), 3);   
 }
 
-void print_no_bikes(cv::Mat &p_img, no_bikes_chunk nb_chunk, float p_score)
+void print_no_bikes(cv::Mat &p_img, circle_chunk nb_chunk, float p_score)
 {
     cv::Scalar color = cv::Scalar(0, 255, 0);
     int thickness = DRAW_LINE_THICKNESS;

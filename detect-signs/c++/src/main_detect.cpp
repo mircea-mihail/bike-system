@@ -19,7 +19,7 @@ void load_templates(std::vector<cv::Mat> &p_templates)
 	p_templates.push_back(buf);
 	buf = cv::imread(std::string(NO_BIKES_PATH), cv::IMREAD_COLOR);
 	p_templates.push_back(buf);
-	buf = cv::imread(std::string(CROSSING_PATH), cv::IMREAD_COLOR);
+	buf = cv::imread(std::string(WRONG_WAY_PATH), cv::IMREAD_COLOR);
 	p_templates.push_back(buf);
 }
 
