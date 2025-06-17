@@ -187,6 +187,109 @@ float find_stop_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_label
     return 0;
 }
 
+float find_wrong_way_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_labels, 
+    cv::Mat &p_stats, int32_t p_label, std::vector<cv::Mat> &p_templates)
+{
+    int32_t x = p_stats.at<int32_t>(cv::Point(0, p_label));
+    int32_t y = p_stats.at<int32_t>(cv::Point(1, p_label));
+    int32_t w = p_stats.at<int32_t>(cv::Point(2, p_label));
+    int32_t h = p_stats.at<int32_t>(cv::Point(3, p_label));
+
+    if (h * w < MIN_BOUNDING_BOX_AREA)
+    {
+        return 0;
+    }
+
+    #ifdef PRINT_STATS
+        print_bounding_box(p_img, x, y, w, h);
+    #endif
+
+    point left_pt;
+    int first_idx = -1, last_idx = 0;
+    for (int i = y+h - 1; i >= y; i--)
+    {
+        if (p_labels.at<int32_t>(i, x) == p_label)
+        {
+            if(first_idx == -1)
+            {
+                first_idx = i;
+            }
+            last_idx = i;
+        }
+    }
+    left_pt.x = x;
+    left_pt.y = (first_idx + last_idx) / 2;
+
+    first_idx = -1; last_idx = 0;
+    point right_pt;
+    for (int i = y + h - 1; i >= y; i--)
+    {
+        if (p_labels.at<int32_t>(i, x + w-1) == p_label)
+        {
+            if(first_idx == -1)
+            {
+                first_idx = i;
+            }
+            last_idx = i;
+
+            break;
+        }
+    }
+    right_pt.x = x + w-1;
+    right_pt.y = (first_idx + last_idx) / 2;
+
+
+    first_idx = -1; last_idx = 0;
+    point bottom_pt;
+    for (int j = x; j < x + w; j++)
+    {
+        if (p_labels.at<int32_t>(y + h-1, j) == p_label)
+        {
+            if(first_idx == -1)
+            {
+                first_idx = j;
+            }
+            last_idx = j;
+
+            break;
+        }
+    }
+    bottom_pt.x = (first_idx + last_idx) / 2;
+    bottom_pt.y = y + h-1;
+ 
+    first_idx = -1; last_idx = 0;
+    point top_pt;
+    for (int j = x; j < x + w; j++)
+    {
+        if (p_labels.at<int32_t>(y, j) == p_label)
+        {
+            if(first_idx == -1)
+            {
+                first_idx = j;
+            }
+            last_idx = j;
+
+            break;
+        }
+    }
+    top_pt.x = (first_idx + last_idx) / 2;
+    top_pt.y = y;
+
+    no_bikes_chunk nb_chunk = no_bikes_chunk(top_pt, bottom_pt, left_pt, right_pt);
+
+    // float chunk_score = check_for_no_bikes(p_white_mask, nb_chunk, p_labels, p_label, p_templates[NO_BIKES_POSITION], p_img);
+    // if(chunk_score > MIN_CHUNK_SCORE)
+    // {
+    //     #ifdef PRINT_STATS
+    //         print_no_bikes(p_img, nb_chunk, chunk_score);
+    //     #endif
+
+    //     return chunk_score;
+    // }
+
+    return 0;
+}
+
 // todo p_templates -> make it just no bikes template?
 float find_no_bikes_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_black_mask,
     cv::Mat &p_labels, cv::Mat &p_stats, int32_t p_label, std::vector<cv::Mat> &p_templates)
@@ -205,49 +308,76 @@ float find_no_bikes_in_chunk(cv::Mat &p_img, cv::Mat &p_white_mask, cv::Mat &p_b
         print_bounding_box(p_img, x, y, w, h);
     #endif
 
+
     point left_pt;
+    int first_idx = -1, last_idx = 0;
     for (int i = y+h - 1; i >= y; i--)
     {
         if (p_labels.at<int32_t>(i, x) == p_label)
         {
-            left_pt.x = x;
-            left_pt.y = i;
-            break;
+            if(first_idx == -1)
+            {
+                first_idx = i;
+            }
+            last_idx = i;
         }
     }
+    left_pt.x = x;
+    left_pt.y = (first_idx + last_idx) / 2;
 
+    first_idx = -1; last_idx = 0;
     point right_pt;
     for (int i = y + h - 1; i >= y; i--)
     {
         if (p_labels.at<int32_t>(i, x + w-1) == p_label)
         {
-            right_pt.x = x + w-1;
-            right_pt.y = i;
+            if(first_idx == -1)
+            {
+                first_idx = i;
+            }
+            last_idx = i;
+
             break;
         }
     }
+    right_pt.x = x + w-1;
+    right_pt.y = (first_idx + last_idx) / 2;
 
+    first_idx = -1; last_idx = 0;
     point bottom_pt;
     for (int j = x; j < x + w; j++)
     {
         if (p_labels.at<int32_t>(y + h-1, j) == p_label)
         {
-            bottom_pt.x = j;
-            bottom_pt.y = y + h-1;
+            if(first_idx == -1)
+            {
+                first_idx = j;
+            }
+            last_idx = j;
+
             break;
         }
     }
-
+    bottom_pt.x = (first_idx + last_idx) / 2;
+    bottom_pt.y = y + h-1;
+ 
+    first_idx = -1; last_idx = 0;
     point top_pt;
     for (int j = x; j < x + w; j++)
     {
         if (p_labels.at<int32_t>(y, j) == p_label)
         {
-            top_pt.x = j;
-            top_pt.y = y;
+            if(first_idx == -1)
+            {
+                first_idx = j;
+            }
+            last_idx = j;
+
             break;
         }
     }
+    top_pt.x = (first_idx + last_idx) / 2;
+    top_pt.y = y;
     no_bikes_chunk nb_chunk = no_bikes_chunk(top_pt, bottom_pt, left_pt, right_pt);
 
     float chunk_score = check_for_no_bikes(p_white_mask, p_black_mask, nb_chunk, p_labels, p_label, p_templates[NO_BIKES_POSITION], p_img);
