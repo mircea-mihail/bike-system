@@ -240,7 +240,6 @@ void measurementTask(void *p_args)
 
     while(true)
     {
-        // todo daca spamez butonul de change menu, fortez un approximateVelocity care s-ar putea sa imi aproximeze ceva aiurea 
         // send informaiton to display task
         if(millis() - lastMeasure > SEND_MEASUREMENTS_PERIOD || menu.getChangedState())
         {
@@ -259,9 +258,14 @@ void measurementTask(void *p_args)
                 }
             }
             // estimate real time trip data as if a measurement has just been made
+            // unless the estimation is not realistic (if no real detection was found, safe to say we're slowing down)
             else
             {
                 TripData estimatedData = bikeCalc.approximateVelocity();
+                if(estimatedData.m_currentVelocity > tripData.m_currentVelocity)
+                {
+                    estimatedData = tripData;
+                }
                 menu.update(estimatedData);
                 menu.resetChangedState();
 
