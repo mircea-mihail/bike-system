@@ -16,7 +16,7 @@
 
 extern GxEPD2_BW<GxEPD2_150_BN, GxEPD2_150_BN::HEIGHT> g_display;
 
-enum mainMenuStates 
+enum displayMetricsStates 
 {
     InstantSpeed, 
     TripAvg,
@@ -28,7 +28,7 @@ class Menu
 {
 private:
     // menu and submenu states
-    mainMenuStates m_mainMenuState;
+    displayMetricsStates m_metricDisplayed;
 
     // relevant information regarding to things that need to be displayed
     TripData m_tripData;
@@ -38,7 +38,7 @@ public:
     /// @brief constructor used to init the member variables
     /// @param p_mainMenuState the main menu state, used to know what to display
     /// @param p_speedSubmenuState the sub-menu state, used to know what to display
-    Menu( mainMenuStates p_mainMenuState = InstantSpeed) : m_mainMenuState(p_mainMenuState)
+    Menu( displayMetricsStates p_mainMenuState = InstantSpeed) : m_metricDisplayed(p_mainMenuState)
     {
         m_changedState = true;
     };

@@ -25,7 +25,7 @@ bool HardwareUtility::detectedSensor()
     return false;
 }
 
-bool HardwareUtility::pressedMenuButton()
+bool HardwareUtility::pressedNextButton()
 {
     unsigned long time = millis();
     int state = digitalRead(CHANGE_MENU_PIN);
@@ -55,7 +55,7 @@ bool HardwareUtility::pressedMenuButton()
     return false;
 }
 
-bool HardwareUtility::pressedSubmenuButton()
+bool HardwareUtility::pressedPrevButton()
 {
     unsigned long time = millis();
     int state = digitalRead(CHANGE_SUBMENU_PIN);

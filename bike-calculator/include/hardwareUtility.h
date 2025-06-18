@@ -35,11 +35,11 @@ public:
 
     /// @brief debounces the menu button
     /// @return returns true if it has been pressed
-    bool pressedMenuButton();
+    bool pressedNextButton();
 
     /// @brief debounces the submenu button
     /// @return returns true if it has been pressed
-    bool pressedSubmenuButton();
+    bool pressedPrevButton();
 };
 
 

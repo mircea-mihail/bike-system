@@ -11,7 +11,7 @@ void Menu::getImmage(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT])
     double minutesPassed = 0;
     double currentAcceleration = 0;
 
-    switch(m_mainMenuState)
+    switch(m_metricDisplayed)
     {
     case InstantSpeed:
         g_display.getTextBounds("speed", 0, 0, &tbx, &tby, &tbw, &tbh);
@@ -110,22 +110,22 @@ void Menu::update(TripData p_tripData)
 
 void Menu::nextMetricsPage()
 {
-    switch(m_mainMenuState)
+    switch(m_metricDisplayed)
     {
     case InstantSpeed:
-        m_mainMenuState = TripAvg;
+        m_metricDisplayed = TripAvg;
         m_changedState = true;
         break;
     case TripAvg:
-        m_mainMenuState = Time;
+        m_metricDisplayed = Time;
         m_changedState = true;
         break;
     case Time:
-        m_mainMenuState = Distance;
+        m_metricDisplayed = Distance;
         m_changedState = true;
         break;
     case Distance:
-        m_mainMenuState = InstantSpeed;
+        m_metricDisplayed = InstantSpeed;
         m_changedState = true;
         break;
     default:
@@ -135,22 +135,22 @@ void Menu::nextMetricsPage()
 
 void Menu::prevMetricsPage()
 {
-    switch(m_mainMenuState)
+    switch(m_metricDisplayed)
     {
     case InstantSpeed:
-        m_mainMenuState = Distance;
+        m_metricDisplayed = Distance;
         m_changedState = true;
         break;
     case TripAvg:
-        m_mainMenuState = InstantSpeed;
+        m_metricDisplayed = InstantSpeed;
         m_changedState = true;
         break;
     case Time:
-        m_mainMenuState = TripAvg;
+        m_metricDisplayed = TripAvg;
         m_changedState = true;
         break;
     case Distance:
-        m_mainMenuState = Time;
+        m_metricDisplayed = Time;
         m_changedState = true;
         break;
     default:
@@ -171,7 +171,7 @@ bool Menu::getChangedState()
 bool Menu::operator== (const Menu p_rhs)
 {
     if(this->m_changedState == p_rhs.m_changedState 
-        && this->m_mainMenuState == p_rhs.m_mainMenuState
+        && this->m_metricDisplayed == p_rhs.m_metricDisplayed
         && this->m_tripData == p_rhs.m_tripData)
     {
         return true;   
@@ -183,7 +183,7 @@ bool Menu::operator== (const Menu p_rhs)
 bool Menu::operator!= (const Menu p_rhs)
 {
     if(this->m_changedState == p_rhs.m_changedState 
-        && this->m_mainMenuState == p_rhs.m_mainMenuState
+        && this->m_metricDisplayed == p_rhs.m_metricDisplayed
         && this->m_tripData == p_rhs.m_tripData)
     {
         return false;   
@@ -197,7 +197,7 @@ Menu& Menu::operator= (const Menu& p_rhs)
     if(this != &p_rhs)
     {
         this->m_changedState = p_rhs.m_changedState; 
-        this->m_mainMenuState = p_rhs.m_mainMenuState;
+        this->m_metricDisplayed = p_rhs.m_metricDisplayed;
         this->m_tripData = p_rhs.m_tripData;
     }
     return *this;
