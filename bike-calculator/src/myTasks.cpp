@@ -235,6 +235,7 @@ void measurementTask(void *p_args)
     HardwareUtility hwUtil;
 
     unsigned long lastMeasure = 0;
+    unsigned long lastChangedMenu = 0;
     double previousVelocity = 0;
     bool sendingLatestSpeed = true;
 
@@ -295,11 +296,17 @@ void measurementTask(void *p_args)
         if(hwUtil.pressedPrevButton())
         {
             menu.prevMetricsPage();
+            lastChangedMenu = millis();
         }
-
         if(hwUtil.pressedNextButton())
         {
             menu.nextMetricsPage();
+            lastChangedMenu = millis();
+        }
+        if(millis() - lastChangedMenu > MAIN_MENU_TIMEOUT_MS && lastChangedMenu != 0)
+        {
+            menu.defaultMetricsPage();
+            lastChangedMenu = 0;
         }
         
         taskYIELD();

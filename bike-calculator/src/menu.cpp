@@ -158,6 +158,12 @@ void Menu::prevMetricsPage()
     }
 }
 
+void Menu::defaultMetricsPage()
+{
+    m_metricDisplayed = InstantSpeed;
+    m_changedState = true;
+}
+
 void Menu::resetChangedState()
 {
     m_changedState = false;

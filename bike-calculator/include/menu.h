@@ -66,6 +66,8 @@ public:
     /// @return returns the state of the changedState member variable
     bool getChangedState();
 
+    void defaultMetricsPage();
+
     /// @brief overloads the == operator 
     /// @param p_rhs the right hand side Menu object to compare to
     /// @return returns the result of the comparison
