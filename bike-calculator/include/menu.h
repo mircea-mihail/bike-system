@@ -18,23 +18,10 @@ extern GxEPD2_BW<GxEPD2_150_BN, GxEPD2_150_BN::HEIGHT> g_display;
 
 enum mainMenuStates 
 {
-    Speed, 
-    Misc
-};
-
-enum speedSubmenuStates 
-{
-    Instant, 
+    InstantSpeed, 
     TripAvg,
-    BothCombined 
-};
-
-enum miscSubmenuStates
-{
-    Distance,
     Time, 
-    Force, 
-    Acceleration
+    Distance,
 };
 
 class Menu
@@ -42,8 +29,6 @@ class Menu
 private:
     // menu and submenu states
     mainMenuStates m_mainMenuState;
-    speedSubmenuStates m_speedSubmenuState;
-    miscSubmenuStates m_miscSubmenuState;
 
     // relevant information regarding to things that need to be displayed
     TripData m_tripData;
@@ -53,10 +38,7 @@ public:
     /// @brief constructor used to init the member variables
     /// @param p_mainMenuState the main menu state, used to know what to display
     /// @param p_speedSubmenuState the sub-menu state, used to know what to display
-    Menu( mainMenuStates p_mainMenuState = Speed, 
-          speedSubmenuStates p_speedSubmenuState = Instant, 
-          miscSubmenuStates p_miscSubmenuState = Distance
-        ) : m_mainMenuState(p_mainMenuState), m_speedSubmenuState(p_speedSubmenuState), m_miscSubmenuState(p_miscSubmenuState)
+    Menu( mainMenuStates p_mainMenuState = InstantSpeed) : m_mainMenuState(p_mainMenuState)
     {
         m_changedState = true;
     };
@@ -72,11 +54,11 @@ public:
 
     /// @brief updates the menu state if it should
     /// @param p_shouldChangeState only change state when this is true
-    void nextMenuState();
-    
-    /// @brief updates the submenu state to the next one in order
-    void nextSubmenuState();
+    void nextMetricsPage();
 
+    /// @brief updates the display metrics
+    void prevMetricsPage();
+    
     /// @brief resets the changedState member variable
     void resetChangedState();
     

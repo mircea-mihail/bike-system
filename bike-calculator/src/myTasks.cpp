@@ -290,12 +290,12 @@ void measurementTask(void *p_args)
 
         if(hwUtil.pressedSubmenuButton())
         {
-            menu.nextSubmenuState();
+            menu.prevMetricsPage();
         }
 
         if(hwUtil.pressedMenuButton())
         {
-            menu.nextMenuState();
+            menu.nextMetricsPage();
         }
         
         taskYIELD();
