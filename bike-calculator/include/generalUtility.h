@@ -28,7 +28,7 @@
 #define KMPH_TO_MPS (10.0/36.0)
 
 // menu stuff
-#define MAIN_MENU_TIMEOUT_MS MS_TO_SECONDS * 30UL
+#define MAIN_MENU_TIMEOUT_MS (MS_TO_SECONDS * 30UL)
 
 // hardware debounce timings
 #define SENSOR_DEBOUNCE_PERIOD_MS 10UL

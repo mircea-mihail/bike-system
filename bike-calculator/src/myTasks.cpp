@@ -94,10 +94,8 @@ void writeToFileTask(void *p_args)
     const char writeDirPath[MAX_SIZE_OF_DIR_PATH] = "/data";
     
     // const char default
-    const char errorFileName[MAX_SIZE_OF_FILE_NAME] = "hall_sensor_errors.txt";
     const char velocityAccFileName[MAX_SIZE_OF_FILE_NAME] = "speed_acc.txt";
 
-    char errorCheckFilePath[MAX_SIZE_OF_FILE_PATH] = "/data/hall_sensor_errors.txt";
     char velocityAccFilePath[MAX_SIZE_OF_FILE_PATH];
 
     int currentFileIdx = FSInteraction::getLatestVersion(writeDirPath, velocityAccFileName);
@@ -128,15 +126,12 @@ void writeToFileTask(void *p_args)
     // show contents of files on terminal
     if(PRINT_CONTENTS_OF_ALL_FILES)
     {
-        Serial.print("printing from error file:\n");
-        FSInteraction::printFileContents(errorCheckFilePath);
         Serial.print("printing from monitor file:\n");
         FSInteraction::printFileContents(velocityAccFilePath);
         Serial.print("total file size: ");
         Serial.println(FSInteraction::getFileSize(velocityAccFilePath));
         if(RESET_FILES_AFTER_PRINT)
         {
-            FSInteraction::deleteFileContents(errorCheckFilePath);
             FSInteraction::deleteFileContents(velocityAccFilePath);
         }
     }  
@@ -148,10 +143,8 @@ void writeToFileTask(void *p_args)
         { 
             //todo do i need previous velocity in logging?
             //todo add street sign idx
-            char csvErrStartMsg[MAX_SIZE_OF_ERR_MSG] = "time, velocity, previous velocity\n";
-            char csvSpeedAccStartMsg[MAX_SIZE_OF_ERR_MSG] = "detection time micros\n";
+            std::string csvSpeedAccStartMsg = "detection time micros\n";
 
-            FSInteraction::appendStringToFile(errorCheckFilePath, csvErrStartMsg);
             FSInteraction::appendStringToFile(velocityAccFilePath, csvSpeedAccStartMsg);
             
             xSemaphoreGive(g_spiMutex);
@@ -176,18 +169,6 @@ void writeToFileTask(void *p_args)
         {
             if (xSemaphoreTake(g_spiMutex, portMAX_DELAY))
             {
-                //todo get rid of error dir...
-                // record possible error                
-                if(dataToWrite.m_currentVelocity >= SUSPICIOUS_SPEED_KMPH)
-                {
-                    snprintf(sendMessage, MAX_SIZE_OF_ERR_MSG, "%lu, %.2lf, %.2lf\n", 
-                            (millis() / MS_TO_SECONDS), 
-                            dataToWrite.m_currentVelocity, 
-                            dataToWrite.m_previousVelocity);
-                
-                    FSInteraction::appendStringToFile(errorCheckFilePath, sendMessage);
-                }
-
                 // record time of latest detection
                 // >>> len(str(pow(2, 64))) == 20 
 

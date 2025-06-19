@@ -46,6 +46,7 @@ Menu g_menu;
 xSemaphoreHandle g_menuMutex;
 xSemaphoreHandle g_spiMutex;
 QueueHandle_t g_tripDataQueue;
+QueueHandle_t g_detectedSignsQueue;
 HardwareSerial g_camSerial(1); 
 
 void setup()

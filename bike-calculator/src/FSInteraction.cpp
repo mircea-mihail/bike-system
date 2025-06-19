@@ -91,7 +91,7 @@ bool FSInteraction::printFileContents(const char* p_filePath)
     return false;
 }
 
-bool FSInteraction::appendStringToFile(const char* p_filePath, char *p_string)
+bool FSInteraction::appendStringToFile(const char* p_filePath, std::string p_string)
 {
     if(!m_canWriteToFs)
     {
@@ -101,7 +101,7 @@ bool FSInteraction::appendStringToFile(const char* p_filePath, char *p_string)
     File fileObj = SD.open(p_filePath, FILE_APPEND);
     if(fileObj)
     {
-        if (fileObj.print(p_string)) 
+        if (fileObj.print(p_string.c_str())) 
         {
             fileObj.flush();
             fileObj.close();

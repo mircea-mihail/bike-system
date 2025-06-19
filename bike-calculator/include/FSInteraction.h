@@ -46,7 +46,7 @@ public:
     /// @param p_filePath the file to append to 
     /// @param p_string string to append
     /// @return if operation was succesful (bool)
-    static bool appendStringToFile(const char* p_filePath, char *p_string);
+    static bool appendStringToFile(const char* p_filePath, std::string p_string);
 
     static size_t getFileSize(const char* p_filePath);
 
