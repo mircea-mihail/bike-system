@@ -317,8 +317,8 @@ cv::Point2f get_line_intersection( point A, point B, point C, point D) {
 void print_bounding_box(cv::Mat &p_img, int32_t p_x, int32_t p_y, int32_t p_w, int32_t p_h)
 {
     // print a bounding box above all checked shapes
-    cv::Scalar color(255,0,0);
-    cv::Rect rect(p_x, p_y, p_w, p_h);
-    uint8_t thickness = DRAW_LINE_THICKNESS;
-    cv::rectangle(p_img, rect, color, thickness);
+    // cv::Scalar color(255,0,0);
+    // cv::Rect rect(p_x, p_y, p_w, p_h);
+    // uint8_t thickness = DRAW_LINE_THICKNESS;
+    // cv::rectangle(p_img, rect, color, thickness);
 }

@@ -127,10 +127,11 @@ float detect_gw_cv(cv::Mat &p_img, std::vector<cv::Mat> &p_templates)
 
     std::cout << "detection number:" << detection_number << std::endl;
     #ifdef PRINT_STATS
-        std::string img_desc = "Found " + std::to_string(detection_number) + " gw signs";
-        cv::Point desc_pt(10, 40);
-        cv::putText(p_img, img_desc, desc_pt, 1, 3, cv::Scalar(0, 0, 0), 7);   
-        cv::putText(p_img, img_desc, desc_pt, 1, 3, cv::Scalar(0, 255, 0), 3);   
+    // print all signs found
+        // std::string img_desc = "Found " + std::to_string(detection_number) + " gw signs";
+        // cv::Point desc_pt(10, 40);
+        // cv::putText(p_img, img_desc, desc_pt, 1, 3, cv::Scalar(0, 0, 0), 7);   
+        // cv::putText(p_img, img_desc, desc_pt, 1, 3, cv::Scalar(0, 255, 0), 3);   
     #endif
 
     return detection_number;
