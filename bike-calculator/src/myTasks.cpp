@@ -14,6 +14,7 @@ void displayManagement(void *p_args)
 
     Menu menu;
     Menu prevMenuState;
+    SignInfo signInfo;
 
     // one full white refresh
     clearImmage(g_matrixToDisplay);
@@ -39,13 +40,26 @@ void displayManagement(void *p_args)
         burstPrintAfterRefresh = (millis() - lastFullRefresh < PRINT_BURST_PERIOD_MS) && doBurstRefresh;
 
         // wait for as long as possible to receive the speed to print
-        if (menu != g_menu && xSemaphoreTake(g_menuMutex, portMAX_DELAY))
+        if (xSemaphoreTake(g_menuMutex, 0))
         {
-            menu = g_menu;
+            if(menu != g_menu)
+            {
+                menu = g_menu;
+            }
+
             xSemaphoreGive(g_menuMutex);
         }
 
-        if(menu != prevMenuState || needsFullRefresh || burstPrintAfterRefresh)
+        if (xSemaphoreTake(g_signInfoMutex, 0))
+        {
+            if(signInfo != g_signInfo && g_signInfo.m_signIndex != NO_SIGN)
+            {
+                signInfo = g_signInfo;
+            }
+            xSemaphoreGive(g_signInfoMutex);
+        }
+
+        if(menu != prevMenuState || needsFullRefresh || burstPrintAfterRefresh || millis() - signInfo.m_detectionMoment < SIGN_DISPLAY_MS)
         {
             doBurstRefresh = false;
 
@@ -58,7 +72,17 @@ void displayManagement(void *p_args)
 
             if (xSemaphoreTake(g_spiMutex, portMAX_DELAY))
             {
-                menu.getImmage(g_matrixToDisplay);
+                if(millis() - signInfo.m_detectionMoment < SIGN_DISPLAY_MS && signInfo.m_detectionMoment != 0)
+                {
+                    menu.showStreetSign(g_matrixToDisplay, signInfo.m_signIndex);
+                    // change prev menu state to force refresh
+                    prevMenuState = Menu();
+                }
+                else
+                {
+                    menu.showMetric(g_matrixToDisplay);
+                    prevMenuState = menu;    
+                }
 
                 // needs a full refresh
                 if(needsFullRefresh)
@@ -73,11 +97,9 @@ void displayManagement(void *p_args)
                 }
                 xSemaphoreGive(g_spiMutex);
             }
-
-            prevMenuState = menu;    
-            
-            taskYIELD(); // yeld after update
         }   
+
+        taskYIELD(); 
     }
 }
 
@@ -177,7 +199,8 @@ void writeToFileTask(void *p_args)
                             // (dataToWrite.m_currentVelocity - dataToWrite.m_previousVelocity) * (dataToWrite.m_currentVelocity + dataToWrite.m_previousVelocity) / (2 * WHEEL_PERIMETER_MM / MM_TO_KM) * M_TO_KM);
                 FSInteraction::appendStringToFile(velocityAccFilePath, sendMessage);
                         
-                Serial.print(sendMessage);
+                Serial.print("send message: ");
+                Serial.println(sendMessage);
 
                 // check file size and make a new file fi surpassed max acceptable file size
                 if(FSInteraction::getFileSize(velocityAccFilePath) > MAX_FILE_SIZE_BYTES)
@@ -284,11 +307,11 @@ void measurementTask(void *p_args)
             menu.nextMetricsPage();
             lastChangedMenu = millis();
         }
-        if(millis() - lastChangedMenu > MAIN_MENU_TIMEOUT_MS && lastChangedMenu != 0)
-        {
-            menu.defaultMetricsPage();
-            lastChangedMenu = 0;
-        }
+        // if(millis() - lastChangedMenu > MAIN_MENU_TIMEOUT_MS && lastChangedMenu != 0)
+        // {
+        //     menu.defaultMetricsPage();
+        //     lastChangedMenu = 0;
+        // }
         
         taskYIELD();
     }
@@ -300,13 +323,36 @@ void serialCamTask(void *p_args)
     int32_t signCode = -2;
     while(true)
     {
-        if(g_camSerial.available())
+
+        if(Serial.available())
         {
             Serial.println("about to get an int:");
-            signCode = g_camSerial.parseInt();
+            signCode = Serial.parseInt();
             Serial.print("Got: ");
             Serial.println(signCode);
-            taskYIELD();
+            if(signCode >= SMALLEST_SIGN_VAL && signCode <= BIGGEST_SIGN_VAL)
+            {
+                Serial.println("about to take on the mutex");
+                SignInfo signInfo(millis(), signCode);
+                if (xSemaphoreTake(g_signInfoMutex, portMAX_DELAY))
+                {
+                    Serial.println("sent sign info");
+                    g_signInfo = signInfo;
+                    xSemaphoreGive(g_signInfoMutex);
+                }
+                Serial.println("done serial loop");
+            }
         }
-   }
+
+        taskYIELD();
+    }
 }
+
+
+        // if(g_camSerial.available())
+        // {
+        //     Serial.println("about to get an int:");
+        //     signCode = g_camSerial.parseInt();
+        //     Serial.print("Got: ");
+        //     Serial.println(signCode);
+        // }
