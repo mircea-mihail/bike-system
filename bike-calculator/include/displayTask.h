@@ -5,6 +5,7 @@
 
 #include <Arduino.h>
 #include "numbersFont.h"
+#include "signsMatrix.h"
 #include "stampsFont.h"
 #include "generalUtility.h"
 
@@ -73,6 +74,8 @@ int intPow(int p_number, int p_exponent = 2);
 /// @return the offset value this function computes 
 ///     (as int because i'm workig on pixels and there is no such a thig as 0.2 pixels) 
 int getOneOffsetValue(int p_number, int p_digitsInNumber);
+
+void addSignCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], const bool *p_sign_pointer, int p_width, int p_height, float p_scale = 1);
 
 /// @brief overlays the number given by the user on the immage that is going to be displayed
 ///     using the custom font saved in flash

@@ -157,6 +157,58 @@ bool checkValueWithinBounds(int p_value, int p_lowerBound, int p_upperBound)
     return true;
 }
 
+// void addSignCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], const bool *p_sign_pointer, int p_width, int p_height, float p_scale)
+// {   
+    
+//     int xStartPos = (DISPLAY_WIDTH - p_width * p_scale) / 2; // to center horisontally
+//     int yStartPos = (DISPLAY_HEIGHT - p_height * p_scale) / 2;
+
+//     // takes around 0.8 microseconds to read one digit from flash
+
+//     for(int row = yStartPos; row < yStartPos + p_height* p_scale; row++)
+//     {
+//         for(int col = xStartPos; col < xStartPos + p_width * p_scale; col ++)
+//         {      
+//             uint8_t pixelToWrite;
+
+//             pixelToWrite = pgm_read_byte(p_sign_pointer + int((row-yStartPos)/p_scale) * p_width) + int((col-xStartPos)/p_scale);
+
+//             if(checkValueWithinBounds(row, 0, DISPLAY_HEIGHT)  
+//                 && checkValueWithinBounds(col, 0, DISPLAY_WIDTH))
+//             {
+//                 p_immageBuffer[row][col] = pixelToWrite;
+//             }
+//         }
+//     }
+// }
+
+void addSignCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], const bool *p_sign_pointer, int p_width, int p_height, float p_scale)
+{   
+    
+    int xStartPos = (DISPLAY_WIDTH - p_width * p_scale) / 2; // to center horisontally
+    int yStartPos = (DISPLAY_HEIGHT - p_height * p_scale) / 2;
+
+    // takes around 0.8 microseconds to read one digit from flash
+
+    for(int row = yStartPos; row < yStartPos + p_height* p_scale; row++)
+    {
+        for(int col = xStartPos; col < xStartPos + p_width * p_scale; col ++)
+        {      
+            uint8_t pixelToWrite;
+            
+            int y_index = int((row-yStartPos)/p_scale);
+            int x_index = int((col-xStartPos)/p_scale);
+            int flat_index = int(y_index * p_width + x_index);
+            pixelToWrite = pgm_read_byte(&(p_sign_pointer[flat_index]));
+        
+            if(checkValueWithinBounds(row, 0, DISPLAY_HEIGHT)  
+                && checkValueWithinBounds(col, 0, DISPLAY_WIDTH))
+            {
+                p_immageBuffer[row][col] = pixelToWrite;
+            }
+        }
+    }
+}
 // add scale function
 // add function that displays number with one or two presision decimals
 void addNumberCentered(uint8_t p_immageBuffer[DISPLAY_WIDTH][DISPLAY_HEIGHT], int p_numberToWrite, int p_OxImmageOffset, int p_OyImmageOffset, float p_scale)
