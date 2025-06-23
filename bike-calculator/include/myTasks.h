@@ -44,9 +44,12 @@
 // spi_device_handle_t g_spi2;
 extern uint8_t g_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT];
 extern Menu g_menu;
+extern SignInfo g_signInfo;
 
 extern xSemaphoreHandle g_menuMutex;
 extern xSemaphoreHandle g_spiMutex;
+extern xSemaphoreHandle g_signInfoMutex;
+
 extern QueueHandle_t g_tripDataQueue;
 extern HardwareSerial g_camSerial; 
 

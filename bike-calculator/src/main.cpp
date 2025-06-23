@@ -42,8 +42,10 @@ GxEPD2_BW<GxEPD2_150_BN, GxEPD2_150_BN::HEIGHT> g_display(GxEPD2_150_BN(/*CS=D8*
 
 uint8_t g_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT];
 Menu g_menu;
+SignInfo g_signInfo;
 
 xSemaphoreHandle g_menuMutex;
+xSemaphoreHandle g_signInfoMutex;
 xSemaphoreHandle g_spiMutex;
 QueueHandle_t g_tripDataQueue;
 QueueHandle_t g_detectedSignsQueue;
@@ -53,6 +55,11 @@ void setup()
 {    
     initPins();
     Serial.begin(115200);
+
+    esp_log_level_set("*", ESP_LOG_VERBOSE);
+    esp_reset_reason_t reason = esp_reset_reason();
+    Serial.printf("Reset reason: %d\n", reason);
+
     g_camSerial.begin(9600, SERIAL_8N1, RX_SERIAL, TX_SERIAL); // RX=16, TX=17
 
     g_tripDataQueue = xQueueCreate(QUEUE_SIZE, sizeof(TripData));
@@ -63,6 +70,7 @@ void setup()
  
     g_spiMutex = xSemaphoreCreateMutex();
     g_menuMutex = xSemaphoreCreateMutex();
+    g_signInfoMutex = xSemaphoreCreateMutex();
 
     TaskHandle_t writeToFsTask = NULL;
     xTaskCreate(writeToFileTask, "writeToFsTask", FILE_WRITING_TASK_STACK_SIZE, NULL, DEFAULT_TASK_PRIORITY, &writeToFsTask);
