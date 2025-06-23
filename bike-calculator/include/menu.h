@@ -41,9 +41,10 @@ public:
     Menu( displayMetricsStates p_mainMenuState = InstantSpeed) : m_metricDisplayed(p_mainMenuState)
     {
         m_changedState = true;
+        m_tripData = TripData();
     };
 
-    void Menu::showStreetSign(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT], int p_signToShow);
+    void showStreetSign(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT], int p_signToShow);
     
     /// @brief the part that does the actual displaying of the letters on the screen
     ///     and that writes to the pixel matrix the appropriate number to be then sent to the screen
