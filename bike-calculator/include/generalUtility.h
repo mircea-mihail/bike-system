@@ -29,6 +29,7 @@
 
 // menu stuff
 #define MAIN_MENU_TIMEOUT_MS (MS_TO_SECONDS * 30UL)
+#define SIGN_DISPLAY_MS (MS_TO_SECONDS * 10UL)
 
 // hardware debounce timings
 #define SENSOR_DEBOUNCE_PERIOD_MS 10UL
@@ -72,6 +73,49 @@
 // pins for e-paper display
 #define RST GPIO_NUM_27             // External reset, low active
 #define BUSY GPIO_NUM_35            // Busy status output, high active
+
+struct SignInfo
+{
+    unsigned long m_detectionMoment;
+    int m_signIndex;
+
+    SignInfo(unsigned long p_detectionMoment, int p_signIndex): m_detectionMoment(p_detectionMoment), m_signIndex(p_signIndex) {}; 
+
+    SignInfo()
+    {
+        m_detectionMoment = 0;
+        m_signIndex = 0;
+    }
+
+    bool operator== (const SignInfo p_rhs)
+    {
+        if(this->m_detectionMoment == p_rhs.m_detectionMoment
+            && this->m_signIndex == p_rhs.m_signIndex)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    bool operator!= (const SignInfo p_rhs)
+    {
+        if(this->m_detectionMoment == p_rhs.m_detectionMoment
+            && this->m_signIndex == p_rhs.m_signIndex)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    SignInfo & operator= (const SignInfo& p_rhs){
+        if(this != &p_rhs)
+        {
+            this->m_detectionMoment = p_rhs.m_detectionMoment;
+            this->m_signIndex = p_rhs.m_signIndex;
+        }
+        return *this;
+    }
+};
 
 // data packet to send to menu
 struct TripData
