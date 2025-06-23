@@ -1,12 +1,14 @@
 #include <stdbool.h>
 #include <Arduino.h>
 
+#define SMALLEST_SIGN_VAL 0
 #define NO_SIGN 0
 #define CROSSING 1
 #define GIVE_WAY 2
 #define NO_BIKES 3
 #define STOP 4
 #define NO_ENTRY 5
+#define BIGGEST_SIGN_VAL 5
 
 #define CROSSING_WIDTH 88
 #define CROSSING_HEIGHT 77
