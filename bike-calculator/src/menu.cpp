@@ -1,6 +1,37 @@
 #include "menu.h"
 
-void Menu::getImmage(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT])
+void Menu::showStreetSign(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT], int p_signToShow)
+{
+    switch(p_signToShow)
+    {
+        case NO_SIGN:
+            break;
+        case CROSSING:
+            clearImmage(p_matrixToDisplay);
+            addSignCentered(p_matrixToDisplay, &g_crossing[0][0], CROSSING_WIDTH, CROSSING_HEIGHT, 2);
+            break;
+        case GIVE_WAY:
+            clearImmage(p_matrixToDisplay);
+            addSignCentered(p_matrixToDisplay, &g_give_way[0][0], GIVE_WAY_WIDTH, GIVE_WAY_HEIGHT, 2);
+            break;
+        case NO_BIKES:
+            clearImmage(p_matrixToDisplay);
+            addSignCentered(p_matrixToDisplay, &g_no_bikes[0][0], NO_BIKES_WIDTH, NO_BIKES_HEIGHT, 2);
+            break;
+        case STOP:
+            clearImmage(p_matrixToDisplay);
+            addSignCentered(p_matrixToDisplay, &g_stop[0][0], STOP_WIDTH, STOP_HEIGHT, 2);
+            break;
+        case NO_ENTRY:
+            clearImmage(p_matrixToDisplay);
+            addSignCentered(p_matrixToDisplay, &g_no_entry[0][0], NO_ENTRY_WIDTH, NO_ENTRY_HEIGHT, 2);
+            break;
+        default:
+            break;
+    }
+}
+
+void Menu::showMetric(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT])
 {
     int16_t tbx, tby;
     uint16_t tbw, tbh;

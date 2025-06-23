@@ -42,11 +42,13 @@ public:
     {
         m_changedState = true;
     };
+
+    void Menu::showStreetSign(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT], int p_signToShow);
     
     /// @brief the part that does the actual displaying of the letters on the screen
     ///     and that writes to the pixel matrix the appropriate number to be then sent to the screen
     /// @param p_matrixToDisplay the 200 x 200 matrix that is then displayed to the screen
-    void getImmage(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT]);
+    void showMetric(uint8_t p_matrixToDisplay[DISPLAY_WIDTH][DISPLAY_HEIGHT]);
     
     /// @brief updates the tripdata member variable
     /// @param p_tripData value to put in the trip data member variable
