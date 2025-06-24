@@ -172,6 +172,15 @@ struct crossing_chunk
 #define FAILED_TO_ROTATE_VAL 361
 #define DRAW_LINE_THICKNESS 3   
 
+#define SMALLEST_SIGN_VAL 0
+#define NO_SIGN 0
+#define CROSSING 1
+#define GIVE_WAY 2
+#define NO_BIKES 3
+#define STOP 4
+#define WRONG_WAY 5
+#define BIGGEST_SIGN_VAL 5
+
 // ------------------------------- GIVE WAY RED BORDER   
 // #define THICK_GW_BORDER_PER_CENT 0.376
 #define THICK_GW_BORDER_PER_CENT 0.4
@@ -199,7 +208,7 @@ struct crossing_chunk
 #define HUE_POSITIVE_DARK_OFFSET 10
 #define HUE_NEGATIVE_DARK_OFFSET 20
 
-#define BRIGHT_MIN_RED_SATURATION 100
+#define BRIGHT_MIN_RED_SATURATION 120
 
 #define DARK_MIN_RED_SATURATION 140
 #define DARK_MIN_RED_VALUE 30

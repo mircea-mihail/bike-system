@@ -52,9 +52,10 @@ void get_black_mask(cv::Mat &p_hsv_img, cv::Mat &p_black_mask)
     cv::inRange(p_hsv_img, lower_red_1, upper_red_1, p_black_mask); 
 }
 
-void detect_gw_thread(cv::Mat *p_img, cv::Mat *p_red_mask, cv::Mat *p_white_mask, cv::Mat *p_black_mask,
+int detect_thread(cv::Mat *p_img, cv::Mat *p_red_mask, cv::Mat *p_white_mask, cv::Mat *p_black_mask,
     std::atomic<int32_t> *p_detection_number, std::vector<cv::Mat> *p_templates)
 {
+    int found_signs = NO_SIGN;
     cv::Mat labels;
     cv::Mat stats;
     cv::Mat centroids;
@@ -62,25 +63,75 @@ void detect_gw_thread(cv::Mat *p_img, cv::Mat *p_red_mask, cv::Mat *p_white_mask
 
     for(int i=1; i < stats.rows; i++)
     {
-        float gw_detection_res = find_gw_in_chunk(*p_img, *p_white_mask, labels, stats, i);
-        find_stop_in_chunk(*p_img, *p_white_mask, labels, stats, i, *p_templates);
-        find_no_bikes_in_chunk(*p_img, *p_white_mask, *p_black_mask, labels, stats, i, *p_templates);
-        find_wrong_way_in_chunk(*p_img, *p_white_mask, labels, stats, i, *p_templates);
-        find_crossing_in_chunk(*p_img, *p_white_mask, *p_black_mask, labels, stats, i, *p_templates);
+        float gw_res = find_gw_in_chunk(*p_img, *p_white_mask, labels, stats, i);
+        if(gw_res > MIN_CHUNK_SCORE && ((found_signs & (1 << GIVE_WAY)) == 0)) found_signs += (1 << GIVE_WAY);
 
-        if(gw_detection_res > 0)
-        {
-            (*p_detection_number) ++;
-        }
+        float st_res = find_stop_in_chunk(*p_img, *p_white_mask, labels, stats, i, *p_templates);
+        if(st_res > MIN_CHUNK_SCORE && ((found_signs & 1 << STOP) == 0)) found_signs += (1 << STOP);
+
+        float nb_res = find_no_bikes_in_chunk(*p_img, *p_white_mask, *p_black_mask, labels, stats, i, *p_templates);
+        if(nb_res > MIN_CHUNK_SCORE && ((found_signs & 1 << NO_BIKES) == 0)) found_signs += (1 << NO_BIKES);
+
+        float ww_res = find_wrong_way_in_chunk(*p_img, *p_white_mask, labels, stats, i, *p_templates);
+        if(ww_res > MIN_CHUNK_SCORE && ((found_signs & 1 << WRONG_WAY) == 0)) found_signs += (1 << WRONG_WAY);
+
+        float cr_res = find_crossing_in_chunk(*p_img, *p_white_mask, *p_black_mask, labels, stats, i, *p_templates);
+        if(cr_res > MIN_CHUNK_SCORE && ((found_signs & 1 << CROSSING) == 0)) found_signs += (1 << CROSSING);
     }
+
+    return found_signs;
 }
 
-float detect_gw_cv(cv::Mat &p_img, std::vector<cv::Mat> &p_templates)
+void print_detections(int p_detections)
+{
+    if((p_detections & (1 << GIVE_WAY)) != 0) 
+        std::cout << "give way\n";
+
+    if((p_detections & (1 << STOP)) != 0) 
+        std::cout << "stop\n";
+
+    if((p_detections & (1 << NO_BIKES)) != 0) 
+        std::cout << "no bikes\n";
+
+    if((p_detections & (1 << WRONG_WAY)) != 0) 
+        std::cout << "wrong way\n";
+
+    if((p_detections & (1 << CROSSING)) != 0) 
+        std::cout << "crossing\n";
+
+    if(p_detections != 0)
+        std::cout << std::endl;
+}
+
+int merge_detections(int p_detections_1, int p_detections_2)
+{
+    int final_detections = NO_SIGN;
+
+    if(((p_detections_1 & (1 << GIVE_WAY)) != 0) || (p_detections_2 & (1 << GIVE_WAY))) 
+        final_detections += 1 << GIVE_WAY;
+
+    if(((p_detections_1 & (1 << STOP)) != 0) || (p_detections_2 & (1 << STOP))) 
+        final_detections += 1 << STOP;
+
+    if(((p_detections_1 & (1 << NO_BIKES)) != 0) || (p_detections_2 & (1 << NO_BIKES))) 
+        final_detections += 1 << NO_BIKES;
+
+    if(((p_detections_1 & (1 << WRONG_WAY)) != 0) || (p_detections_2 & (1 << WRONG_WAY))) 
+        final_detections += 1 << WRONG_WAY;
+
+    if(((p_detections_1 & (1 << CROSSING)) != 0) || (p_detections_2 & (1 << CROSSING))) 
+        final_detections += 1 << CROSSING;
+
+    return final_detections;
+}
+
+int detect_signs(cv::Mat &p_img, std::vector<cv::Mat> &p_templates)
 {
 
     cv::Mat hsv_image;
     cv::Mat dark_red_mask, bright_red_mask;
     cv::Mat white_mask, black_mask;
+    int dark_detected = 0, bright_detected = 0;
 
     std::atomic<int32_t> detection_number = 0;
     float best_score = 0;
@@ -113,8 +164,8 @@ float detect_gw_cv(cv::Mat &p_img, std::vector<cv::Mat> &p_templates)
     // on avg 15.8508 milis
     // 16.36
     // 17.45
-    detect_gw_thread(&p_img, &bright_red_mask, &white_mask, &black_mask, &detection_number, &p_templates);
-    detect_gw_thread(&p_img, &dark_red_mask, &white_mask, &black_mask, &detection_number, &p_templates);
+    bright_detected = detect_thread(&p_img, &bright_red_mask, &white_mask, &black_mask, &detection_number, &p_templates);
+    dark_detected = detect_thread(&p_img, &dark_red_mask, &white_mask, &black_mask, &detection_number, &p_templates);
 
     // 14.12 milis
     // 14.09 milis
@@ -125,7 +176,6 @@ float detect_gw_cv(cv::Mat &p_img, std::vector<cv::Mat> &p_templates)
     // bright_red_gw_thread.join();
     // dark_red_gw_thread.join();
 
-    std::cout << "detection number:" << detection_number << std::endl;
     #ifdef PRINT_STATS
     // print all signs found
         // std::string img_desc = "Found " + std::to_string(detection_number) + " gw signs";
@@ -134,7 +184,7 @@ float detect_gw_cv(cv::Mat &p_img, std::vector<cv::Mat> &p_templates)
         // cv::putText(p_img, img_desc, desc_pt, 1, 3, cv::Scalar(0, 255, 0), 3);   
     #endif
 
-    return detection_number;
+    return merge_detections(bright_detected, dark_detected);
 }
 
 //todo intersection over union

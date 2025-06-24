@@ -44,9 +44,11 @@ void get_dark_red_mask(cv::Mat &p_hsv_img, cv::Mat &p_red_pixels);
 
 /// @brief gets a mask of the red pixels in the image, aplies erosion to it, 
 /// gets all the connex components in the mask using an opencv function and if they are big enough 
-/// tries to find a give way sign in the current connex components
+/// tries to find all supported signs in the current connex components
 /// @param p_img the rgb image to try to find give way sign in 
-/// @return the best score found in the img
-float detect_gw_cv(cv::Mat &p_img, std::vector<cv::Mat> &templates);
+/// @return the signs found in the img
+int detect_signs(cv::Mat &p_img, std::vector<cv::Mat> &templates);
+
+void print_detections(int p_detections);
 
 #endif

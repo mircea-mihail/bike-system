@@ -73,12 +73,10 @@ void detect_dir_images(std::string p_input_dir)
 			cv::resize(image, image, cv::Size(image_size));
 
 			std::chrono::time_point start = std::chrono::high_resolution_clock::now();
-			float score = detect_gw_cv(image, templates);
+			int signs_found = detect_signs(image, templates);
 			std::chrono::time_point end = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> duration = end - start;
 
-			avg_score += score;
-			scored_images_count += 1 ? score > 0 : 0;
 			avg_duration += duration.count();
 
 			images_cout ++;
@@ -89,8 +87,6 @@ void detect_dir_images(std::string p_input_dir)
         }
     }
 	std::cout << "\nOn average it took " << avg_duration / images_cout << " milis\n";
-	std::cout << "Avg score:" << avg_score / scored_images_count << std::endl;
-	std::cout << "detected " << scored_images_count << " images" << std::endl;
 
 }
 
@@ -111,9 +107,7 @@ void detect_from_name(std::string p_image_name)
 
 	std::chrono::time_point start = std::chrono::high_resolution_clock::now();
 
-	uint32_t gw_detected = detect_gw_cv(image, templates);
-
-	std::cout << "found " << gw_detected << " give way signs" << std::endl;
+	int signs = detect_signs(image, templates);
 
 	std::chrono::time_point end = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double, std::milli> duration = end - start;
@@ -123,7 +117,7 @@ void detect_from_name(std::string p_image_name)
 	show_pic(image);
 }
 
-float detect_pic(cv::Mat &p_pic, std::vector<cv::Mat> &p_templates)
+int detect_pic(cv::Mat &p_pic, std::vector<cv::Mat> &p_templates)
 {
 	std::vector<cv::Mat> templates;
 	load_templates(templates);
@@ -133,26 +127,13 @@ float detect_pic(cv::Mat &p_pic, std::vector<cv::Mat> &p_templates)
 
 	std::chrono::time_point start = std::chrono::high_resolution_clock::now();
 
-	float score = detect_gw_cv(p_pic, templates);
+	int signs = detect_signs(p_pic, templates);
 
 	std::chrono::time_point end = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double, std::milli> duration = end - start;
 
-
-	if(score)
-	{
-		std::cout << "detect gw took " << duration.count() << " ms" << std::endl;
-
-		#ifdef PRINT_STATS
-			std::string img_desc = "Detection took " + std::to_string(int(duration.count())) + " millis";
-			cv::Point desc_pt(10, 80);
-			cv::putText(p_pic, img_desc, desc_pt, 1, 3, cv::Scalar(0, 0, 0), 7);   
-			cv::putText(p_pic, img_desc, desc_pt, 1, 3, cv::Scalar(0, 255, 0), 3);   
-		#endif
-	}
-
 	// show_pic(p_pic, "img");
-	return score;
+	return signs;
 }
 
 int take_picture(cv::Mat &p_pic, cv::VideoCapture &p_camera)
@@ -247,16 +228,19 @@ void detection_loop()
 			std::chrono::duration<double, std::milli> take_pic_duration = take_pic_end - take_pic_start;
 			cv::medianBlur(pic, pic, 3);
 
-			float detection_score = detect_pic(pic, templates);
+			int signs_found = detect_pic(pic, templates);
 
-			maybe_idx = detection_score > 0 ? maybe_idx+1 : 0;
-
-			if(maybe_idx >= MIN_MAYBE_IDX)
+			// todo 
+			// maybe_idx = detection_score > 0 ? maybe_idx+1 : 0;
+			// if(maybe_idx >= MIN_MAYBE_IDX)
+			if(signs_found != 0)
 			{
+				std::cout << "\tdetections found in pic:" << std::endl;
+				print_detections(signs_found);
+
 				std::cout << "take picture took " << take_pic_duration.count() << " ms" << std::endl;
 				// show_pic(pic);
 				save_pic(pic, output_dir, pic_idx);
-
 				pic_idx ++;
 			}
 
@@ -295,7 +279,7 @@ int main(int argc, char** argv)
 	std::vector<cv::Mat> template_vector;
 	load_templates(template_vector);
 
-	// detection_loop();
+	detection_loop();
 
 	// if (argc != 2) { 
 	// 	printf("usage: main_detect <Images Dir>\n"); 
@@ -303,6 +287,6 @@ int main(int argc, char** argv)
 	// } 
 	// detect_dir_images(argv[1]);
 
-	detect_from_name(argv[1]);
+	// detect_from_name(argv[1]);
 	return 0; 
 }
