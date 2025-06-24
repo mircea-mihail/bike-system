@@ -4,6 +4,11 @@
 #include <chrono>
 #include <thread>
 
+// serial
+#include <fcntl.h>
+#include <termios.h>
+#include <unistd.h>
+
 #include <filesystem>
 
 #include "utility.h"
@@ -158,6 +163,54 @@ void save_pic(cv::Mat &p_pic, std::string p_output_dir, int32_t p_pic_idx)
 	cv::imwrite(p_output_dir + std::to_string(p_pic_idx) + ".jpg", pic_to_save);
 }
 
+int get_most_important_sign(int p_detections)
+{
+    if((p_detections & (1 << STOP)) != 0) 
+		return STOP;
+
+    if((p_detections & (1 << GIVE_WAY)) != 0) 
+		return GIVE_WAY;
+
+    if((p_detections & (1 << CROSSING)) != 0) 
+		return CROSSING;
+
+    if((p_detections & (1 << NO_BIKES)) != 0) 
+		return NO_BIKES;
+
+    if((p_detections & (1 << WRONG_WAY)) != 0) 
+		return WRONG_WAY;
+
+	return NO_SIGN;
+}
+
+void configure_serial(termios &options, int fd)
+{
+    tcgetattr(fd, &options);
+
+    // Set baud rate 
+    cfsetispeed(&options, B9600);
+    cfsetospeed(&options, B9600);
+
+    // 8 data bits, no parity, 1 stop bit (8N1)
+    options.c_cflag &= ~PARENB; // no parity
+    options.c_cflag &= ~CSTOPB; // 1 stop bit
+    options.c_cflag &= ~CSIZE; 
+    options.c_cflag |= CS8;     // 8 bits
+
+    // Disable hardware flow control
+    options.c_cflag &= ~CRTSCTS;
+
+    // Enable receiver, ignore modem control lines
+    options.c_cflag |= (CLOCAL | CREAD);
+
+    // Raw input/output mode
+    options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+    options.c_iflag &= ~(IXON | IXOFF | IXANY);
+    options.c_oflag &= ~OPOST;
+
+    // Apply settings
+    tcsetattr(fd, TCSANOW, &options);
+}
 
 void detection_loop()
 {
@@ -167,6 +220,22 @@ void detection_loop()
 		camera.options->video_width=IMAGE_WIDTH;
 		camera.options->video_height=IMAGE_HEIGHT;
 		camera.options->verbose=false;
+
+
+		const char* serial_port = "/dev/serial0"; // change if needed, e.g. /dev/ttyS0 or /dev/ttyAMA0
+
+		// Open serial port for read/write, not controlling terminal, no delay
+		int fd = open(serial_port, O_RDWR | O_NOCTTY | O_NDELAY);
+		if (fd == -1) {
+			std::cerr << "Failed to open " << serial_port << "\n";
+			return 1;
+		}
+
+		// Configure serial port
+		struct termios options;
+
+		configure_serial(options);
+
 	#else
 		// for USB cameras
 		cv::VideoCapture camera(0);
@@ -237,10 +306,21 @@ void detection_loop()
 			{
 				std::cout << "\tdetections found in pic:" << std::endl;
 				print_detections(signs_found);
+				int sign_to_send = get_most_important_sign(signs_found);
+
+				#ifdef IN_RASPI
+					std::string message = std::to_string(sign_to_send) + "\n";
+					ssize_t bytes_written = write(fd, message.c_str(), message.size());
+
+					if (bytes_written < 0) {
+						std::cerr << "Failed to write to serial port\n";
+					}
+					std::cout << "Wrote " << message << " to " << serial_port << "\n";
+				#endif
 
 				std::cout << "take picture took " << take_pic_duration.count() << " ms" << std::endl;
 				// show_pic(pic);
-				save_pic(pic, output_dir, pic_idx);
+				// save_pic(pic, output_dir, pic_idx);
 				pic_idx ++;
 			}
 
@@ -251,7 +331,7 @@ void detection_loop()
 				control_pic_start = std::chrono::high_resolution_clock::now();
 				std::cout << "took control pic..." << std::endl;
 
-				save_pic(pic, ctrl_output_dir, ctrl_pic_idx);
+				// save_pic(pic, ctrl_output_dir, ctrl_pic_idx);
 				ctrl_pic_idx ++;
 			}
 
