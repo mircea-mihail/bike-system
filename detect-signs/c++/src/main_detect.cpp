@@ -216,15 +216,17 @@ void detection_loop()
 		// try to open the video until you can
 		while (!camera.isOpened()) {
 			cv::VideoCapture cap("/dev/video2");
+			std::cout << "failed to video capture" << std::endl;
 			sleep(0.1);
 		}
 		
 		const char* serial_port = "/dev/serial0"; 
 		// Open serial port for read/write, not controlling terminal, no delay
 		int fd = open(serial_port, O_RDWR | O_NOCTTY | O_NDELAY);
-		if (fd == -1) {
-			std::cerr << "Failed to open " << serial_port << "\n";
-			return 1;
+		while (fd == -1) {
+			fd = open(serial_port, O_RDWR | O_NOCTTY | O_NDELAY);
+			std::cout << "failed to open serial" << std::endl;
+			sleep(0.1);
 		}
 		struct termios options;
 		configure_serial(options, fd);
