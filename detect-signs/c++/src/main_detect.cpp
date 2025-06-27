@@ -14,10 +14,6 @@
 #include "utility.h"
 #include "detect_signs.h"
 
-#ifdef IN_RASPI
-	#include <lccv.hpp>
-#endif
-
 void load_templates(std::vector<cv::Mat> &p_templates)
 {
 	cv::Mat buf = cv::imread(std::string(STOP_PATH), cv::IMREAD_COLOR);
@@ -215,27 +211,23 @@ void configure_serial(termios &options, int fd)
 void detection_loop()
 {
 	#ifdef IN_RASPI
-		lccv::PiCamera camera;
+		cv::VideoCapture camera("/dev/video2");
+
+		// try to open the video until you can
+		while (!camera.isOpened()) {
+			cv::VideoCapture cap("/dev/video2");
+			sleep(0.1);
+		}
 		
-		camera.options->video_width=IMAGE_WIDTH;
-		camera.options->video_height=IMAGE_HEIGHT;
-		camera.options->verbose=false;
-
-
-		const char* serial_port = "/dev/serial0"; // change if needed, e.g. /dev/ttyS0 or /dev/ttyAMA0
-
+		const char* serial_port = "/dev/serial0"; 
 		// Open serial port for read/write, not controlling terminal, no delay
 		int fd = open(serial_port, O_RDWR | O_NOCTTY | O_NDELAY);
 		if (fd == -1) {
 			std::cerr << "Failed to open " << serial_port << "\n";
 			return 1;
 		}
-
-		// Configure serial port
 		struct termios options;
-
 		configure_serial(options);
-
 	#else
 		// for USB cameras
 		cv::VideoCapture camera(0);
@@ -262,12 +254,8 @@ void detection_loop()
 	std::string output_dir = std::string(LOG_PIC_PATH).append("/detections/");
 	std::string ctrl_output_dir = std::string(LOG_PIC_PATH).append("/control/");
 
-	#ifdef IN_RASPI
-		camera.startVideo();
-	#endif
 	while(true)
 	{
-
 		if (! std::filesystem::exists(output_dir)) 
 		{
 			if (! std::filesystem::create_directory(output_dir))
@@ -287,11 +275,7 @@ void detection_loop()
 
 		std::chrono::time_point take_pic_start = std::chrono::high_resolution_clock::now();
 
-		#ifdef IN_RASPI
-			if(camera.getVideoFrame(pic, 1000))
-		#else
-			if(take_picture(pic, camera) == 0)
-		#endif
+		if(take_picture(pic, camera) == 0)
 		{
 			std::chrono::time_point take_pic_end = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> take_pic_duration = take_pic_end - take_pic_start;
@@ -347,11 +331,7 @@ void detection_loop()
 			}
 		}
 	}
-	#ifdef IN_RASPI
-		camera.stopVideo();
-	#else
-		camera.release();
-	#endif
+	camera.release();
 }
 
 int main(int argc, char** argv) 
