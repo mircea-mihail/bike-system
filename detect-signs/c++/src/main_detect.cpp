@@ -219,6 +219,12 @@ void detection_loop()
 			std::cout << "failed to video capture" << std::endl;
 			sleep(0.1);
 		}
+		// warm up the camera a little
+		cv::Mat temp;
+		for (int i = 0; i < 10; ++i) {
+			camera.read(temp);
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		}
 		
 		const char* serial_port = "/dev/serial0"; 
 		// Open serial port for read/write, not controlling terminal, no delay
