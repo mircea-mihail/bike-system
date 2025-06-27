@@ -227,7 +227,7 @@ void detection_loop()
 			return 1;
 		}
 		struct termios options;
-		configure_serial(options);
+		configure_serial(options, fd);
 	#else
 		// for USB cameras
 		cv::VideoCapture camera(0);
