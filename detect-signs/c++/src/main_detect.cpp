@@ -219,7 +219,7 @@ void detection_loop()
 
 		// try to open the video until you can
 		while (!camera.isOpened()) {
-			cv::VideoCapture cap("/dev/video2");
+			camera("/dev/video2");
 			std::cout << "failed to video capture" << std::endl;
 			sleep(0.1);
 		}
