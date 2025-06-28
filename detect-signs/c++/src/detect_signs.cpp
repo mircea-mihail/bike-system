@@ -164,17 +164,35 @@ int detect_signs(cv::Mat &p_img, std::vector<cv::Mat> &p_templates)
     // on avg 15.8508 milis
     // 16.36
     // 17.45
-    bright_detected = detect_thread(&p_img, &bright_red_mask, &white_mask, &black_mask, &detection_number, &p_templates);
-    dark_detected = detect_thread(&p_img, &dark_red_mask, &white_mask, &black_mask, &detection_number, &p_templates);
+    // bright_detected = detect_thread(&p_img, &bright_red_mask, &white_mask, &black_mask, &detection_number, &p_templates);
+    // dark_detected = detect_thread(&p_img, &dark_red_mask, &white_mask, &black_mask, &detection_number, &p_templates);
 
     // 14.12 milis
     // 14.09 milis
     // 17.94
     // parralel?
-    // std::thread bright_red_gw_thread(detect_gw_thread, &p_img, &bright_red_mask, &white_mask, &black_mask, &detection_number, &p_templates);
-    // std::thread dark_red_gw_thread(detect_gw_thread, &p_img, &dark_red_mask, &white_mask, &black_mask, &detection_number, &p_templates);
-    // bright_red_gw_thread.join();
-    // dark_red_gw_thread.join();
+
+    std::promise<int> bright_promise;
+    std::future<int> bright_future = bright_promise.get_future();
+    std::promise<int> dark_promise;
+    std::future<int> dark_future = dark_promise.get_future();
+
+	int result;
+    std::thread bright_red_gw_thread([&]() {
+        result = detect_thread(&p_img, &bright_red_mask, &white_mask, &black_mask, &detection_number, &p_templates);
+        bright_promise.set_value(result);
+    });
+
+    std::thread dark_red_gw_thread([&]() {
+        result = detect_thread(&p_img, &dark_red_mask, &white_mask, &black_mask, &detection_number, &p_templates);
+        dark_promise.set_value(result);
+    });
+
+    bright_red_gw_thread.join();
+    dark_red_gw_thread.join();
+
+	bright_detected = bright_future.get();
+	dark_detected = dark_future.get();
 
     #ifdef PRINT_STATS
     // print all signs found

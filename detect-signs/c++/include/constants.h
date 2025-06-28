@@ -130,8 +130,8 @@ struct crossing_chunk
 };
 
 ///////////////////////////////// tweak-able constants
-#define PRINT_STATS
-// #define IN_RASPI
+// #define PRINT_STATS
+#define IN_RASPI
 
 #define LOG_PIC_PATH "/home/mircea/.bike-sys-data"
 #define STOP_PATH "./templates/stop_100.png"

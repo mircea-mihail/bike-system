@@ -6,6 +6,7 @@
 #include <fstream>
 #include <thread>
 #include <atomic>
+#include <future>
 
 #include "constants.h"
 #include "utility.h"

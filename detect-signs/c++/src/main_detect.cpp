@@ -211,7 +211,13 @@ void configure_serial(termios &options, int fd)
 void detection_loop()
 {
 	#ifdef IN_RASPI
-		cv::VideoCapture camera("/dev/video2");
+		cv::VideoCapture camera(
+		  "libcamerasrc ! "
+		  "video/x-raw,width=1280,height=960,framerate=30/1 ! "
+		  "videoconvert ! "
+		  "appsink drop=true max-buffers=1"
+		);
+		// cv::VideoCapture camera("libcamerasrc ! video/x-raw,width=1280,height=960,framerate=30/1 ! videoconvert ! appsink");
 
 		camera.set(cv::CAP_PROP_FRAME_WIDTH, IMAGE_WIDTH);
 		camera.set(cv::CAP_PROP_FRAME_HEIGHT, IMAGE_HEIGHT);
