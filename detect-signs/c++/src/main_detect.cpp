@@ -316,8 +316,14 @@ void detection_loop()
 				#endif
 
 				std::cout << "take picture took " << take_pic_duration.count() << " ms" << std::endl;
+				std::chrono::duration<double, std::milli> detect_duration = std::chrono::high_resolution_clock::now() - take_pic_start;
+				std::cout << "detection took " << detect_duration.count() << " ms" << std::endl;
+
 				// show_pic(pic);
-				// save_pic(pic, output_dir, pic_idx);
+				save_pic(pic, output_dir, pic_idx);
+				std::chrono::duration<double, std::milli> store_duration = std::chrono::high_resolution_clock::now() - take_pic_start;
+				std::cout << "storing to flash took " << store_duration.count() << " ms" << std::endl;
+	
 				pic_idx ++;
 			}
 
@@ -328,7 +334,7 @@ void detection_loop()
 				control_pic_start = std::chrono::high_resolution_clock::now();
 				std::cout << "took control pic..." << std::endl;
 
-				// save_pic(pic, ctrl_output_dir, ctrl_pic_idx);
+				save_pic(pic, ctrl_output_dir, ctrl_pic_idx);
 				ctrl_pic_idx ++;
 			}
 
