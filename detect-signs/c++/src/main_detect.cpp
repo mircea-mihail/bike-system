@@ -219,7 +219,7 @@ void detection_loop()
 
 		// try to open the video until you can
 		while (!camera.isOpened()) {
-			camera("/dev/video2");
+			camera.open("/dev/video2");
 			std::cout << "failed to video capture" << std::endl;
 			sleep(0.1);
 		}
@@ -289,6 +289,7 @@ void detection_loop()
 
 		if(take_picture(pic, camera) == 0)
 		{
+			std::cout << "took pic" << std::endl;
 			std::chrono::time_point take_pic_end = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> take_pic_duration = take_pic_end - take_pic_start;
 			cv::medianBlur(pic, pic, 3);
@@ -342,6 +343,7 @@ void detection_loop()
 				current_iteration = 0;
 			}
 		}
+		else std::cout << "failed to take pic" << std::endl;
 	}
 	camera.release();
 }
