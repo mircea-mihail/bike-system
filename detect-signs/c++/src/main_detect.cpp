@@ -213,6 +213,10 @@ void detection_loop()
 	#ifdef IN_RASPI
 		cv::VideoCapture camera("/dev/video2");
 
+		camera.set(cv::CAP_PROP_FRAME_WIDTH, IMAGE_WIDTH);
+		camera.set(cv::CAP_PROP_FRAME_HEIGHT, IMAGE_HEIGHT);
+		camera.set(cv::CAP_PROP_FPS, 30); 
+
 		// try to open the video until you can
 		while (!camera.isOpened()) {
 			cv::VideoCapture cap("/dev/video2");
