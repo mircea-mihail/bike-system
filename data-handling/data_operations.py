@@ -18,14 +18,8 @@ def getVelocityList(momentMicrosList):
 
     velocityList = np.zeros(tripLength)
 
-    # velocity is distance over speed
-    if momentMicrosList[0] * MMPUS_TO_KMPH != 0:
-        velocityList[0] = BIKE_WHEEL_PERIMETER_MM / momentMicrosList[0] * MMPUS_TO_KMPH
-    else:
-        velocityList[0] = 0
-
     for i in range(1, tripLength):
-        velocityList[i] = BIKE_WHEEL_PERIMETER_MM / (momentMicrosList[i] - momentMicrosList[i-1]) * MMPUS_TO_KMPH
+        velocityList[i-1] = BIKE_WHEEL_PERIMETER_MM / (momentMicrosList[i] - momentMicrosList[i-1]) * MMPUS_TO_KMPH
 
     return velocityList
 
@@ -84,6 +78,9 @@ def findNumberOfSavedTrips():
     return len(tripFiles)
 
 def back_up_data(sd_path):
+    allFiles = os.listdir(sd_path)
+    dataFiles = [file for file in allFiles if MAIN_DATA_FILE_NAME in file]
+
     if not(Path(BACKUP_SAVE_LOCATION).exists()):
         os.makedirs(BACKUP_SAVE_LOCATION)
 
@@ -95,9 +92,6 @@ def back_up_data(sd_path):
         current_backup_dir = str(max(int_backup_dirs) + 1)
 
     os.makedirs(os.path.join(BACKUP_SAVE_LOCATION, current_backup_dir))
-
-    allFiles = os.listdir(sd_path)
-    dataFiles = [file for file in allFiles if MAIN_DATA_FILE_NAME in file]
 
     for dataFileName in dataFiles:
         src_file_path = os.path.join(sd_path, dataFileName)
