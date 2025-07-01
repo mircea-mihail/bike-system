@@ -225,9 +225,14 @@ void detection_loop()
 
 		// try to open the video until you can
 		while (!camera.isOpened()) {
-			camera.open("/dev/video2");
+			sleep(3);
 			std::cout << "failed to video capture" << std::endl;
-			sleep(0.1);
+			camera.open(
+			  "libcamerasrc ! "
+			  "video/x-raw,width=1280,height=960,framerate=30/1 ! "
+			  "videoconvert ! "
+			  "appsink drop=true max-buffers=1"
+			);
 		}
 		// warm up the camera a little
 		cv::Mat temp;
@@ -240,9 +245,9 @@ void detection_loop()
 		// Open serial port for read/write, not controlling terminal, no delay
 		int fd = open(serial_port, O_RDWR | O_NOCTTY | O_NDELAY);
 		while (fd == -1) {
-			fd = open(serial_port, O_RDWR | O_NOCTTY | O_NDELAY);
+			sleep(3);
 			std::cout << "failed to open serial" << std::endl;
-			sleep(0.1);
+			fd = open(serial_port, O_RDWR | O_NOCTTY | O_NDELAY);
 		}
 		struct termios options;
 		configure_serial(options, fd);
@@ -295,7 +300,7 @@ void detection_loop()
 
 		if(take_picture(pic, camera) == 0)
 		{
-			std::cout << "took pic" << std::endl;
+			// std::cout << "took pic" << std::endl;
 			std::chrono::time_point take_pic_end = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> take_pic_duration = take_pic_end - take_pic_start;
 			cv::medianBlur(pic, pic, 3);
