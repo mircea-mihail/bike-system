@@ -211,29 +211,39 @@ void configure_serial(termios &options, int fd)
 void detection_loop()
 {
 	#ifdef IN_RASPI
-		cv::VideoCapture camera(
-		  "libcamerasrc ! "
-		  "video/x-raw,width=1280,height=960,framerate=30/1 ! "
-		  "videoconvert ! "
-		  "appsink drop=true max-buffers=1"
-		);
-		// cv::VideoCapture camera("libcamerasrc ! video/x-raw,width=1280,height=960,framerate=30/1 ! videoconvert ! appsink");
+		//  try boot the camera until it works
+		bool opened_camera = false;
+		cv::VideoCapture camera;
+
+		while(!opened_camera)
+		{
+			try
+			{
+				do{
+					sleep(3);
+					std::cout << "failed to video capture" << std::endl;
+					camera.open(
+						"libcamerasrc ! "
+						"video/x-raw,width=1280,height=960,framerate=30/1 ! "
+						"videoconvert ! "
+						"appsink drop=true max-buffers=1"
+					);
+				} while(!camera.isOpened());
+				opened_camera = true;
+			}
+			catch (const std::exception &e) 
+			{
+				std::cerr << "Exception caught: " << e.what() << std::endl;
+				sleep(3);
+				opened_camera = false;
+			}
+		}
 
 		camera.set(cv::CAP_PROP_FRAME_WIDTH, IMAGE_WIDTH);
 		camera.set(cv::CAP_PROP_FRAME_HEIGHT, IMAGE_HEIGHT);
 		camera.set(cv::CAP_PROP_FPS, 30); 
 
-		// try to open the video until you can
-		while (!camera.isOpened()) {
-			sleep(3);
-			std::cout << "failed to video capture" << std::endl;
-			camera.open(
-			  "libcamerasrc ! "
-			  "video/x-raw,width=1280,height=960,framerate=30/1 ! "
-			  "videoconvert ! "
-			  "appsink drop=true max-buffers=1"
-			);
-		}
+
 		// warm up the camera a little
 		cv::Mat temp;
 		for (int i = 0; i < 10; ++i) {
