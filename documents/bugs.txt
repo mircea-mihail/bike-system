@@ -1,6 +1,0 @@
-Unsolved:
-	* data filtering not working on mcu
-
-To do next:
-	* display float number
-	* display negative number
