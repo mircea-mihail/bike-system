@@ -1,53 +1,25 @@
-# Bike-System
-This repo is made to track my progress developing a complete bike system for my Elops Speed 500 bike from Dechatlon.
+# Bike System
+This repo tracks my progress developing a three-module bike system for my Elops Speed 500 bike from Decathlon. It is able to warn the cyclist in real time of 5 important traffic signs using the bike camera module, display real time movement metrics using the magnetic sensor on the wheel via the bike calculator module and a third component can analyse data stored on a microSD by plotting graphs enabled by a python 3 script.    
+<p align="center">
+	<img src="documents/github-images/high-level-diagram.png" alt="high-lvl-diagram" width="75%">
+</p>
 
-## Original goal of the project
-My goal is to have a bike calculator that tracks your speed, acceleration, turning, breaking and everything else. Then, it uses this information to: turn on turn signals, light up break lights and display relevant information on an E-Ink display.
+## The Bike Camera
+The Bike Camera is able to detect 5 important street signs in real time: Pedestrian crossing, Give way, No bikes, Stop and Wrong way.
 
-I also want a nice user interface, with buttons / encoders to control an interactive menu and separate buttons to manually turn on turn signals (Overriding the automatic one).
+<p align="center">
+  <img src="documents/github-images/street-signs/crossing.png"   alt="crossing-sign"   height="330">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="documents/github-images/street-signs/give-way.png"   alt="give-way-sign"  height="330">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="documents/github-images/street-signs/no-bikes.png"   alt="no-bikes-sign"  height="330">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="documents/github-images/street-signs/stop.png"       alt="stop-sign"      height="330">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="documents/github-images/street-signs/wrong-way.png"  alt="wrong-way-sign" height="330">
+</p>
 
-I'd also like to add automatic charging using the wheel's momentum in order to avoid manually removing and charging the battery.
-
-## Current state of the project
-Although the project ended up a little different compared to the initial plan, it still retained the main shape envisioned in the beggining.
-Right now the project is split into 3 main parts: 
-* the real time bike calculator, showing information about the current trip
-* the data analysis part that involves storing data from every trip and drawing conclusions from it
-* the sign detection and behaviour analysis
-
-### Real Time Bike Calculator
-The code for this part is C++. It involves reading data from the sensor on the wheel, writing it to an SD Card and regurarly displaying it on the E-Paper screen. I would also say that the casing for the project fits here.
-
-#### Main goal
-* it needs to be reliable and fast (solder some connections in for better reliability)
-* display real-time trip data in a nice and readable fashion
-* the case needs to be sturdy and easy to carry
-* the buttons need to be reliable (maybe replace the current buttons)
-* add a rechargeable battery and charge it from usb
-* design and order a custom PCB and a new 3D printed case for it
-
-### Data Analisys
-This is written in Python. This part re-structures the data stored on the SD in trip files and shows some interesting graphs to better visualise some aspects of the trip.
-
-#### Main goal
-* organise the collected data
-* display said data and draw interesting conclusions
-* compute averages 
-* observe behaviour and tendecies
-* can you classify trips using key features? Interesting classes and features:
-	- potential classes: 
-		* going to work
-		* coming from work
-		* going to university
-		* going to gym
-		* coming back from gym
-	- potential features: 
-		* length of trip
-		* number of stops
-		* average speed
-		* acceleration spikes
-		* deceleration spikes
-		* velocity evolution during trip (am I faster in the beginning and slower at the end?)
+The detections happen in real time, about 5 photos are taken and processed every second. 
 
 ### Sign Detection and Behaviour analiysis
 Detect street signs in real time and store the moment of detection in a csv file. Look at the velocity evolution after seeing key street signs and observe behaviour. This part is a mix between the real time calculator and the data analisys. 
