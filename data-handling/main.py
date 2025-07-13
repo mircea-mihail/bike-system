@@ -1,4 +1,3 @@
-# %%
 import os
 
 import numpy as np
@@ -14,16 +13,15 @@ from data_printing import *
 
 
 
-# %%
-back_up_data(BIKE_DATA_PATH)
+try:
+    back_up_data(BIKE_DATA_PATH)
 
-# %%
-#   * split the collected data into trips (data is stored in equally sized chunks)
-#   * delete everything on the sd card to make room for new data
-#   * print facts about the new trips
-
-extractDataFromSD(BIKE_DATA_PATH)
-
+    #   * split the collected data into trips (data is stored in equally sized chunks)
+    #   * delete everything on the sd card to make room for new data
+    #   * print facts about the new trips
+    extractDataFromSD(BIKE_DATA_PATH)
+except:
+    print("no sd found")
 # %%
 # run this to plot:
 #   * the latest two trips speed evolution (big picture)
@@ -37,6 +35,9 @@ PAST_TRIPS_TO_SHOW = 4
 
 TRIP_TO_SHOW = 2
 OUTPUT_DIR = "./graphs"
+
+LABEL_FONTSIZE = 14
+TITLE_FONTSIZE = 18
 
 if not(Path(OUTPUT_DIR).exists()):
     os.makedirs(OUTPUT_DIR)
@@ -52,15 +53,14 @@ tripCsv = pd.read_csv(TRIP_SAVE_LOCATION + tripFiles[0])
 velocityList = getVelocityList(tripCsv['detection time micros'])
 velocityListLen = len(velocityList)
 
-
 distanceList = np.linspace(0, velocityListLen, velocityListLen)
 distanceList = [distMarker * (BIKE_WHEEL_PERIMETER_MM / MM_TO_KM) for distMarker in distanceList]
 
 plt.subplot(FIGURE_ROWS, FIGURE_COLS, 1)
 plt.plot(distanceList, velocityList, color="purple")
-plt.xlabel("distance (KM)")
-plt.ylabel("velocity (KM/H)")
-plt.title("last trip")
+plt.xlabel("Distance (KM)", fontsize=LABEL_FONTSIZE)
+plt.ylabel("Velocity (KM/H)", fontsize=LABEL_FONTSIZE)
+plt.title("Last trip", fontsize=TITLE_FONTSIZE)
 plt.axhline(0, color="black")
 
 tripCsv = pd.read_csv(TRIP_SAVE_LOCATION + tripFiles[1])
@@ -71,9 +71,9 @@ distanceList = [distMarker * (BIKE_WHEEL_PERIMETER_MM / MM_TO_KM) for distMarker
 
 plt.subplot(FIGURE_ROWS, FIGURE_COLS, 2)
 plt.plot(distanceList, velocityList, color="purple")
-plt.xlabel("distance (KM)")
-plt.ylabel("velocity (KM/H)")
-plt.title("the run before")
+plt.xlabel("Distance (KM)", fontsize=LABEL_FONTSIZE)
+plt.ylabel("Velocity (KM/H)", fontsize=LABEL_FONTSIZE)
+plt.title("The run before", fontsize=TITLE_FONTSIZE)
 plt.axhline(0, color="black")
 
 plt.subplots_adjust(hspace=0.4)
@@ -85,7 +85,7 @@ plt.close()
 SUB_FIGURE_COLS = 2
 SUB_FIGURE_ROWS = 2
 
-figure(figsize=(15, 4), dpi=FILE_DPI)
+figure(figsize=(15, 5), dpi=FILE_DPI)
 
 trips_to_show = len(tripFiles) - 2
 for i in range(0, PAST_TRIPS_TO_SHOW):
@@ -98,9 +98,9 @@ for i in range(0, PAST_TRIPS_TO_SHOW):
 
     plt.subplot(SUB_FIGURE_ROWS, SUB_FIGURE_COLS, i + 1)
     plt.plot(distanceList, velocityList, color="purple")
-    plt.xlabel("distance (KM)")
-    plt.ylabel("velocity (KM/H)")
-    plt.title(str(i + 2) + " trips before")
+    plt.xlabel("Distance (KM)", fontsize=LABEL_FONTSIZE)
+    plt.ylabel("Velocity (KM/H)", fontsize=LABEL_FONTSIZE)
+    plt.title(str(i + 3) + " trips before", fontsize=TITLE_FONTSIZE)
     plt.axhline(0, color="black")
 
 
@@ -147,24 +147,24 @@ plt.subplot(1, 2, 1)
 mostCommonSpeeds = np.array([speed for speed in speedCounter.most_common(len(speedCounter)) if speed[0] < 50])
 
 plt.bar(mostCommonSpeeds[:, 0], mostCommonSpeeds[:, 1] * BIKE_WHEEL_PERIMETER_MM / MM_TO_KM, width=0.8, color="purple")
-plt.title("velocity distribution accross distance")
-plt.xlabel("velocity (KM/H)")
-plt.ylabel("KM travelled (KM)")
+plt.title("Velocity distribution accross distance", fontsize=TITLE_FONTSIZE)
+plt.xlabel("Velocity (KM/H)", fontsize=LABEL_FONTSIZE)
+plt.ylabel("KM travelled (KM)", fontsize=LABEL_FONTSIZE)
 
 
 plt.subplot(1, 2, 2)
 mostCommonSpeeds = np.array(speedCounter.most_common(10))
 plt.bar(mostCommonSpeeds[:, 0], mostCommonSpeeds[:, 1] * BIKE_WHEEL_PERIMETER_MM / MM_TO_KM, width=0.8, color="purple")
-plt.title("top 10 most common velocities")
-plt.xlabel("velocity (KM/H)")
-plt.ylabel("KM travelled (KM)")
+plt.title("Top 10 most common velocities", fontsize=TITLE_FONTSIZE)
+plt.xlabel("Velocity (KM/H)", fontsize=LABEL_FONTSIZE)
+plt.ylabel("KM travelled (KM)", fontsize=LABEL_FONTSIZE)
 plt.savefig(os.path.join(OUTPUT_DIR, "1-all-time-granular-velocity-distribution.png"), bbox_inches='tight')
 plt.close() 
 
 averageHistogram = averageHistogram / len(tripFiles)
 
 figure(figsize=(6, 6), dpi=FILE_DPI)
-plt.title("Distance traveled at each speed")
+plt.title("Distance traveled at each speed", fontsize=TITLE_FONTSIZE, loc="center")
 patches, labels, autotexts = plt.pie(averageHistogram, labels=binsLables, autopct='%1.2f%%')
 
 # labels[0]._y += 0.1
@@ -198,9 +198,9 @@ tripDistance = [dist * BIKE_WHEEL_PERIMETER_MM / MM_TO_KM for dist in tripDistan
 
 figure(dpi=FILE_DPI)
 plt.scatter(tripDistance, averageTripSpeed, color="purple")
-plt.ylabel("average velocity (KM/H)")
-plt.xlabel("distance travelled (KM)")
-plt.title("trip corelations")
+plt.ylabel("Average velocity (KM/H)", fontsize=LABEL_FONTSIZE)
+plt.xlabel("Distance travelled (KM)", fontsize=LABEL_FONTSIZE)
+plt.title("Trip corelations", fontsize=TITLE_FONTSIZE)
 
 plt.savefig(os.path.join(OUTPUT_DIR, "2-all-time-data-relations.png"), bbox_inches='tight')
 plt.close()  
@@ -243,16 +243,16 @@ FIGURE_ROWS = 2
 figure(figsize=(15, 7), dpi=FILE_DPI)
 plt.subplot(FIGURE_ROWS, FIGURE_COLS, 1)
 plt.plot(distanceList, velocityList, color="purple")
-plt.xlabel("distance (KM)")
-plt.ylabel("velocity (KM/H)")
+plt.xlabel("Distance (KM)", fontsize=LABEL_FONTSIZE)
+plt.ylabel("Velocity (KM/H)", fontsize=LABEL_FONTSIZE)
 plt.axhline(0, color="black")
-plt.title("evolution of velocity in a trip")
+plt.title("Evolution of velocity in a trip", fontsize=TITLE_FONTSIZE)
 
 plt.subplot(FIGURE_ROWS, FIGURE_COLS, 2)
 plt.plot(distanceList, accList, color="purple")
-plt.ylabel("acceleration (m/s^2))")
-plt.xlabel("distance (KM)")
-plt.title("evolution of acceleration in a trip")
+plt.ylabel("Acceleration (m/s^2))", fontsize=LABEL_FONTSIZE)
+plt.xlabel("Distance (KM)", fontsize=LABEL_FONTSIZE)
+plt.title("Evolution of acceleration in a trip", fontsize=TITLE_FONTSIZE)
 plt.axhline(0, color="black")
 # plt.axhline(5, color="red")
 # plt.axhline(2.5, color="orange")
@@ -264,18 +264,18 @@ plt.close()
 figure(figsize=(15, 7), dpi=FILE_DPI)
 plt.subplot(FIGURE_ROWS, FIGURE_COLS, 1)
 plt.scatter(velocityList, accList, s=5, color="purple")
-plt.xlabel("velocity (KM/H)")
-plt.ylabel("acceleration (m/s^2))")
-plt.title("acceleration and velocity")
+plt.xlabel("Velocity (KM/H)", fontsize=LABEL_FONTSIZE)
+plt.ylabel("Acceleration (m/s^2))", fontsize=LABEL_FONTSIZE)
+plt.title("Acceleration and velocity", fontsize=TITLE_FONTSIZE)
 accAverage = sum(accList)/len(accList)
 print("Total acceleration:", accAverage)
 plt.axhline(y=accAverage, color='black', linewidth=1)
 
 plt.subplot(FIGURE_ROWS, FIGURE_COLS, 2)
 plt.scatter(velocityList, deltaVelList, s=5, color="purple")
-plt.xlabel("velocity")
-plt.ylabel("delta V (KM/H)")
-plt.title("change in speed and velocity (KM/H)")
+plt.xlabel("Velocity", fontsize=LABEL_FONTSIZE)
+plt.ylabel("Delta V (KM/H)", fontsize=LABEL_FONTSIZE)
+plt.title("Change in speed and velocity (KM/H)", fontsize=TITLE_FONTSIZE)
 plt.axhline(y=0, color='black', linewidth=1)
 
 plt.subplots_adjust(hspace=0.4)
@@ -286,9 +286,9 @@ plt.close()
 # make every point a slightly different hue
 figure(figsize=(15, 7), dpi=200)
 plt.scatter(velocityList, accList, s=0.5, color="purple")
-plt.xlabel("velocity (KM/H)")
-plt.ylabel("acceleration (m/s^2))")
-plt.title("the most interesting plot")
+plt.xlabel("Velocity (KM/H)", fontsize=LABEL_FONTSIZE)
+plt.ylabel("Acceleration (m/s^2))", fontsize=LABEL_FONTSIZE)
+plt.title("The most interesting plot", fontsize=TITLE_FONTSIZE)
 accAverage = sum(accList)/len(accList)
 print(accAverage)
 plt.axhline(y=accAverage, color='black', linewidth=1)
