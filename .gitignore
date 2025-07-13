@@ -15,5 +15,8 @@ detect-signs/c++/test_images*
 detect-signs/c++/trick_images*
 detect-signs/c++/Makefile
 detect-signs/c++/main_detect
-
 detect-signs/pi-connect
+
+documents/untracked-docs/
+
+data-handling/graphs/
