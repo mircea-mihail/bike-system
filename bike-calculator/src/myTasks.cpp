@@ -324,23 +324,19 @@ void serialCamTask(void *p_args)
     while(true)
     {
 
-        if(Serial.available())
+        // if(Serial.available())
+        if(g_camSerial.available())
         {
-            Serial.println("about to get an int:");
-            signCode = Serial.parseInt();
-            Serial.print("Got: ");
-            Serial.println(signCode);
+            // signCode = Serial.parseInt();
+            signCode = g_camSerial.parseInt();
             if(signCode >= SMALLEST_SIGN_VAL && signCode <= BIGGEST_SIGN_VAL)
             {
-                Serial.println("about to take on the mutex");
                 SignInfo signInfo(millis(), signCode);
                 if (xSemaphoreTake(g_signInfoMutex, portMAX_DELAY))
                 {
-                    Serial.println("sent sign info");
                     g_signInfo = signInfo;
                     xSemaphoreGive(g_signInfoMutex);
                 }
-                Serial.println("done serial loop");
             }
         }
 
