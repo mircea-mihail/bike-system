@@ -15,7 +15,11 @@ detect-signs/c++/test_images*
 detect-signs/c++/trick_images*
 detect-signs/c++/Makefile
 detect-signs/c++/main_detect
+detect-signs/c++/templates/high-rez-versions/
 detect-signs/pi-connect
+
+scripts-and-misc/detect-sign-scripts/view-gw-serial-photo.py
+scripts-and-misc/detect-sign-scripts/single_sign_neighborhood_set/
 
 documents/untracked-docs/
 
