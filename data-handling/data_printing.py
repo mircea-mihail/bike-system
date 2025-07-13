@@ -17,4 +17,6 @@ def printTripData(tripData):
     for idx in range(len(tripData["distanceList"]) - 1, len(tripData["distanceList"]) - distancesToPrint - 1, -1):
         print(round(tripData["distanceList"][idx], 2), end=", ")
 
+    print()
+
 
