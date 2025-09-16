@@ -1,5 +1,5 @@
 # Bike System
-This repo tracks my progress developing a three-module bike system for my Elops Speed 500 bike from Decathlon. It is able to warn the cyclist in real time of 5 important traffic signs using the bike camera module, display real time movement metrics using the magnetic sensor on the wheel via the bike calculator module and a third component can analyse data stored on a microSD by plotting graphs enabled by a Python3 script.
+This repo tracks my progress developing a three-module bike system for my Elops Speed 500 bike from Decathlon, but it was designed to be easily adapted to any other bike. It is able to warn the cyclist in real time of 5 important traffic signs using the bike camera module, display real time movement metrics using the magnetic sensor on the wheel via the bike calculator module and a third component can analyse data stored on a microSD by plotting graphs enabled by a Python3 script.
 
 You can find the original thesis, presentation and final grade in the "./documents/thesis-presentation" directory and <a href="https://docs.google.com/presentation/d/1_chzi4_kqwfPNCdIw6u2Pty6pEz1_2fhgnUXKMC94gg/edit?usp=sharing"><u><b>here</b></u></a> is a link to the final presentation translated in english. 
 
@@ -16,7 +16,9 @@ Below is a diagram with the main high level components of the project, as well a
 </p>
 
 ## The Bike Camera
-The Bike Camera is able to detect 5 important street signs in real time: Presignaling pedestrian crossing, Give way, No entry for bicycles, Stop and No entry. The detections happen in real time: about 5 photos can be taken and processed every second.
+The bike camera is able to detect 5 important street signs in real time: Presignaling pedestrian crossing, Give way, No entry for bicycles, Stop and No entry. The detections happen in real time: about 5 photos can be taken and processed every second.
+
+The main purpose for it is to provide an example of possible modular components within this system, where hardware can be added or removed whether necessary or not, in order to achieve a more compact form factor. The complexity of this component highlights the countless possibilities of what add-ons can bring.
 
 <p align="center">
   <img src="documents/github-images/street-signs/crossing.png"   alt="crossing-sign"   height="290">
