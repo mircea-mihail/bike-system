@@ -15,6 +15,36 @@ Below is a diagram with the main high level components of the project, as well a
 	<img src="documents/github-images/project-as-a-whole/high-level-diagram.png" alt="high-lvl-diagram" width=600>
 </p>
 
+## The Bike Calculator
+
+The bike calculator represents the primary component of this project. Its purpose is to monitor in real time the velocity, average velocity, distance traveled and trip time of the cyclist and display the data on an E-paper display. Everthing is stored to a microSD for retrospective analisys. Two buttons on top of the device can be used to switch between the metrics mentioned.
+
+<details>
+<br>
+<summary> <B>Hardware</B> </summary>
+
+</details>
+
+The main hardware components include:
+  * SparkFun Thing Plus - ESP32 WROOM development board(MCU)
+  * E-paper display, 100 × 100px, 1.54inch 
+  * Hall effect sensor module 
+  * TP4056 charging module
+  * 2 LiPo batteries, 3.7V, 280mAh 
+
+The MCU is assembled on a perforated board among the display, necessary resistors and battery.
+
+
+A connector is designed to plug into a wire mounted near the handlebars which leads to the Hall effect sensor module. It is tied on the fork of the bike, designed to detect the passing of a magnet mounted on the bike wheel. 
+
+<p align="center">
+  <img src="./documents/github-images/hardware/bike-calc-resistors-and-buttons.png" alt="crossing-sign"   height="150">
+  &nbsp;&nbsp;
+  <img src="./documents/github-images/hardware/bike-calc-added-epaper.png" alt="give-way-sign"  height="150">
+  &nbsp;&nbsp;
+  <img src="./documents/github-images/hardware/bike-calc-added-battery.png" alt="no-bikes-sign"  height="150">
+</p>
+
 ## The Bike Camera
 The bike camera is able to detect 5 important street signs in real time: Presignaling pedestrian crossing, Give way, No entry for bicycles, Stop and No entry. The detections happen in real time: about 5 photos can be taken and processed every second.
 
